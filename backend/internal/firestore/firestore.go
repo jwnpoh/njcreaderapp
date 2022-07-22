@@ -20,13 +20,10 @@ type FireStoreRepo struct {
 
 const projectID = "the-njc-reader-244fd"
 
-// const pathToCredentialsFile = "./internal/firestore/the-njc-reader-244fd-firebase-adminsdk-p1f8d-cc6c2575b4.json"
-
 func NewFireStoreRepo() (*FireStoreRepo, error) {
 	godotenv.Load(".env")
 	credentials := os.Getenv("CREDENTIALS")
 	ctx := context.Background()
-	// sa := option.WithCredentialsFile(pathToCredentialsFile)
 	sa := option.WithCredentialsJSON([]byte(credentials))
 
 	app, err := firebase.NewApp(ctx, &firebase.Config{ProjectID: projectID}, sa)
