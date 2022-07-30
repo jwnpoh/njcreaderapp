@@ -11,11 +11,16 @@ import (
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 )
 
-type PscaleDB struct {
+// PScale provides interface for services to connect to the planetscale database.
+type PScale interface {
+	Get(page int) (*core.ArticleSeries, error)
+}
+type pscaleDB struct {
 	DB *sqlx.DB
 }
 
-func NewPscaleDB() (*PscaleDB, error) {
+// NewPscaleDB returns a connection interface for the application to connect to the planetscale database.
+func NewPscaleDB() (PScale, error) {
 	db, err := sqlx.Open("mysql", os.Getenv("DSN"))
 	if err != nil {
 		return nil, fmt.Errorf("unable to initialize pscale database - %w", err)
@@ -27,10 +32,11 @@ func NewPscaleDB() (*PscaleDB, error) {
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(10)
 
-	return &PscaleDB{DB: db}, nil
+	return &pscaleDB{DB: db}, nil
 }
 
-func (pScale *PscaleDB) Get(page int) (*core.ArticleSeries, error) {
+// Get retrieves a slice of 12 articles from the planetscale database with limit and offset in the query.
+func (pScale *pscaleDB) Get(page int) (*core.ArticleSeries, error) {
 	series := make(core.ArticleSeries, 0, 12)
 
 	query := "SELECT * FROM articles ORDER BY id DESC LIMIT 12 OFFSET ?"

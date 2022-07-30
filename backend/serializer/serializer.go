@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// Serializer provides an interface to read and write JSON data passed between server and client.
 type Serializer interface {
 	Encode(w http.ResponseWriter, status int, headers ...http.Header) error
 	// Decode(w http.ResponseWriter, r *http.Request, data any) error
@@ -19,6 +20,7 @@ type serializer struct {
 	Data    any    `json:"data,omitempty"`
 }
 
+// NewSerializer instantiates a new serializer struct to carry out encoding/decoding.
 func NewSerializer(err bool, msg string, data ...any) Serializer {
 	return &serializer{
 		Error:   err,
@@ -27,6 +29,7 @@ func NewSerializer(err bool, msg string, data ...any) Serializer {
 	}
 }
 
+// Encode writes a JSON payload to response writer to return to the client.
 func (s *serializer) Encode(w http.ResponseWriter, status int, headers ...http.Header) error {
 	out, err := json.Marshal(s)
 	if err != nil {
@@ -50,6 +53,7 @@ func (s *serializer) Encode(w http.ResponseWriter, status int, headers ...http.H
 	return nil
 }
 
+// Decode reads a JSON payload from the request into data interface that is specified by the application service.
 func Decode(w http.ResponseWriter, r *http.Request, data any) error {
 	maxBytes := 1048576
 
@@ -69,6 +73,7 @@ func Decode(w http.ResponseWriter, r *http.Request, data any) error {
 	return nil
 }
 
+// ErrorJson writes an error payload back to the client.
 func (s *serializer) ErrorJson(w http.ResponseWriter, err error, status ...int) error {
 	statusCode := http.StatusBadRequest
 

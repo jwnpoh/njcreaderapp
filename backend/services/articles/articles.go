@@ -10,7 +10,7 @@ import (
 )
 
 type articleService struct {
-	db *pscale.PscaleDB
+	db pscale.PScale
 }
 
 // NewArticlesService returns an articleService object to implement methods to interact with Firestore repo.
@@ -31,7 +31,7 @@ func (a *articleService) Get(page int) (serializer.Serializer, error) {
 
 	articles, err := a.db.Get(n)
 	if err != nil {
-		return serializer.NewSerializer(true, fmt.Sprintf("unable to get articles"), nil), err
+		return serializer.NewSerializer(true, "unable to get articles", nil), err
 	}
 
 	return serializer.NewSerializer(false, "hit the broker", articles), nil
