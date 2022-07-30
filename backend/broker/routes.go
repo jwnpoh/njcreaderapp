@@ -27,6 +27,5 @@ func (b *broker) SetupRouter() chi.Router {
 }
 
 func (b *broker) serveRoutes(mux chi.Router) {
-	mux.Get("/api", b.GetLatest)
-	mux.Get("/api/{pager}", b.GetPage)
+	mux.Get("/api/articles/{page}", b.Get)
 }

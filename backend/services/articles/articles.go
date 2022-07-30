@@ -3,62 +3,57 @@ package articles
 import (
 	"fmt"
 
-	fire "github.com/jwnpoh/njcreaderapp/backend/firestore"
-	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
+	"github.com/jwnpoh/njcreaderapp/backend/pscale"
+
+	// "github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/serializer"
 )
 
 type articleService struct {
+	db *pscale.PscaleDB
 }
 
 // NewArticlesService returns an articleService object to implement methods to interact with Firestore repo.
-func NewArticlesService() *articleService {
-	return &articleService{}
+func NewArticlesService() (*articleService, error) {
+	db, err := pscale.NewPscaleDB()
+	if err != nil {
+		return nil, fmt.Errorf("unable to initialize pscale database - %w", err)
+	}
+	return &articleService{db: db}, nil
 }
 
-// Get gets up to 144 documents from Firestore and serves them in pages of 12 articles each.
-func (a *articleService) Get(n ...int) (serializer.Serializer, error) {
-	// check if page argument is passed
-	if len(n) > 1 {
-		return serializer.NewSerializer(true, fmt.Sprintf("faulty request url"), nil), fmt.Errorf("too many params in request url")
+// Get gets up to 12 documents per page from PScale and serves them in pages of 12 articles each.
+func (a *articleService) Get(page int) (serializer.Serializer, error) {
+	n := ((page - 1) * 12)
+	if n < 0 {
+		n = 0
 	}
 
-	articles, err := fire.NewFireStoreRepo().Get()
+	articles, err := a.db.Get(n)
 	if err != nil {
 		return serializer.NewSerializer(true, fmt.Sprintf("unable to get articles"), nil), err
 	}
 
-	data := make([]core.Article, 0, 12)
-
-	// if no page argument passed
-	if len(n) == 0 {
-		for i, j := range *articles {
-			if i > 11 {
-				break
-			}
-			data = append(data, j)
-		}
-		return serializer.NewSerializer(false, "hit the broker", data), nil
-
-	}
-
-	// if page is 2 or more
-	if n[0] > 1 {
-		// implement paging logic
-		startAt := (n[0] - 1) * 12
-		endAt := (n[0] * 12) - 1
-
-		for i, j := range *articles {
-			if i < startAt {
-				continue
-			}
-			if i > endAt {
-				break
-			}
-			data = append(data, j)
-		}
-	}
-	return serializer.NewSerializer(false, "hit the broker", data), nil
-
-	// if page is 1 or 0
+	return serializer.NewSerializer(false, "hit the broker", articles), nil
 }
+
+// func (a *articleService) Store(data core.ArticleSeries) error {
+// 	// go func indexer
+// 	i := indexer.NewIndexer(data)
+// 	index, err := i.Index()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	// send index to firestore
+// 	a.fireStoreRepo.Index(index)
+
+// 	// send to Firestore
+// 	articles := make(core.ArticleSeries, 0, 5)
+// 	articles = append(articles, data...)
+// 	err = a.fireStoreRepo.Store(&articles)
+// 	if err != nil {
+// 		return fmt.Errorf("unable to store articles - %w", err)
+// 	}
+
+// 	return nil
+// }
