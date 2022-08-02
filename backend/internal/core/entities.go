@@ -2,7 +2,7 @@ package core
 
 // Article is the main entity of the app.
 type Article struct {
-	ID          int      `json:"id"`
+	ID          int      `json:"id,omitempty"`
 	Title       string   `json:"title"`
 	URL         string   `json:"url"`
 	Topics      []string `json:"topics"`

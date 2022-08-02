@@ -14,6 +14,8 @@ import (
 // PScale provides interface for services to connect to the planetscale database.
 type PScale interface {
 	Get(page int) (*core.ArticleSeries, error)
+	Store(data *core.ArticleSeries) error
+	GetQns(questions []string) (*[]core.Question, error)
 }
 type pscaleDB struct {
 	DB *sqlx.DB
@@ -36,12 +38,13 @@ func NewPscaleDB() (PScale, error) {
 }
 
 // Get retrieves a slice of 12 articles from the planetscale database with limit and offset in the query.
-func (pScale *pscaleDB) Get(page int) (*core.ArticleSeries, error) {
+func (ps *pscaleDB) Get(offset int) (*core.ArticleSeries, error) {
+
 	series := make(core.ArticleSeries, 0, 12)
 
 	query := "SELECT * FROM articles ORDER BY id DESC LIMIT 12 OFFSET ?"
 
-	rows, err := pScale.DB.Queryx(query, page)
+	rows, err := ps.DB.Queryx(query, offset)
 	if err != nil {
 		return nil, fmt.Errorf("unable to query pscale database - %w", err)
 	}
@@ -62,4 +65,61 @@ func (pScale *pscaleDB) Get(page int) (*core.ArticleSeries, error) {
 	}
 
 	return &series, nil
+}
+
+func (ps *pscaleDB) GetQns(questions []string) (*[]core.Question, error) {
+
+	qns := make([]core.Question, 0)
+
+	query := "SELECT year, number, wording FROM question_list WHERE (question = ?)"
+
+	for _, q := range questions {
+		var qn core.Question
+		err := ps.DB.Get(&qn, query, q)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row to retrieve question %s - %w", q, err)
+		}
+		qns = append(qns, qn)
+	}
+	return &qns, nil
+}
+
+// Store stores a slice of articles sent from the front end admin dashboard via the articles service.
+func (ps *pscaleDB) Store(data *core.ArticleSeries) error {
+
+	for _, article := range *data {
+		tx, err := ps.DB.Begin()
+
+		if err != nil {
+			return fmt.Errorf("unable to begin tx for adding articles input to db - %w", err)
+		}
+		defer tx.Rollback()
+
+		res, err := tx.Exec("INSERT INTO articles (title, url, topics, questions, published_on) VALUES (?, ?, ?, ?, ?)", article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, ","), article.PublishedOn)
+		if err != nil {
+			return fmt.Errorf("unable to add article %s to db - %w", article.Title, err)
+		}
+
+		id, _ := res.LastInsertId()
+		for _, w := range article.Topics {
+			_, err = tx.Exec("INSERT INTO topics (topic, article_id) VALUES (?, ?)", w, id)
+			if err != nil {
+				return fmt.Errorf("unable to add topics for article %s to db - %w", article.Title, err)
+			}
+		}
+
+		for _, x := range article.Questions {
+			_, err = tx.Exec("INSERT INTO questions (question, article_id) VALUES (?, ?)", x, id)
+			if err != nil {
+				return fmt.Errorf("unable to add questions for article %s to db - %w", article.Title, err)
+			}
+		}
+
+		err = tx.Commit()
+		if err != nil {
+			return fmt.Errorf("unable to commit tx to db - %w", err)
+		}
+	}
+
+	return nil
 }

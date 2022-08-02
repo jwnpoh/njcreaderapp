@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/serializer"
 	"github.com/jwnpoh/njcreaderapp/backend/services/articles"
 )
@@ -20,7 +21,7 @@ func (b *broker) Get(w http.ResponseWriter, r *http.Request) {
 
 	service, err := articles.NewArticlesService()
 	if err != nil {
-		serializer.NewSerializer(true, "unable to start broker service", nil).ErrorJson(w, err)
+		serializer.NewSerializer(true, "unable to start articles service", nil).ErrorJson(w, err)
 	}
 
 	serializer, err := service.Get(n)
@@ -31,32 +32,21 @@ func (b *broker) Get(w http.ResponseWriter, r *http.Request) {
 	serializer.Encode(w, http.StatusAccepted)
 }
 
-// GetPage will serve paged data if URL params are specified.
-// func (b *broker) GetPage(w http.ResponseWriter, r *http.Request) {
-// 	pager := chi.URLParam(r, "pager")
-// 	page, err := strconv.Atoi(pager)
-// 	if err != nil {
-// 		serializer.NewSerializer(true, "unable to parse page", nil).ErrorJson(w, err)
-// 	}
+func (b *broker) Store(w http.ResponseWriter, r *http.Request) {
+	data := make(core.ArticleSeries, 0)
 
-// 	serializer, err := articles.NewArticlesService().Get(page)
-// 	if err != nil {
-// 		serializer.ErrorJson(w, err)
-// 	}
+	err := serializer.Decode(w, r, &data)
+	if err != nil {
+		serializer.NewSerializer(true, "unable to decode input data", nil).ErrorJson(w, err)
+	}
 
-// 	serializer.Encode(w, http.StatusAccepted)
-// }
+	service, err := articles.NewArticlesService()
+	if err != nil {
+		serializer.NewSerializer(true, "unable to start articles service", nil).ErrorJson(w, err)
+	}
 
-// func (b *broker) Store(w http.ResponseWriter, r *http.Request) {
-// 	a := make(core.ArticleSeries, 0)
-
-// 	err := serializer.Decode(w, r, a)
-// 	if err != nil {
-// 		serializer.NewSerializer(true, "unable to decode input data", nil).ErrorJson(w, err)
-// 	}
-
-// 	err = articles.NewArticlesService().Store(a)
-// 	if err != nil {
-// 		serializer.NewSerializer(true, "unable to store input data", nil).ErrorJson(w, err)
-// 	}
-// }
+	err = service.Store(data)
+	if err != nil {
+		serializer.NewSerializer(true, "unable to store input data", nil).ErrorJson(w, err)
+	}
+}

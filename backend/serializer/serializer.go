@@ -21,7 +21,7 @@ type serializer struct {
 }
 
 // NewSerializer instantiates a new serializer struct to carry out encoding/decoding.
-func NewSerializer(err bool, msg string, data ...any) Serializer {
+func NewSerializer(err bool, msg string, data any) Serializer {
 	return &serializer{
 		Error:   err,
 		Message: msg,
