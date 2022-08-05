@@ -10,43 +10,77 @@ import (
 	"github.com/jwnpoh/njcreaderapp/backend/services/articles"
 )
 
-// GetLatest will be the "index" page of the application api.
+// Get makes a call to the articles service to retrieve articles from the db for a given page.
 func (b *broker) Get(w http.ResponseWriter, r *http.Request) {
 	page := chi.URLParam(r, "page")
 
 	n, err := strconv.Atoi(page)
 	if err != nil {
-		serializer.NewSerializer(true, "unable to parse request params", nil).ErrorJson(w, err)
+		s := serializer.NewSerializer(true, "something went wrong with the page number", nil)
+		s.ErrorJson(w, err)
+		b.Logger.Error(r.Method, r.URL, s)
 	}
 
 	service, err := articles.NewArticlesService()
 	if err != nil {
-		serializer.NewSerializer(true, "unable to start articles service", nil).ErrorJson(w, err)
+		s := serializer.NewSerializer(true, "unable to start articles service", nil)
+		s.ErrorJson(w, err)
+		b.Logger.Error(r.Method, r.URL, s)
 	}
 
-	serializer, err := service.Get(n)
+	data, err := service.Get(n)
 	if err != nil {
-		serializer.ErrorJson(w, err)
+		s := serializer.NewSerializer(true, "unable to get articles from database", nil)
+		s.ErrorJson(w, err)
+		b.Logger.Error(r.Method, r.URL, err)
 	}
 
-	serializer.Encode(w, http.StatusAccepted)
+	b.Logger.Error(data.Encode(w, http.StatusAccepted))
+	b.Logger.Success(r.Method, r.URL)
 }
 
+// Store parses the new article input in the request body and sends it to the db via articles service.
 func (b *broker) Store(w http.ResponseWriter, r *http.Request) {
 	data := make(core.ArticleSeries, 0)
 
-	err := serializer.Decode(w, r, &data)
+	s := serializer.NewSerializer(false, "", nil)
+	err := s.Decode(w, r, &data)
 	if err != nil {
-		serializer.NewSerializer(true, "unable to decode input data", nil).ErrorJson(w, err)
+		s := serializer.NewSerializer(true, "unable to decode input data", nil)
+		s.ErrorJson(w, err)
+		b.Logger.Error(r.Method, r.URL, s)
 	}
 
 	service, err := articles.NewArticlesService()
 	if err != nil {
-		serializer.NewSerializer(true, "unable to start articles service", nil).ErrorJson(w, err)
+		s := serializer.NewSerializer(true, "unable to start articles service to store input", nil)
+		s.ErrorJson(w, err)
+		b.Logger.Error(r.Method, r.URL, s)
+
 	}
 
 	err = service.Store(data)
 	if err != nil {
-		serializer.NewSerializer(true, "unable to store input data", nil).ErrorJson(w, err)
+		s := serializer.NewSerializer(true, "unable to store input data", nil)
+		s.ErrorJson(w, err)
+		b.Logger.Error(r.Method, r.URL, s)
 	}
+	b.Logger.Success(r.Method, r.URL)
 }
+
+// Find makes a call to the database via the articles service to search for a match of the given search term specified in the url params.
+// func (b *broker) Find(w http.ResponseWriter, r *http.Request) {
+// 	q := r.URL.Query().Get("term")
+// 	service, err := articles.NewArticlesService()
+// 	if err != nil {
+// 		serializer.NewSerializer(true, "unable to start articles service for search", nil).ErrorJson(w, err)
+// 	}
+
+// 	serializer, err := service.Find(q)
+// 	if err != nil {
+// 		serializer.ErrorJson(w, err)
+// 	}
+
+// 	serializer.Encode(w, http.StatusAccepted)
+
+// }

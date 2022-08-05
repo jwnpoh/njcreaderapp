@@ -2,7 +2,7 @@ package broker
 
 import (
 	"fmt"
-	"log"
+	"github.com/jwnpoh/njcreaderapp/backend/logger"
 	"net/http"
 )
 
@@ -12,27 +12,24 @@ type BrokerService interface {
 }
 
 type broker struct {
-	Port string
+	Port   string
+	Logger logger.Logger
 }
 
 // NewBrokerService creates a new BrokerService.
 func NewBrokerService(port string) BrokerService {
-	return &broker{Port: port}
+	return &broker{Port: port, Logger: logger.NewAppLogger()}
 }
 
 // Start sets up a server with routes and handlers that call the various backend services.
 func (b *broker) Start() error {
-	log.Printf("Starting broker service on port %s\n", b.Port)
-
+	// log.Printf("Starting broker service on port %s\n", b.Port)
+	b.Logger.Info(fmt.Sprintf("Starting broker service on port %s\n", b.Port))
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", b.Port),
 		Handler: b.SetupRouter(),
 	}
 
-	err := srv.ListenAndServe()
-	if err != nil {
-		return fmt.Errorf("unable to start broker service - %w", err)
-	}
-
+	b.Logger.Error(srv.ListenAndServe())
 	return nil
 }

@@ -10,7 +10,7 @@ import (
 // Serializer provides an interface to read and write JSON data passed between server and client.
 type Serializer interface {
 	Encode(w http.ResponseWriter, status int, headers ...http.Header) error
-	// Decode(w http.ResponseWriter, r *http.Request, data any) error
+	Decode(w http.ResponseWriter, r *http.Request, data any) error
 	ErrorJson(w http.ResponseWriter, err error, status ...int) error
 }
 
@@ -54,7 +54,7 @@ func (s *serializer) Encode(w http.ResponseWriter, status int, headers ...http.H
 }
 
 // Decode reads a JSON payload from the request into data interface that is specified by the application service.
-func Decode(w http.ResponseWriter, r *http.Request, data any) error {
+func (s *serializer) Decode(w http.ResponseWriter, r *http.Request, data any) error {
 	maxBytes := 1048576
 
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
