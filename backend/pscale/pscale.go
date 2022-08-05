@@ -14,9 +14,11 @@ import (
 // PScale provides interface for services to connect to the planetscale database.
 type PScale interface {
 	Get(page int) (*core.ArticleSeries, error)
+	Find(term string) (*core.ArticleSeries, error)
 	Store(data *core.ArticleSeries) error
 	GetQns(questions []string) (*[]core.Question, error)
 }
+
 type pscaleDB struct {
 	DB *sqlx.DB
 }
@@ -39,12 +41,59 @@ func NewPscaleDB() (PScale, error) {
 
 // Get retrieves a slice of 12 articles from the planetscale database with limit and offset in the query.
 func (ps *pscaleDB) Get(offset int) (*core.ArticleSeries, error) {
-
 	series := make(core.ArticleSeries, 0, 12)
 
 	query := "SELECT * FROM articles ORDER BY id DESC LIMIT 12 OFFSET ?"
 
 	rows, err := ps.DB.Queryx(query, offset)
+	if err != nil {
+		return nil, fmt.Errorf("unable to query articles table for page %d - %w", offset, err)
+	}
+
+	for rows.Next() {
+		var article core.Article
+		var questions, topics string
+		err = rows.Scan(&article.ID, &article.Title, &article.URL, &topics, &questions, &article.PublishedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row - %w", err)
+		}
+		article.Questions = strings.Split(questions, ",")
+		article.Topics = strings.Split(topics, ",")
+
+		article.Date = time.Unix(article.PublishedOn, 0).Format("Jan 2, 2006")
+
+		series = append(series, article)
+	}
+
+	return &series, nil
+}
+
+// Find implements a search of the articles table and the question_list table for a match of the search term
+func (ps *pscaleDB) Find(term string) (*core.ArticleSeries, error) {
+	term = "%" + term + "%"
+	series := make(core.ArticleSeries, 0, 12)
+
+	// Match questions with term and find article id
+	query := "SELECT question FROM question_list WHERE wording LIKE ?"
+	var b strings.Builder
+	rows, err := ps.DB.Queryx(query, term)
+	if err != nil {
+		return nil, fmt.Errorf("unable to query question_list table for the search term '%s' - %w", term, err)
+	}
+	for rows.Next() {
+		var q string
+		err = rows.Scan(&q)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning query results into Go variable - %w", err)
+		}
+		fmt.Fprintf(&b, "%s|", q)
+	}
+
+	// Match articles with term in title or topics
+
+	query = "SELECT * FROM articles WHERE title LIKE ? OR topics LIKE ? OR questions REGEXP ?"
+
+	rows, err = ps.DB.Queryx(query, term, term, b.String())
 	if err != nil {
 		return nil, fmt.Errorf("unable to query pscale database - %w", err)
 	}

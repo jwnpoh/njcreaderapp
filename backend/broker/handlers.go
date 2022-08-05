@@ -69,18 +69,22 @@ func (b *broker) Store(w http.ResponseWriter, r *http.Request) {
 }
 
 // Find makes a call to the database via the articles service to search for a match of the given search term specified in the url params.
-// func (b *broker) Find(w http.ResponseWriter, r *http.Request) {
-// 	q := r.URL.Query().Get("term")
-// 	service, err := articles.NewArticlesService()
-// 	if err != nil {
-// 		serializer.NewSerializer(true, "unable to start articles service for search", nil).ErrorJson(w, err)
-// 	}
+func (b *broker) Find(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query().Get("term")
+	service, err := articles.NewArticlesService()
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to start articles service for search", nil)
+		s.ErrorJson(w, err)
+		b.Logger.Error(r.Method, r.URL, s)
+	}
 
-// 	serializer, err := service.Find(q)
-// 	if err != nil {
-// 		serializer.ErrorJson(w, err)
-// 	}
+	data, err := service.Find(q)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to start find results for search term", nil)
+		s.ErrorJson(w, err)
+		b.Logger.Error(r.Method, r.URL, s)
+	}
 
-// 	serializer.Encode(w, http.StatusAccepted)
-
-// }
+	data.Encode(w, http.StatusAccepted)
+	b.Logger.Success(r.Method, r.URL)
+}
