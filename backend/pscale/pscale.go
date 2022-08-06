@@ -3,6 +3,7 @@ package pscale
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -13,10 +14,9 @@ import (
 
 // PScale provides interface for services to connect to the planetscale database.
 type PScale interface {
-	Get(page int) (*core.ArticleSeries, error)
+	Get(offset int) (*core.ArticleSeries, error)
 	Find(term string) (*core.ArticleSeries, error)
 	Store(data *core.ArticleSeries) error
-	GetQns(questions []string) (*[]core.Question, error)
 }
 
 type pscaleDB struct {
@@ -68,32 +68,13 @@ func (ps *pscaleDB) Get(offset int) (*core.ArticleSeries, error) {
 	return &series, nil
 }
 
-// Find implements a search of the articles table and the question_list table for a match of the search term
+// Find implements a mysql fulltext search of the articles table
 func (ps *pscaleDB) Find(term string) (*core.ArticleSeries, error) {
-	term = "%" + term + "%"
 	series := make(core.ArticleSeries, 0, 12)
 
-	// Match questions with term and find article id
-	query := "SELECT question FROM question_list WHERE wording LIKE ?"
-	var b strings.Builder
+	query := "SELECT * FROM articles WHERE MATCH (title, topics, questions) AGAINST (?) ORDER BY id DESC"
+
 	rows, err := ps.DB.Queryx(query, term)
-	if err != nil {
-		return nil, fmt.Errorf("unable to query question_list table for the search term '%s' - %w", term, err)
-	}
-	for rows.Next() {
-		var q string
-		err = rows.Scan(&q)
-		if err != nil {
-			return nil, fmt.Errorf("error scanning query results into Go variable - %w", err)
-		}
-		fmt.Fprintf(&b, "%s|", q)
-	}
-
-	// Match articles with term in title or topics
-
-	query = "SELECT * FROM articles WHERE title LIKE ? OR topics LIKE ? OR questions REGEXP ?"
-
-	rows, err = ps.DB.Queryx(query, term, term, b.String())
 	if err != nil {
 		return nil, fmt.Errorf("unable to query pscale database - %w", err)
 	}
@@ -113,24 +94,11 @@ func (ps *pscaleDB) Find(term string) (*core.ArticleSeries, error) {
 		series = append(series, article)
 	}
 
-	return &series, nil
-}
-
-func (ps *pscaleDB) GetQns(questions []string) (*[]core.Question, error) {
-
-	qns := make([]core.Question, 0)
-
-	query := "SELECT year, number, wording FROM question_list WHERE (question = ?)"
-
-	for _, q := range questions {
-		var qn core.Question
-		err := ps.DB.Get(&qn, query, q)
-		if err != nil {
-			return nil, fmt.Errorf("error scanning row to retrieve question %s - %w", q, err)
-		}
-		qns = append(qns, qn)
+	if len(series) == 0 {
+		return &series, fmt.Errorf("no articles matched the query %s", term)
 	}
-	return &qns, nil
+
+	return &series, nil
 }
 
 // Store stores a slice of articles sent from the front end admin dashboard via the articles service.
@@ -138,7 +106,6 @@ func (ps *pscaleDB) Store(data *core.ArticleSeries) error {
 
 	for _, article := range *data {
 		tx, err := ps.DB.Begin()
-
 		if err != nil {
 			return fmt.Errorf("unable to begin tx for adding articles input to db - %w", err)
 		}
@@ -157,8 +124,11 @@ func (ps *pscaleDB) Store(data *core.ArticleSeries) error {
 			}
 		}
 
+		rx := regexp.MustCompile(`\d{1,4}\s\d{1,2}`)
 		for _, x := range article.Questions {
-			_, err = tx.Exec("INSERT INTO questions (question, article_id) VALUES (?, ?)", x, id)
+			question := rx.Find([]byte(x))
+
+			_, err = tx.Exec("INSERT INTO questions (question, article_id) VALUES (?, ?)", question, id)
 			if err != nil {
 				return fmt.Errorf("unable to add questions for article %s to db - %w", article.Title, err)
 			}
