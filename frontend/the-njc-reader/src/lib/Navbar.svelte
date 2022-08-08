@@ -1,27 +1,31 @@
 <script>
   import Icon from "svelte-awesome";
   import user from "svelte-awesome/icons/user";
+  import { goto } from "$app/navigation";
 
   let searchTerm = "";
+  $: console.log(searchTerm);
 
-  const submitSearch = () => {
-    console.log("submitted search for", searchTerm);
-    searchTerm = "";
+  const submitForm = () => {
+    const queryURL = "/search/" + searchTerm;
+    goto(queryURL);
   };
 </script>
 
 <div class="navbar bg-base-100">
   <div class="flex-1">
-    <a class="btn btn-ghost normal-case text-xl">The NJC Reader</a>
+    <a href="/" class="btn btn-ghost normal-case text-xl">The NJC Reader</a>
   </div>
+
   <div class="flex-none gap-2">
-    <form on:submit|preventDefault={submitSearch}>
-      <div class="form-control  ">
+    <form on:submit|preventDefault={submitForm}>
+      <div class="form-control ">
         <input
           type="text"
           placeholder="Search"
           class="input input-bordered"
           bind:value={searchTerm}
+          name="term"
         />
       </div>
     </form>

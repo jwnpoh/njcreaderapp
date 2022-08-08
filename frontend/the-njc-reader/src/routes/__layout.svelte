@@ -4,11 +4,10 @@
   import Container from "$lib/Container.svelte";
 </script>
 
-<header>
-  <Navbar />
-</header>
-
 <main>
+  <header>
+    <Navbar />
+  </header>
   <Container>
     <slot />
   </Container>
