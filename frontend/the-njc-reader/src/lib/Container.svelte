@@ -1,3 +1,3 @@
-<div class="sm:container mx-auto px-5 mt-5 mb-10">
+<div class="sm:container relative mx-auto px-5 mt-2 mb-10">
   <slot />
 </div>

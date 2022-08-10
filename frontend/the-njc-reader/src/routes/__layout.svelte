@@ -5,15 +5,13 @@
 </script>
 
 <main>
-  <header>
-    <Navbar />
-  </header>
+  <Navbar />
   <Container>
     <slot />
   </Container>
 </main>
 
-<footer class="footer footer-center p-4 bg-base-300 text-base-content">
+<footer class="footer footer-center p-4 bg-secondary text-base-content">
   <div>
     <p>Copyright © 2022 National Junior College</p>
   </div>

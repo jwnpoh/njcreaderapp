@@ -3,9 +3,9 @@
   export let articles;
 </script>
 
-<div class="grid grid-cols-2 gap-y-8">
+<div class="md:px-80 ">
   {#each articles as article}
-    <div class="basis-1/2 px-5">
+    <div class=" px-5 py-6">
       <Card
         title={article.title}
         url={article.url}
