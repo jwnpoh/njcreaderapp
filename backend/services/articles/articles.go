@@ -4,21 +4,27 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jwnpoh/njcreaderapp/backend/pscale"
+	"github.com/jwnpoh/njcreaderapp/backend/external/pscale"
 
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
-	"github.com/jwnpoh/njcreaderapp/backend/serializer"
+	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
 )
 
+type ArticleService interface {
+	Get(page int) (serializer.Serializer, error)
+	Find(term string) (serializer.Serializer, error)
+	Store(data core.ArticleSeries) error
+}
+
 type articleService struct {
-	db pscale.PScale
+	db pscale.PScaleArticles
 }
 
 // NewArticlesService returns an articleService object to implement methods to interact with PlanetScale database.
-func NewArticlesService() (*articleService, error) {
-	db, err := pscale.NewPscaleDB()
+func NewArticlesService() (ArticleService, error) {
+	db, err := pscale.NewArticlesDB()
 	if err != nil {
-		return nil, fmt.Errorf("unable to initialize pscale database - %w", err)
+		return nil, fmt.Errorf("unable to initialize articles service - %w", err)
 	}
 	return &articleService{db: db}, nil
 }

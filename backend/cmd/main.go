@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/jwnpoh/njcreaderapp/backend/broker"
+	"github.com/jwnpoh/njcreaderapp/backend/cmd/broker"
 )
 
 func main() {
