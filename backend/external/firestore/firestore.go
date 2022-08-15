@@ -50,8 +50,9 @@ func (r *FireStoreRepo) Log(v interface{}) error {
 	// t := strconv.Itoa(int(time.Now().Unix()))
 	year := strconv.Itoa(time.Now().Year())
 	month := time.Now().Month().String()
-	date := time.Now().Format("2 Jan 2006 15:04")
-	_, err = client.Collection("logs").Doc(year).Collection(month).Doc(date).Set(ctx, v)
+	// date := time.Now().Format("2 Jan 2006 15:04")
+	t := time.Now().UnixMicro()
+	_, err = client.Collection("logs").Doc(year).Collection(month).Doc(strconv.Itoa(int(t))).Set(ctx, v)
 	if err != nil {
 		return fmt.Errorf("unable to add log entry to firestore - %w", err)
 	}

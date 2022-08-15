@@ -31,7 +31,7 @@ func NewArticlesDB() (PScaleArticles, error) {
 	}
 	err = db.Ping()
 	if err != nil {
-    return nil, fmt.Errorf("PScaleArticles: no response from pscale database - %w", err)
+		return nil, fmt.Errorf("PScaleArticles: no response from pscale database - %w", err)
 	}
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(10)
@@ -49,7 +49,7 @@ func (ps *pscaleDB) Get(offset int) (*core.ArticleSeries, error) {
 
 	rows, err := ps.DB.Queryx(query, offset)
 	if err != nil {
-    return nil, fmt.Errorf("PScaleArticles: unable to query articles table for page %d - %w", offset, err)
+		return nil, fmt.Errorf("PScaleArticles: unable to query articles table for page %d - %w", offset, err)
 	}
 
 	for rows.Next() {
@@ -57,7 +57,7 @@ func (ps *pscaleDB) Get(offset int) (*core.ArticleSeries, error) {
 		var questions, topics string
 		err = rows.Scan(&article.ID, &article.Title, &article.URL, &topics, &questions, &article.PublishedOn)
 		if err != nil {
-      return nil, fmt.Errorf("PScaleArticles: error scanning row - %w", err)
+			return nil, fmt.Errorf("PScaleArticles: error scanning row - %w", err)
 		}
 		article.Questions = strings.Split(questions, ",")
 		article.Topics = strings.Split(topics, ",")
@@ -80,7 +80,7 @@ func (ps *pscaleDB) Find(term string) (*core.ArticleSeries, error) {
 
 	rows, err := ps.DB.Queryx(query, term)
 	if err != nil {
-    return nil, fmt.Errorf("PScaleArticles: unable to query pscale database - %w", err)
+		return nil, fmt.Errorf("PScaleArticles: unable to query pscale database - %w", err)
 	}
 
 	for rows.Next() {
@@ -88,7 +88,7 @@ func (ps *pscaleDB) Find(term string) (*core.ArticleSeries, error) {
 		var questions, topics string
 		err = rows.Scan(&article.ID, &article.Title, &article.URL, &topics, &questions, &article.PublishedOn)
 		if err != nil {
-      return nil, fmt.Errorf("PScaleArticles: error scanning row - %w", err)
+			return nil, fmt.Errorf("PScaleArticles: error scanning row - %w", err)
 		}
 		article.Questions = strings.Split(questions, ",")
 		article.Topics = strings.Split(topics, ",")
@@ -99,7 +99,7 @@ func (ps *pscaleDB) Find(term string) (*core.ArticleSeries, error) {
 	}
 
 	if len(series) == 0 {
-    return &series, fmt.Errorf("PScaleArticles: no articles matched the query %s", term)
+		return &series, fmt.Errorf("PScaleArticles: no articles matched the query %s", term)
 	}
 
 	return &series, nil
@@ -109,23 +109,25 @@ func (ps *pscaleDB) Find(term string) (*core.ArticleSeries, error) {
 func (ps *pscaleDB) Store(data *core.ArticleSeries) error {
 	defer ps.DB.Close()
 
+	query := "INSERT INTO articles (title, url, topics, questions, published_on) VALUES (?, ?, ?, ?, ?)"
+
 	for _, article := range *data {
 		tx, err := ps.DB.Begin()
 		if err != nil {
-      return fmt.Errorf("PScaleArticles: unable to begin tx for adding articles input to db - %w", err)
+			return fmt.Errorf("PScaleArticles: unable to begin tx for adding articles input to db - %w", err)
 		}
 		defer tx.Rollback()
 
-		res, err := tx.Exec("INSERT INTO articles (title, url, topics, questions, published_on) VALUES (?, ?, ?, ?, ?)", article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, ","), article.PublishedOn)
+		res, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, ","), article.PublishedOn)
 		if err != nil {
-      return fmt.Errorf("PScaleArticles: unable to add article %s to db - %w", article.Title, err)
+			return fmt.Errorf("PScaleArticles: unable to add article %s to db - %w", article.Title, err)
 		}
 
 		id, _ := res.LastInsertId()
 		for _, w := range article.Topics {
 			_, err = tx.Exec("INSERT INTO topics (topic, article_id) VALUES (?, ?)", w, id)
 			if err != nil {
-        return fmt.Errorf("PScaleArticles: unable to add topics for article %s to db - %w", article.Title, err)
+				return fmt.Errorf("PScaleArticles: unable to add topics for article %s to db - %w", article.Title, err)
 			}
 		}
 
@@ -135,13 +137,13 @@ func (ps *pscaleDB) Store(data *core.ArticleSeries) error {
 
 			_, err = tx.Exec("INSERT INTO questions (question, article_id) VALUES (?, ?)", question, id)
 			if err != nil {
-        return fmt.Errorf("PScaleArticles: unable to add questions for article %s to db - %w", article.Title, err)
+				return fmt.Errorf("PScaleArticles: unable to add questions for article %s to db - %w", article.Title, err)
 			}
 		}
 
 		err = tx.Commit()
 		if err != nil {
-      return fmt.Errorf("PScaleArticles: unable to commit tx to db - %w", err)
+			return fmt.Errorf("PScaleArticles: unable to commit tx to db - %w", err)
 		}
 	}
 
