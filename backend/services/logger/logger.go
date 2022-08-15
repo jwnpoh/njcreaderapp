@@ -2,17 +2,19 @@ package logger
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"time"
 
 	fire "github.com/jwnpoh/njcreaderapp/backend/external/firestore"
+	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
 )
 
 // Logger provides methods to interface with the app logger.
 type Logger interface {
-	Info(method, urlPath, query string, message interface{})
-	Error(method, urlPath, query string, message interface{})
-	Success(method, urlPath, query string, message interface{})
+	Info(s serializer.Serializer, r *http.Request)
+	Error(s serializer.Serializer, r *http.Request)
+	Success(s serializer.Serializer, r *http.Request)
 }
 
 type appLogger struct {
@@ -48,14 +50,14 @@ func NewAppLogger() Logger {
 }
 
 // Info logs an info level log entry.
-func (l *appLogger) Info(method, urlPath, query string, message interface{}) {
+func (l *appLogger) Info(s serializer.Serializer, r *http.Request) {
 	entry := logEntry{
 		Date:     time.Now().Format("Jan 2, 2006 15:04:05"),
-		LogLevel: "SUCCESS",
-		Method:   method,
-		URL:      urlPath,
-		Query:    query,
-		Message:  message,
+		LogLevel: "INFO",
+		Method:   r.Method,
+		URL:      r.URL.Path,
+		Query:    r.URL.Query().Encode(),
+		Message:  s,
 	}
 
 	l.info.Println(entry)
@@ -63,14 +65,14 @@ func (l *appLogger) Info(method, urlPath, query string, message interface{}) {
 }
 
 // Error logs an error level log entry.
-func (l *appLogger) Error(method, urlPath, query string, message interface{}) {
+func (l *appLogger) Error(s serializer.Serializer, r *http.Request) {
 	entry := logEntry{
 		Date:     time.Now().Format("Jan 2, 2006 15:04:05"),
-		LogLevel: "SUCCESS",
-		Method:   method,
-		URL:      urlPath,
-		Query:    query,
-		Message:  message,
+		LogLevel: "ERROR",
+		Method:   r.Method,
+		URL:      r.URL.Path,
+		Query:    r.URL.Query().Encode(),
+		Message:  s,
 	}
 
 	l.err.Println(entry)
@@ -78,14 +80,14 @@ func (l *appLogger) Error(method, urlPath, query string, message interface{}) {
 }
 
 // Success logs a success level log entry.
-func (l *appLogger) Success(method, urlPath, query string, message interface{}) {
+func (l *appLogger) Success(s serializer.Serializer, r *http.Request) {
 	entry := logEntry{
 		Date:     time.Now().Format("Jan 2, 2006 15:04:05"),
 		LogLevel: "SUCCESS",
-		Method:   method,
-		URL:      urlPath,
-		Query:    query,
-		Message:  message,
+		Method:   r.Method,
+		URL:      r.URL.Path,
+		Query:    r.URL.Query().Encode(),
+		Message:  "",
 	}
 
 	l.success.Println(entry)
