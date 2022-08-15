@@ -33,6 +33,8 @@ func (b *broker) serveRoutes(mux chi.Router) {
 	//test user functions
 	mux.Get("/api/users/insert-test", b.InsertUserTest)
 	mux.Get("/api/users/get-test", b.GetUserTest)
+	mux.Get("/api/users/update-test", b.UpdateUserTest)
+	mux.Get("/api/users/delete-test", b.DeleteUserTest)
 
 	mux.Post("/api/articles", b.Store)
 }

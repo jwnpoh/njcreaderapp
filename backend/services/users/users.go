@@ -11,8 +11,8 @@ import (
 type UserManager interface {
 	InsertUser(*core.User) error
 	GetUser(username string) (*core.User, error)
-	DeleteUser(username, hash string) error
-	UpdateUserPassword(newPasswordHash string, user *core.User) error
+	DeleteUser(id int) error
+	UpdateUserPassword(id int, newPasswordHash string) error
 }
 
 type userManager struct {
@@ -47,13 +47,29 @@ func (um *userManager) GetUser(email string) (*core.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("userManager: unable to get user %s - %w", email, err)
 	}
+
 	return user, nil
 }
 
-func (um *userManager) DeleteUser(username, hash string) error {
+func (um *userManager) UpdateUserPassword(id int, newPassword string) error {
+	newPasswordHash, err := hasher.GenerateHash(newPassword)
+	if err != nil {
+		return fmt.Errorf("userManager: unable to generate hash from user input password - %w", err)
+	}
+
+	err = um.db.UpdateUser(id, "hash", newPasswordHash)
+	if err != nil {
+		return fmt.Errorf("userManager: unable to update user %d - %w", id, err)
+	}
+
 	return nil
 }
 
-func (um *userManager) UpdateUserPassword(newPasswordHash string, user *core.User) error {
+func (um *userManager) DeleteUser(id int) error {
+	err := um.db.DeleteUser(id)
+	if err != nil {
+		return fmt.Errorf("userManager: unable to delete user %d - %w", id, err)
+	}
+
 	return nil
 }

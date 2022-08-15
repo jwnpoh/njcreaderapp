@@ -2,8 +2,10 @@ package broker
 
 import (
 	"fmt"
-	"github.com/jwnpoh/njcreaderapp/backend/services/logger"
+	"log"
 	"net/http"
+
+	"github.com/jwnpoh/njcreaderapp/backend/services/logger"
 )
 
 // BrokerService provides an interface for cmd/main to instantiate the app.
@@ -23,16 +25,12 @@ func NewBrokerService(port string) BrokerService {
 
 // Start sets up a server with routes and handlers that call the various backend services.
 func (b *broker) Start() error {
-	// log.Printf("Starting broker service on port %s\n", b.Port)
-	b.Logger.Info("Start", "broker", fmt.Sprintf("port %s", b.Port), nil)
+	log.Printf("Starting broker service on port %s\n", b.Port)
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", b.Port),
 		Handler: b.SetupRouter(),
 	}
 
-	err := srv.ListenAndServe()
-	if err != nil {
-		b.Logger.Error("ListenAndServe", "broker", "", nil)
-	}
+	log.Fatal(srv.ListenAndServe())
 	return nil
 }

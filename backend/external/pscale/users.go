@@ -11,8 +11,8 @@ import (
 type PScaleUsersDB interface {
 	InsertUser(*core.User) error
 	GetUser(username string) (*core.User, error)
-	DeleteUser(username, hash string) error
-	UpdateUser(user *core.User, field, newValue string) error
+	DeleteUser(id int) error
+	UpdateUser(id int, field, newValue string) error
 }
 
 func NewUsersDB() (PScaleUsersDB, error) {
@@ -78,14 +78,14 @@ func (ps *pscaleDB) GetUser(email string) (*core.User, error) {
 	return &user, nil
 }
 
-func (ps *pscaleDB) UpdateUser(user *core.User, field, newValue string) error {
+func (ps *pscaleDB) UpdateUser(id int, field, newValue string) error {
 	defer ps.DB.Close()
 
 	if field != "hash" && field != "last_login" && field != "role" {
 		return fmt.Errorf("field must be one of 'hash', 'last_login', or 'role'")
 	}
 
-	query := "UPDATE users SET ? = ? WHERE id = ? AND email = ?"
+	query := "UPDATE users SET hash = ? WHERE id = ?"
 
 	tx, err := ps.DB.Begin()
 	if err != nil {
@@ -93,7 +93,7 @@ func (ps *pscaleDB) UpdateUser(user *core.User, field, newValue string) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(query, field, newValue, user.ID, user.Email)
+	_, err = tx.Exec(query, newValue, id)
 	if err != nil {
 		return fmt.Errorf("unable to update user field %s - %w", field, err)
 	}
@@ -106,15 +106,26 @@ func (ps *pscaleDB) UpdateUser(user *core.User, field, newValue string) error {
 	return nil
 }
 
-func (ps *pscaleDB) DeleteUser(username, hash string) error {
-	return nil
-}
-func (ps *pscaleDB) InsertToken(token *core.Token, user *core.User) error {
-	return nil
-}
-func (ps *pscaleDB) GetToken(tokenString string) (*core.User, error) {
-	return &core.User{}, nil
-}
-func (ps *pscaleDB) DeleteToken(user *core.User) error {
+func (ps *pscaleDB) DeleteUser(id int) error {
+	defer ps.DB.Close()
+
+	query := "DELETE FROM users WHERE id = ?"
+
+	tx, err := ps.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("unable to begin db tx for deleting user %d - %w", id, err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf("unable to delete user %d - %w", id, err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("unable to commit tx to db for updating user - %w", err)
+	}
+
 	return nil
 }
