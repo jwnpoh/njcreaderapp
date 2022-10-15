@@ -2,21 +2,24 @@ package pscale
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 )
 
-type PScaleUsersDB interface {
-	InsertUser(*core.User) error
-	GetUser(username string) (*core.User, error)
-	DeleteUser(id int) error
-	UpdateUser(id int, field, newValue string) error
+// type PScaleUsersDB interface {
+// 	InsertUser(*core.User) error
+// 	GetUser(field string, value any) (*core.User, error)
+// 	DeleteUser(id int) error
+// 	UpdateUser(id int, field, newValue string) error
+// }
+
+type usersDB struct {
+	DB *sqlx.DB
 }
 
-func NewUsersDB() (PScaleUsersDB, error) {
-	db, err := sqlx.Open("mysql", os.Getenv("PSCALE"))
+func NewUsersDB(dsn string) (*usersDB, error) {
+	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("unable to initialize pscale database - %w", err)
 	}
@@ -27,14 +30,13 @@ func NewUsersDB() (PScaleUsersDB, error) {
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(10)
 
-	return &pscaleDB{DB: db}, nil
+	return &usersDB{DB: db}, nil
 }
-func (ps *pscaleDB) InsertUser(user *core.User) error {
-	defer ps.DB.Close()
 
+func (uDB *usersDB) InsertUser(user *core.User) error {
 	query := "INSERT INTO users (email, hash, role, last_login) VALUES (?, ?, ?, ?)"
 
-	tx, err := ps.DB.Begin()
+	tx, err := uDB.DB.Begin()
 	if err != nil {
 		return fmt.Errorf("unable to begin tx for adding articles input to db - %w", err)
 	}
@@ -53,14 +55,12 @@ func (ps *pscaleDB) InsertUser(user *core.User) error {
 	return nil
 }
 
-func (ps *pscaleDB) GetUser(email string) (*core.User, error) {
-	defer ps.DB.Close()
+func (uDB *usersDB) GetUser(field string, value any) (*core.User, error) {
+	query := fmt.Sprintf("SELECT * FROM users WHERE %s = ?", field)
 
-	query := "SELECT * FROM users WHERE email = ?"
+	row := uDB.DB.QueryRowx(query, value)
 
-	row := ps.DB.QueryRowx(query, email)
-
-	var hash, role, lastLogin string
+	var email, hash, role, lastLogin string
 	var id int
 	err := row.Scan(&id, &email, &hash, &role, &lastLogin)
 	if err != nil {
@@ -78,16 +78,14 @@ func (ps *pscaleDB) GetUser(email string) (*core.User, error) {
 	return &user, nil
 }
 
-func (ps *pscaleDB) UpdateUser(id int, field, newValue string) error {
-	defer ps.DB.Close()
-
+func (uDB *usersDB) UpdateUser(id int, field, newValue string) error {
 	if field != "hash" && field != "last_login" && field != "role" {
 		return fmt.Errorf("field must be one of 'hash', 'last_login', or 'role'")
 	}
 
 	query := "UPDATE users SET hash = ? WHERE id = ?"
 
-	tx, err := ps.DB.Begin()
+	tx, err := uDB.DB.Begin()
 	if err != nil {
 		return fmt.Errorf("unable to begin db tx for updating user field %s - %w", field, err)
 	}
@@ -106,12 +104,10 @@ func (ps *pscaleDB) UpdateUser(id int, field, newValue string) error {
 	return nil
 }
 
-func (ps *pscaleDB) DeleteUser(id int) error {
-	defer ps.DB.Close()
-
+func (uDB *usersDB) DeleteUser(id int) error {
 	query := "DELETE FROM users WHERE id = ?"
 
-	tx, err := ps.DB.Begin()
+	tx, err := uDB.DB.Begin()
 	if err != nil {
 		return fmt.Errorf("unable to begin db tx for deleting user %d - %w", id, err)
 	}

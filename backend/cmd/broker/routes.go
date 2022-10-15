@@ -30,11 +30,16 @@ func (b *broker) serveRoutes(mux chi.Router) {
 	mux.Get("/api/articles/{page}", b.Get)
 	mux.Get("/api/articles/find", b.Find)
 
-	//test user functions
-	mux.Get("/api/users/insert-test", b.InsertUserTest)
-	mux.Get("/api/users/get-test", b.GetUserTest)
-	mux.Get("/api/users/update-test", b.UpdateUserTest)
-	mux.Get("/api/users/delete-test", b.DeleteUserTest)
+	mux.Post("/api/auth", b.Authenticate)
 
-	mux.Post("/api/articles", b.Store)
+	//test user functions
+	mux.Route("/api/users", func(mux chi.Router) {
+		// mux.Use(b.Auth)
+		mux.Get("/insert-test", b.InsertUserTest)
+		mux.Get("/get-test", b.GetUserTest)
+		mux.Get("/update-test", b.UpdateUserTest)
+		mux.Get("/delete-test", b.DeleteUserTest)
+
+		mux.Post("/api/articles", b.Store)
+	})
 }

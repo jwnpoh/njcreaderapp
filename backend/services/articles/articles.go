@@ -4,33 +4,29 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jwnpoh/njcreaderapp/backend/external/pscale"
+	// "github.com/jwnpoh/njcreaderapp/backend/external/pscale"
 
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
 )
 
 type ArticleService interface {
-	Get(page int) (serializer.Serializer, error)
-	Find(term string) (serializer.Serializer, error)
-	Store(data core.ArticleSeries) error
+	Get(offset int) (*core.ArticleSeries, error)
+	Find(term string) (*core.ArticleSeries, error)
+	Store(data *core.ArticleSeries) error
 }
 
-type articleService struct {
-	db pscale.PScaleArticles
+type Articles struct {
+	db ArticleService
 }
 
 // NewArticlesService returns an articleService object to implement methods to interact with PlanetScale database.
-func NewArticlesService() (ArticleService, error) {
-	db, err := pscale.NewArticlesDB()
-	if err != nil {
-		return nil, fmt.Errorf("unable to initialize articles service - %w", err)
-	}
-	return &articleService{db: db}, nil
+func NewArticlesService(articlesDB ArticleService) *Articles {
+	return &Articles{db: articlesDB}
 }
 
 // Get gets up to 12 documents per page from PScale and serves them in pages of 12 articles each.
-func (a *articleService) Get(page int) (serializer.Serializer, error) {
+func (a *Articles) Get(page int) (serializer.Serializer, error) {
 	// logic for pagination
 	n := ((page - 1) * 12)
 	if n < 0 {
@@ -47,7 +43,7 @@ func (a *articleService) Get(page int) (serializer.Serializer, error) {
 }
 
 // Find parses the query and sends it to database for querying results
-func (a *articleService) Find(term string) (serializer.Serializer, error) {
+func (a *Articles) Find(term string) (serializer.Serializer, error) {
 	articles, err := a.db.Find(term)
 	if err != nil {
 		return serializer.NewSerializer(true, "no articles matched the query", articles), fmt.Errorf("unable to find articles relevant to the query %s from db - %w", term, err)
@@ -57,7 +53,7 @@ func (a *articleService) Find(term string) (serializer.Serializer, error) {
 }
 
 // Store parses the input time from front end admin dashboard to unix time, then sends the data to PlanetScale.
-func (a *articleService) Store(data core.ArticleSeries) error {
+func (a *Articles) Store(data core.ArticleSeries) error {
 	// process string date to unixtime for PublishedOn field.
 	for _, article := range data {
 		t, err := time.Parse("Jan 2, 2006", article.Date)

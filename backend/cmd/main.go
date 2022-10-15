@@ -2,17 +2,18 @@ package main
 
 import (
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/jwnpoh/njcreaderapp/backend/cmd/broker"
+	"github.com/jwnpoh/njcreaderapp/backend/cmd/config"
 )
 
 func main() {
-	godotenv.Load(".env")
-	port := os.Getenv("PORT")
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatal("unable to load config, failed to start app")
+	}
 
-	broker := broker.NewBrokerService(port)
+	broker := broker.NewBrokerService(cfg)
 
 	log.Panic(broker.Start())
 }

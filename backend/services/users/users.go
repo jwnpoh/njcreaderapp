@@ -3,31 +3,30 @@ package users
 import (
 	"fmt"
 
-	"github.com/jwnpoh/njcreaderapp/backend/external/pscale"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/hasher"
 )
 
-type UserManager interface {
+type UsersDB interface {
+	// InsertUser(*core.User) error
+	// GetUser(field string, value any) (*core.User, error)
+	// DeleteUser(id int) error
+	// UpdateUserPassword(id int, newPasswordHash string) error
 	InsertUser(*core.User) error
-	GetUser(username string) (*core.User, error)
+	GetUser(field string, value any) (*core.User, error)
 	DeleteUser(id int) error
-	UpdateUserPassword(id int, newPasswordHash string) error
+	UpdateUser(id int, field, newValue string) error
 }
 
-type userManager struct {
-	db pscale.PScaleUsersDB
+type UserManager struct {
+	db UsersDB
 }
 
-func NewUserManager() (UserManager, error) {
-	db, err := pscale.NewUsersDB()
-	if err != nil {
-		return nil, fmt.Errorf("unable to initialize user manager service - %w", err)
-	}
-	return &userManager{db: db}, nil
+func NewUserManager(usersDB UsersDB) *UserManager {
+	return &UserManager{db: usersDB}
 }
 
-func (um *userManager) InsertUser(user *core.User) error {
+func (um *UserManager) InsertUser(user *core.User) error {
 	hash, err := hasher.GenerateHash(user.Hash)
 	if err != nil {
 		return fmt.Errorf("userManager: unable to generate hash from user input password - %w", err)
@@ -42,16 +41,16 @@ func (um *userManager) InsertUser(user *core.User) error {
 	return nil
 }
 
-func (um *userManager) GetUser(email string) (*core.User, error) {
-	user, err := um.db.GetUser(email)
+func (um *UserManager) GetUser(field string, value any) (*core.User, error) {
+	user, err := um.db.GetUser(field, value)
 	if err != nil {
-		return nil, fmt.Errorf("userManager: unable to get user %s - %w", email, err)
+		return nil, fmt.Errorf("userManager: unable to get user %s by %s - %w", value, field, err)
 	}
 
 	return user, nil
 }
 
-func (um *userManager) UpdateUserPassword(id int, newPassword string) error {
+func (um *UserManager) UpdateUserPassword(id int, newPassword string) error {
 	newPasswordHash, err := hasher.GenerateHash(newPassword)
 	if err != nil {
 		return fmt.Errorf("userManager: unable to generate hash from user input password - %w", err)
@@ -65,7 +64,7 @@ func (um *userManager) UpdateUserPassword(id int, newPassword string) error {
 	return nil
 }
 
-func (um *userManager) DeleteUser(id int) error {
+func (um *UserManager) DeleteUser(id int) error {
 	err := um.db.DeleteUser(id)
 	if err != nil {
 		return fmt.Errorf("userManager: unable to delete user %d - %w", id, err)

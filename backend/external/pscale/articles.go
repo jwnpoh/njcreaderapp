@@ -2,7 +2,6 @@ package pscale
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -13,19 +12,19 @@ import (
 )
 
 // PScale provides interface for services to connect to the planetscale database.
-type PScaleArticles interface {
-	Get(offset int) (*core.ArticleSeries, error)
-	Find(term string) (*core.ArticleSeries, error)
-	Store(data *core.ArticleSeries) error
-}
+// type PScaleArticles interface {
+// 	Get(offset int) (*core.ArticleSeries, error)
+// 	Find(term string) (*core.ArticleSeries, error)
+// 	Store(data *core.ArticleSeries) error
+// }
 
-type pscaleDB struct {
+type articlesDB struct {
 	DB *sqlx.DB
 }
 
 // NewPscaleDB returns a connection interface for the application to connect to the planetscale database.
-func NewArticlesDB() (PScaleArticles, error) {
-	db, err := sqlx.Open("mysql", os.Getenv("PSCALE"))
+func NewArticlesDB(dsn string) (*articlesDB, error) {
+	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("PScaleArticles: unable to initialize pscale database - %w", err)
 	}
@@ -36,18 +35,16 @@ func NewArticlesDB() (PScaleArticles, error) {
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(10)
 
-	return &pscaleDB{DB: db}, nil
+	return &articlesDB{DB: db}, nil
 }
 
 // Get retrieves a slice of 12 articles from the planetscale database with limit and offset in the query.
-func (ps *pscaleDB) Get(offset int) (*core.ArticleSeries, error) {
-	defer ps.DB.Close()
-
+func (aDB *articlesDB) Get(offset int) (*core.ArticleSeries, error) {
 	series := make(core.ArticleSeries, 0, 12)
 
 	query := "SELECT * FROM articles ORDER BY id DESC LIMIT 12 OFFSET ?"
 
-	rows, err := ps.DB.Queryx(query, offset)
+	rows, err := aDB.DB.Queryx(query, offset)
 	if err != nil {
 		return nil, fmt.Errorf("PScaleArticles: unable to query articles table for page %d - %w", offset, err)
 	}
@@ -71,14 +68,12 @@ func (ps *pscaleDB) Get(offset int) (*core.ArticleSeries, error) {
 }
 
 // Find implements a mysql fulltext search of the articles table
-func (ps *pscaleDB) Find(term string) (*core.ArticleSeries, error) {
-	defer ps.DB.Close()
-
+func (aDB *articlesDB) Find(term string) (*core.ArticleSeries, error) {
 	series := make(core.ArticleSeries, 0, 12)
 
 	query := "SELECT * FROM articles WHERE MATCH (title, topics, questions) AGAINST (?) ORDER BY id DESC"
 
-	rows, err := ps.DB.Queryx(query, term)
+	rows, err := aDB.DB.Queryx(query, term)
 	if err != nil {
 		return nil, fmt.Errorf("PScaleArticles: unable to query pscale database - %w", err)
 	}
@@ -106,13 +101,11 @@ func (ps *pscaleDB) Find(term string) (*core.ArticleSeries, error) {
 }
 
 // Store stores a slice of articles sent from the front end admin dashboard via the articles service.
-func (ps *pscaleDB) Store(data *core.ArticleSeries) error {
-	defer ps.DB.Close()
-
+func (aDB *articlesDB) Store(data *core.ArticleSeries) error {
 	query := "INSERT INTO articles (title, url, topics, questions, published_on) VALUES (?, ?, ?, ?, ?)"
 
 	for _, article := range *data {
-		tx, err := ps.DB.Begin()
+		tx, err := aDB.DB.Begin()
 		if err != nil {
 			return fmt.Errorf("PScaleArticles: unable to begin tx for adding articles input to db - %w", err)
 		}

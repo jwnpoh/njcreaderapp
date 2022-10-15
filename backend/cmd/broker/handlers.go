@@ -8,9 +8,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
-	"github.com/jwnpoh/njcreaderapp/backend/services/articles"
+	"github.com/jwnpoh/njcreaderapp/backend/services/hasher"
 	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
-	"github.com/jwnpoh/njcreaderapp/backend/services/users"
 )
 
 // Get makes a call to the articles service to retrieve articles from the db for a given page.
@@ -19,23 +18,23 @@ func (b *broker) Get(w http.ResponseWriter, r *http.Request) {
 
 	n, err := strconv.Atoi(page)
 	if err != nil {
-		s := serializer.NewSerializer(true, "something went wrong with the page number", nil)
+		s := serializer.NewSerializer(true, "something went wrong with the page number", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		return
 	}
 
-	service, err := articles.NewArticlesService()
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to start articles service", nil)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		return
-	}
+	// service, err := articles.NewArticlesService()
+	// if err != nil {
+	// 	s := serializer.NewSerializer(true, "unable to start articles service", err)
+	// 	s.ErrorJson(w, err)
+	// 	b.Logger.Error(s, r)
+	// 	return
+	// }
 
-	data, err := service.Get(n)
+	data, err := b.Articles.Get(n)
 	if err != nil {
-		s := serializer.NewSerializer(true, "unable to get articles from database", nil)
+		s := serializer.NewSerializer(true, "unable to get articles from database", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		return
@@ -52,44 +51,37 @@ func (b *broker) Store(w http.ResponseWriter, r *http.Request) {
 	s := serializer.NewSerializer(false, "", nil)
 	err := s.Decode(w, r, &data)
 	if err != nil {
-		s := serializer.NewSerializer(true, "unable to decode input data", nil)
+		s := serializer.NewSerializer(true, "unable to decode input data", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		return
 	}
 
-	service, err := articles.NewArticlesService()
+	err = b.Articles.Store(data)
 	if err != nil {
-		s := serializer.NewSerializer(true, "unable to start articles service to store input", nil)
+		s := serializer.NewSerializer(true, "unable to store input data", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		return
 	}
 
-	err = service.Store(data)
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to store input data", nil)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		return
-	}
 	b.Logger.Success(s, r)
 }
 
 // Find makes a call to the database via the articles service to search for a match of the given search term specified in the url params.
 func (b *broker) Find(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("term")
-	service, err := articles.NewArticlesService()
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to start articles service for search", nil)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		return
-	}
+	// service, err := articles.NewArticlesService()
+	// if err != nil {
+	// 	s := serializer.NewSerializer(true, "unable to start articles service for search", err)
+	// 	s.ErrorJson(w, err)
+	// 	b.Logger.Error(s, r)
+	// 	return
+	// }
 
-	data, err := service.Find(q)
+	data, err := b.Articles.Find(q)
 	if err != nil {
-		s := serializer.NewSerializer(true, "unable to find results for search term", nil)
+		s := serializer.NewSerializer(true, "unable to find results for search term", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		return
@@ -97,6 +89,42 @@ func (b *broker) Find(w http.ResponseWriter, r *http.Request) {
 
 	data.Encode(w, http.StatusAccepted)
 	b.Logger.Success(data, r)
+}
+
+func (b *broker) Authenticate(w http.ResponseWriter, r *http.Request) {
+	var userInput struct {
+		Email    string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	s := serializer.NewSerializer(false, "", nil)
+	s.Decode(w, r, &userInput)
+
+	user, err := b.Users.GetUser("email", userInput.Email)
+	if err != nil {
+		s := serializer.NewSerializer(true, "invalid credentials", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+	}
+
+	err = hasher.CheckHash(user.Hash, userInput.Password)
+	if err != nil {
+		s := serializer.NewSerializer(true, "invalid credentials", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	token, err := b.Authenticator.CreateToken(user.ID, 24*time.Hour)
+	if err != nil {
+		s := serializer.NewSerializer(true, fmt.Sprintf("unable to generate token for user %s, %v", user.Email, err), nil)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+	}
+
+	s = serializer.NewSerializer(false, fmt.Sprintf("successfully generated token for user %s", user.Email), token)
+	s.Encode(w, http.StatusAccepted)
+	b.Logger.Success(s, r)
 }
 
 func (b *broker) InsertUserTest(w http.ResponseWriter, r *http.Request) {
@@ -107,18 +135,9 @@ func (b *broker) InsertUserTest(w http.ResponseWriter, r *http.Request) {
 		LastLogin: time.Now().Format("02 Jan 2006"),
 	}
 
-	um, err := users.NewUserManager()
+	err := b.Users.InsertUser(&u)
 	if err != nil {
-		s := serializer.NewSerializer(true, "unable to start user manager service", nil)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		fmt.Println(err)
-		return
-	}
-
-	err = um.InsertUser(&u)
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to add new user", nil)
+		s := serializer.NewSerializer(true, "unable to add new user", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		fmt.Println(err)
@@ -129,18 +148,9 @@ func (b *broker) InsertUserTest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *broker) GetUserTest(w http.ResponseWriter, r *http.Request) {
-	um, err := users.NewUserManager()
+	user, err := b.Users.GetUser("email", "jwn.poh@gmail.com")
 	if err != nil {
-		s := serializer.NewSerializer(true, "unable to start user manager service", nil)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		fmt.Println(err)
-		return
-	}
-
-	user, err := um.GetUser("jwn.poh@gmail.com")
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to get user", nil)
+		s := serializer.NewSerializer(true, "unable to get user", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		fmt.Println(err)
@@ -154,29 +164,11 @@ func (b *broker) GetUserTest(w http.ResponseWriter, r *http.Request) {
 func (b *broker) UpdateUserTest(w http.ResponseWriter, r *http.Request) {
 	newPassword := "mypassword"
 
-	um, err := users.NewUserManager()
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to start user manager service", nil)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		fmt.Println(err)
-		return
-	}
+	u, _ := b.Users.GetUser("email", "jwn.poh@gmail.com")
 
-	u, _ := um.GetUser("jwn.poh@gmail.com")
-
-	um, err = users.NewUserManager()
+	err := b.Users.UpdateUserPassword(u.ID, newPassword)
 	if err != nil {
-		s := serializer.NewSerializer(true, "unable to start user manager service", nil)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		fmt.Println(err)
-		return
-	}
-
-	err = um.UpdateUserPassword(u.ID, newPassword)
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to update user", nil)
+		s := serializer.NewSerializer(true, "unable to update user", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		fmt.Println(err)
@@ -187,34 +179,17 @@ func (b *broker) UpdateUserTest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *broker) DeleteUserTest(w http.ResponseWriter, r *http.Request) {
-	um, err := users.NewUserManager()
+	user, _ := b.Users.GetUser("email", "jwn.poh@gmail.com")
+
+	err := b.Users.DeleteUser(user.ID)
 	if err != nil {
-		s := serializer.NewSerializer(true, "unable to start user manager service", nil)
+		s := serializer.NewSerializer(true, "unable to delete user", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		fmt.Println(err)
 		return
 	}
 
-	user, _ := um.GetUser("jwn.poh@gmail.com")
-
-	um, err = users.NewUserManager()
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to get user to delete", nil)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		fmt.Println(err)
-		return
-	}
-
-	err = um.DeleteUser(user.ID)
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to delete user", nil)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		fmt.Println(err)
-		return
-	}
 	s := serializer.NewSerializer(false, "successfully deleted user", user.ID)
 	b.Logger.Success(s, r)
 }
