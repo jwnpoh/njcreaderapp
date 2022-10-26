@@ -1,4 +1,4 @@
-export async function load({ params }) {
+export async function load({ fetch, params }) {
   const queryURL = `http://localhost:8080/api/articles/${params.page}`;
   const res = await fetch(queryURL);
   const data = await res.json();

@@ -25,7 +25,7 @@
       <div class="collapse-title px-0 pt-2">
         Click to view past year questions
       </div>
-      <div class="collapse-content px-0">
+      <div class="collapse-content px-0 py-0">
         <ul class="list-none">
           {#each questions as question}
             <li>{question}</li>

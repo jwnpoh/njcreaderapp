@@ -35,7 +35,7 @@
         tabindex="0"
         class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
       >
-        <li><a href="/articles/1">News Feed</a></li>
+        <li><a data-sveltekit-reload href="/articles/1">News Feed</a></li>
         <li><a href="/columns/1">Longer Reads</a></li>
         <li><a href="/about">About</a></li>
         <li><a href="/feedback">Feedback</a></li>
@@ -43,8 +43,10 @@
     </div>
   </div>
   <div class="navbar-center">
-    <a href="/articles/1" class="btn btn-ghost normal-case text-xl"
-      >The NJC Reader</a
+    <a
+      data-sveltekit-reload
+      href="/articles/1"
+      class="btn btn-ghost normal-case text-xl">The NJC Reader</a
     >
   </div>
   <div class="navbar-end">
