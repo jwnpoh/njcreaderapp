@@ -48,7 +48,7 @@
     >
   </div>
   <div class="navbar-end">
-    <form on:submit|preventDefault={submitForm}>
+    <form on:submit={submitForm}>
       <div class="form-control px-3">
         <input
           type="text"

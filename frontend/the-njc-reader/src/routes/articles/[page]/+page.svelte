@@ -1,6 +1,7 @@
 <script>
   import CardContainer from "$lib/CardContainer.svelte";
-  export let articles;
+  export let data;
+  const { articles } = data;
 </script>
 
 <CardContainer {articles} />
