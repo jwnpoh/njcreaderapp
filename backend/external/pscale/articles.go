@@ -11,13 +11,6 @@ import (
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 )
 
-// PScale provides interface for services to connect to the planetscale database.
-// type PScaleArticles interface {
-// 	Get(offset int) (*core.ArticleSeries, error)
-// 	Find(term string) (*core.ArticleSeries, error)
-// 	Store(data *core.ArticleSeries) error
-// }
-
 type articlesDB struct {
 	DB *sqlx.DB
 }
@@ -56,7 +49,8 @@ func (aDB *articlesDB) Get(offset int) (*core.ArticleSeries, error) {
 		if err != nil {
 			return nil, fmt.Errorf("PScaleArticles: error scanning row - %w", err)
 		}
-		article.Questions = strings.Split(questions, ",")
+		// need to fix. some questions contain a comma in the question wording and should not be split there.
+		article.Questions = strings.Split(questions, "\n")
 		article.Topics = strings.Split(topics, ",")
 
 		article.Date = time.Unix(article.PublishedOn, 0).Format("Jan 2, 2006")
@@ -85,7 +79,8 @@ func (aDB *articlesDB) Find(terms string) (*core.ArticleSeries, error) {
 		if err != nil {
 			return nil, fmt.Errorf("PScaleArticles: error scanning row - %w", err)
 		}
-		article.Questions = strings.Split(questions, ",")
+		// need to fix. some questions contain a comma in the question wording and should not be split there.
+		article.Questions = strings.Split(questions, "\n")
 		article.Topics = strings.Split(topics, ",")
 
 		article.Date = time.Unix(article.PublishedOn, 0).Format("Jan 2, 2006")
