@@ -24,17 +24,25 @@ func (b *broker) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// service, err := articles.NewArticlesService()
-	// if err != nil {
-	// 	s := serializer.NewSerializer(true, "unable to start articles service", err)
-	// 	s.ErrorJson(w, err)
-	// 	b.Logger.Error(s, r)
-	// 	return
-	// }
-
 	data, err := b.Articles.Get(n)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to get articles from database", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	data.Encode(w, http.StatusAccepted)
+	b.Logger.Success(data, r)
+}
+
+// Find makes a call to the database via the articles service to search for a match of the given search term specified in the url params.
+func (b *broker) Find(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query().Get("term")
+
+	data, err := b.Articles.Find(q)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to find results for search term", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		return
@@ -66,29 +74,6 @@ func (b *broker) Store(w http.ResponseWriter, r *http.Request) {
 	}
 
 	b.Logger.Success(s, r)
-}
-
-// Find makes a call to the database via the articles service to search for a match of the given search term specified in the url params.
-func (b *broker) Find(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query().Get("term")
-	// service, err := articles.NewArticlesService()
-	// if err != nil {
-	// 	s := serializer.NewSerializer(true, "unable to start articles service for search", err)
-	// 	s.ErrorJson(w, err)
-	// 	b.Logger.Error(s, r)
-	// 	return
-	// }
-
-	data, err := b.Articles.Find(q)
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to find results for search term", err)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		return
-	}
-
-	data.Encode(w, http.StatusAccepted)
-	b.Logger.Success(data, r)
 }
 
 func (b *broker) Authenticate(w http.ResponseWriter, r *http.Request) {

@@ -2,6 +2,7 @@ package articles
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	// "github.com/jwnpoh/njcreaderapp/backend/external/pscale"
@@ -12,7 +13,7 @@ import (
 
 type ArticleService interface {
 	Get(offset int) (*core.ArticleSeries, error)
-	Find(term string) (*core.ArticleSeries, error)
+	Find(terms string) (*core.ArticleSeries, error)
 	Store(data *core.ArticleSeries) error
 }
 
@@ -39,17 +40,19 @@ func (a *Articles) Get(page int) (serializer.Serializer, error) {
 		return nil, fmt.Errorf("unable to get articles from db - %w", err)
 	}
 
-	return serializer.NewSerializer(false, "hit the broker", articles), nil
+	return serializer.NewSerializer(false, fmt.Sprintf("got articles from page %d", n), articles), nil
 }
 
 // Find parses the query and sends it to database for querying results
-func (a *Articles) Find(term string) (serializer.Serializer, error) {
-	articles, err := a.db.Find(term)
+func (a *Articles) Find(q string) (serializer.Serializer, error) {
+	terms := checkQuery(q)
+
+	articles, err := a.db.Find(terms)
 	if err != nil {
-		return serializer.NewSerializer(true, "no articles matched the query", articles), fmt.Errorf("unable to find articles relevant to the query %s from db - %w", term, err)
+		return serializer.NewSerializer(true, "no articles matched the query", articles), fmt.Errorf("unable to find articles relevant to the query %s from db - %w", terms, err)
 	}
 
-	return serializer.NewSerializer(false, "hit the broker", articles), nil
+	return serializer.NewSerializer(false, fmt.Sprintf("found articles matching '%v'", terms), articles), nil
 }
 
 // Store parses the input time from front end admin dashboard to unix time, then sends the data to PlanetScale.
@@ -70,4 +73,19 @@ func (a *Articles) Store(data core.ArticleSeries) error {
 	}
 
 	return nil
+}
+
+func checkQuery(q string) string {
+	switch {
+	case strings.Contains(q, " "):
+		return searchExact(q)
+	case strings.Contains(q, "AND"):
+		return searchAND(q)
+	case strings.Contains(q, "OR"):
+		return searchOR(q)
+	case strings.Contains(q, "NOT"):
+		return searchNOT(q)
+	default:
+		return q
+	}
 }

@@ -68,12 +68,12 @@ func (aDB *articlesDB) Get(offset int) (*core.ArticleSeries, error) {
 }
 
 // Find implements a mysql fulltext search of the articles table
-func (aDB *articlesDB) Find(term string) (*core.ArticleSeries, error) {
+func (aDB *articlesDB) Find(terms string) (*core.ArticleSeries, error) {
 	series := make(core.ArticleSeries, 0, 12)
 
-	query := "SELECT * FROM articles WHERE MATCH (title, topics, questions) AGAINST (?) ORDER BY id DESC"
+	query := "SELECT * FROM articles WHERE MATCH (title, topics, questions) AGAINST (? IN BOOLEAN MODE) ORDER BY id DESC"
 
-	rows, err := aDB.DB.Queryx(query, term)
+	rows, err := aDB.DB.Queryx(query, terms)
 	if err != nil {
 		return nil, fmt.Errorf("PScaleArticles: unable to query pscale database - %w", err)
 	}
@@ -94,7 +94,7 @@ func (aDB *articlesDB) Find(term string) (*core.ArticleSeries, error) {
 	}
 
 	if len(series) == 0 {
-		return &series, fmt.Errorf("PScaleArticles: no articles matched the query %s", term)
+		return &series, fmt.Errorf("PScaleArticles: no articles matched the query %s", terms)
 	}
 
 	return &series, nil
