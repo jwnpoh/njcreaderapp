@@ -11,12 +11,12 @@ import (
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 )
 
-type articlesDB struct {
+type ArticlesDB struct {
 	DB *sqlx.DB
 }
 
 // NewPscaleDB returns a connection interface for the application to connect to the planetscale database.
-func NewArticlesDB(dsn string) (*articlesDB, error) {
+func NewArticlesDB(dsn string) (*ArticlesDB, error) {
 	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("PScaleArticles: unable to initialize pscale database - %w", err)
@@ -28,11 +28,11 @@ func NewArticlesDB(dsn string) (*articlesDB, error) {
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(10)
 
-	return &articlesDB{DB: db}, nil
+	return &ArticlesDB{DB: db}, nil
 }
 
 // Get retrieves a slice of 12 articles from the planetscale database with limit and offset in the query.
-func (aDB *articlesDB) Get(offset int) (*core.ArticleSeries, error) {
+func (aDB *ArticlesDB) Get(offset int) (*core.ArticleSeries, error) {
 	series := make(core.ArticleSeries, 0, 12)
 
 	query := "SELECT * FROM articles ORDER BY id DESC LIMIT 12 OFFSET ?"
@@ -62,7 +62,7 @@ func (aDB *articlesDB) Get(offset int) (*core.ArticleSeries, error) {
 }
 
 // Find implements a mysql fulltext search of the articles table
-func (aDB *articlesDB) Find(terms string) (*core.ArticleSeries, error) {
+func (aDB *ArticlesDB) Find(terms string) (*core.ArticleSeries, error) {
 	series := make(core.ArticleSeries, 0, 12)
 
 	query := "SELECT * FROM articles WHERE MATCH (title, topics, questions) AGAINST (? IN BOOLEAN MODE) ORDER BY id DESC"
@@ -96,7 +96,7 @@ func (aDB *articlesDB) Find(terms string) (*core.ArticleSeries, error) {
 }
 
 // Store stores a slice of articles sent from the front end admin dashboard via the articles service.
-func (aDB *articlesDB) Store(data *core.ArticleSeries) error {
+func (aDB *ArticlesDB) Store(data *core.ArticleSeries) error {
 	query := "INSERT INTO articles (title, url, topics, questions, published_on) VALUES (?, ?, ?, ?, ?)"
 
 	for _, article := range *data {

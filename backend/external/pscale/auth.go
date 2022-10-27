@@ -13,11 +13,11 @@ import (
 // 	DeleteToken(user *core.Token) error
 // }
 
-type authDB struct {
+type AuthDB struct {
 	DB *sqlx.DB
 }
 
-func NewAuthDB(dsn string) (*authDB, error) {
+func NewAuthDB(dsn string) (*AuthDB, error) {
 	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("unable to initialize pscale database - %w", err)
@@ -29,17 +29,17 @@ func NewAuthDB(dsn string) (*authDB, error) {
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(10)
 
-	return &authDB{DB: db}, nil
+	return &AuthDB{DB: db}, nil
 }
 
-func (ps *authDB) InsertToken(token *core.Token, user *core.User) error {
+func (ps *AuthDB) InsertToken(token *core.Token, user *core.User) error {
 	return nil
 }
 
-func (ps *authDB) GetToken(tokenString string) (*core.Token, error) {
+func (ps *AuthDB) GetToken(tokenString string) (*core.Token, error) {
 	return &core.Token{}, nil
 }
 
-func (ps *authDB) DeleteToken(user *core.Token) error {
+func (ps *AuthDB) DeleteToken(user *core.Token) error {
 	return nil
 }

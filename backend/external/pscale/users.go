@@ -14,11 +14,11 @@ import (
 // 	UpdateUser(id int, field, newValue string) error
 // }
 
-type usersDB struct {
+type UsersDB struct {
 	DB *sqlx.DB
 }
 
-func NewUsersDB(dsn string) (*usersDB, error) {
+func NewUsersDB(dsn string) (*UsersDB, error) {
 	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("unable to initialize pscale database - %w", err)
@@ -30,10 +30,10 @@ func NewUsersDB(dsn string) (*usersDB, error) {
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(10)
 
-	return &usersDB{DB: db}, nil
+	return &UsersDB{DB: db}, nil
 }
 
-func (uDB *usersDB) InsertUser(user *core.User) error {
+func (uDB *UsersDB) InsertUser(user *core.User) error {
 	query := "INSERT INTO users (email, hash, role, last_login) VALUES (?, ?, ?, ?)"
 
 	tx, err := uDB.DB.Begin()
@@ -55,7 +55,7 @@ func (uDB *usersDB) InsertUser(user *core.User) error {
 	return nil
 }
 
-func (uDB *usersDB) GetUser(field string, value any) (*core.User, error) {
+func (uDB *UsersDB) GetUser(field string, value any) (*core.User, error) {
 	query := fmt.Sprintf("SELECT * FROM users WHERE %s = ?", field)
 
 	row := uDB.DB.QueryRowx(query, value)
@@ -78,7 +78,7 @@ func (uDB *usersDB) GetUser(field string, value any) (*core.User, error) {
 	return &user, nil
 }
 
-func (uDB *usersDB) UpdateUser(id int, field, newValue string) error {
+func (uDB *UsersDB) UpdateUser(id int, field, newValue string) error {
 	if field != "hash" && field != "last_login" && field != "role" {
 		return fmt.Errorf("field must be one of 'hash', 'last_login', or 'role'")
 	}
@@ -104,7 +104,7 @@ func (uDB *usersDB) UpdateUser(id int, field, newValue string) error {
 	return nil
 }
 
-func (uDB *usersDB) DeleteUser(id int) error {
+func (uDB *UsersDB) DeleteUser(id int) error {
 	query := "DELETE FROM users WHERE id = ?"
 
 	tx, err := uDB.DB.Begin()
