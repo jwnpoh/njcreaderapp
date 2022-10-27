@@ -1,6 +1,8 @@
 <script>
   import Card from "$lib/Card.svelte";
   export let articles;
+  export let page;
+  $: console.log(page);
 </script>
 
 <div class="px-10 grid md:grid-cols-2 gap-10">
@@ -15,4 +17,31 @@
       />
     </div>
   {/each}
+</div>
+<div class="flex justify-center pt-10">
+  {#if page > 1}
+    <div class="flex-initial btn-group grid grid-cols-2 ">
+      <button
+        class="btn btn-outline"
+        on:click={() => {
+          page--;
+        }}>Previous page</button
+      >
+      <button
+        class="btn btn-outline"
+        on:click={() => {
+          page++;
+        }}>Next</button
+      >
+    </div>
+  {:else}
+    <div class="flex-initial btn-group grid ">
+      <button
+        class="btn btn-outline"
+        on:click={() => {
+          page++;
+        }}>Next page</button
+      >
+    </div>
+  {/if}
 </div>

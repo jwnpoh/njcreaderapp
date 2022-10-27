@@ -1,15 +1,8 @@
 <script>
   import Icon from "svelte-awesome";
   import user from "svelte-awesome/icons/user";
-  import { goto } from "$app/navigation";
 
   let searchTerm = "";
-  $: console.log(searchTerm);
-
-  const submitForm = () => {
-    const queryURL = "/search/" + searchTerm;
-    goto(queryURL);
-  };
 </script>
 
 <div class="navbar bg-primary fixed top-0 z-10">
@@ -50,7 +43,7 @@
     >
   </div>
   <div class="navbar-end">
-    <form on:submit={submitForm}>
+    <form action="/search/{searchTerm}">
       <div class="form-control px-3">
         <input
           type="text"
