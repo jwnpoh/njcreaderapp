@@ -42,7 +42,7 @@ func (b *broker) Find(w http.ResponseWriter, r *http.Request) {
 
 	data, err := b.Articles.Find(q)
 	if err != nil {
-		s := serializer.NewSerializer(true, "unable to find results for search term", err)
+		s := serializer.NewSerializer(true, fmt.Sprintf("unable to find results for search term %s", q), err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		return

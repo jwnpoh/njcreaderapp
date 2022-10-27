@@ -82,7 +82,6 @@ func (s *serializer) ErrorJson(w http.ResponseWriter, err error, status ...int) 
 	}
 
 	s.Error = true
-	s.Message = err.Error()
 
 	return s.Encode(w, statusCode)
 }
