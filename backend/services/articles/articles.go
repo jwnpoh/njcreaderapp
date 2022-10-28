@@ -29,7 +29,7 @@ func NewArticlesService(articlesDB ArticleService) *Articles {
 // Get gets up to 12 documents per page from PScale and serves them in pages of 12 articles each.
 func (a *Articles) Get(page int) (serializer.Serializer, error) {
 	// logic for pagination
-	n := ((page - 1) * 12)
+	n := ((page - 1) * 10)
 	if n < 0 {
 		n = 0
 	}

@@ -31,11 +31,11 @@ func NewArticlesDB(dsn string) (*ArticlesDB, error) {
 	return &ArticlesDB{DB: db}, nil
 }
 
-// Get retrieves a slice of 12 articles from the planetscale database with limit and offset in the query.
+// Get retrieves a slice of 10 articles from the planetscale database with limit and offset in the query.
 func (aDB *ArticlesDB) Get(offset int) (*core.ArticleSeries, error) {
-	series := make(core.ArticleSeries, 0, 12)
+	series := make(core.ArticleSeries, 0, 10)
 
-	query := "SELECT * FROM articles ORDER BY id DESC LIMIT 12 OFFSET ?"
+	query := "SELECT * FROM articles ORDER BY id DESC LIMIT 10 OFFSET ?"
 
 	rows, err := aDB.DB.Queryx(query, offset)
 	if err != nil {
