@@ -7,7 +7,7 @@
 ## Introduction
 The NJC Reader is a full stack web app that is an evolution of the [NJC GP News Feed](njc-gp-newsfeed.et.r.appspot.com). This web app represents an improvement on earlier iterations in the following ways:  
 - Cleaner back end code, adopting a *sort-of* microservices/hex-arch architecture. It is *sort-of*, as I have merely watched various Youtube tutorials on these topics and attempted to implement the principles to the best of my understanding. Pretty sure I got it wrong somewhere.
-- Adopting Svelte/SvelteKit for the front end for a PWA experience for users
+- SvelteKit for a better front end experience for users
 - Utilizing an actual database and the capabilities that such platforms provide, instead of Google Sheets
 
 ### Technologies/Platforms/Frameworks
@@ -23,4 +23,12 @@ The NJC Reader is a full stack web app that is an evolution of the [NJC GP News 
 - [daisyUI](https://daisyui.com/)
 - [Tailwind CSS](https://tailwindcss.com/)
 
-
+### Progress tracking
+- [x] articles feed api
+- [x] articles feed ui
+- [x] articles admin api
+- [ ] articles admin ui
+- [ ] columns feed and admin ui and api
+- [ ] user authentication
+- [ ] user dashboard
+- [ ] user notebook
