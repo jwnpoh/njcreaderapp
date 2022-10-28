@@ -8,6 +8,7 @@
 <div class="navbar bg-primary fixed top-0 z-10">
   <div class="navbar-start">
     <div class="dropdown">
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <!-- svelte-ignore a11y-label-has-associated-control -->
       <label tabindex="0" class="btn btn-ghost btn-circle">
         <svg
@@ -24,6 +25,7 @@
           /></svg
         >
       </label>
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <ul
         tabindex="0"
         class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
@@ -36,10 +38,8 @@
     </div>
   </div>
   <div class="navbar-center">
-    <a
-      data-sveltekit-reload
-      href="/articles/1"
-      class="btn btn-ghost normal-case text-xl">The NJC Reader</a
+    <a class="btn btn-ghost normal-case text-xl" data-sveltekit-reload href="/"
+      >The NJC Reader</a
     >
   </div>
   <div class="navbar-end">
@@ -56,23 +56,22 @@
     </form>
 
     <div class="dropdown dropdown-end">
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <div tabindex="0" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full shadow-md py-2">
           <Icon data={user} scale={1.3} />
         </div>
       </div>
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <ul
         tabindex="0"
         class="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52"
       >
         <li>
-          <a class="justify-between">
-            Profile
-            <span class="badge">New</span>
-          </a>
+          <a href="/profile" class="justify-between"> Profile </a>
         </li>
-        <li><a>Settings</a></li>
-        <li><a>Logout</a></li>
+        <li><a href="/profile">Settings</a></li>
+        <li><a href="/profile">Logout</a></li>
       </ul>
     </div>
   </div>
