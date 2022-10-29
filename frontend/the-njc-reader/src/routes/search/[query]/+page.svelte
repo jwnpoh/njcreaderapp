@@ -8,10 +8,8 @@
   const query = data.query;
 </script>
 
-<p class="py-4 italic font-medium text-xl">Showing results for: "{query}"</p>
-
 {#if !error}
-  <CardContainer {articles} />
+  <CardContainer {articles} {query} />
 {:else}
   {message}
 {/if}

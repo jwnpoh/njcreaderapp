@@ -2,11 +2,18 @@
   import Card from "$lib/Card.svelte";
   export let articles;
   export let page;
+  export let query;
 
   const navigate = (p) => {
     window.location.href = `/articles/${p}`;
   };
 </script>
+
+{#if query}
+  <p class="px-10 py-4 italic font-medium text-xl">
+    Showing results for: "{query}"
+  </p>
+{/if}
 
 <div class="px-10 grid md:grid-cols-2 gap-10">
   {#each articles as article}
@@ -21,6 +28,7 @@
     </div>
   {/each}
 </div>
+
 {#if page}
   <div class="flex justify-center pt-10">
     {#if page > 1}

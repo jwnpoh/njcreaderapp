@@ -4,14 +4,20 @@
   export let topics;
   export let questions;
   export let date;
+
+  let checkBox;
+  $: collapseTitle = checkBox
+    ? "Past year questions"
+    : "View past year questions";
 </script>
 
-<div class="card bg-base-100 shadow-md min-h-full">
+<div class="card bg-base-100 shadow-lg ">
   <div class="card-body pb-5">
     <h2 class="card-title">
       <a href={url} rel="noreferrer" target="_blank">{title}</a>
     </h2>
     <p>{date}</p>
+    <div />
     <div class="inline">
       {#each topics as topic}
         <a data-sveltekit-reload href="/search/{topic}"
@@ -20,10 +26,11 @@
       {/each}
     </div>
     <div class="divider" />
-    <div class="collapse">
-      <input type="checkbox" />
-      <div class="collapse-title px-0 pt-2">
-        Click to view past year questions
+
+    <div class="collapse collapse-arrow">
+      <input type="checkbox" bind:checked={checkBox} />
+      <div class="collapse-title px-0 font-medium">
+        {collapseTitle}
       </div>
       <div class="collapse-content px-0 py-0">
         <ul class="list-none">

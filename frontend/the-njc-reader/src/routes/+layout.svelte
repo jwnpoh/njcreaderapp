@@ -11,7 +11,7 @@
   </Container>
 </main>
 
-<footer class="footer footer-center p-4 bg-secondary text-base-content">
+<footer class="footer footer-center p-4 bg-primary text-white">
   <div>
     <p>Copyright © 2022 National Junior College</p>
   </div>
