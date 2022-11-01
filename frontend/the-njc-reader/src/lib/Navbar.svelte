@@ -1,6 +1,8 @@
 <script>
   let searchTerm = "";
   let showMenu;
+
+  export let signedIn;
 </script>
 
 <div class="navbar bg-primary text-white fixed top-0 z-10 ">
@@ -34,7 +36,17 @@
           <li><a data-sveltekit-reload href="/articles/1">News Feed</a></li>
           <li><a href="/columns/1">Longer Reads</a></li>
           <li><a href="/about">About</a></li>
-          <li><a href="/feedback">Feedback</a></li>
+          {#if signedIn}
+            <li><a href="/feedback">Feedback</a></li>
+            <li>
+              <a href="/preferences">Preferences</a>
+            </li>
+          {/if}
+          <li>
+            <a class="bg-secondary text-black" href="/sign-in"
+              >{signedIn ? "Log out" : "Log in"}</a
+            >
+          </li>
         </ul>
       </div>
     </div>

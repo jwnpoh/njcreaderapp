@@ -4,10 +4,8 @@ export async function load({ fetch }) {
   const data = await res.json();
 
   const articles = data.data;
-  // const page = params.page;
 
   return {
     articles: articles,
-    // page: page,
   };
 }

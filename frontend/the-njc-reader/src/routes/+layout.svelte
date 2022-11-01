@@ -2,10 +2,14 @@
   import "../app.css";
   import Navbar from "$lib/Navbar.svelte";
   import Container from "$lib/Container.svelte";
+
+  let signedIn;
 </script>
 
+<header>
+  <Navbar {signedIn} />
+</header>
 <main>
-  <Navbar />
   <Container>
     <slot />
   </Container>
