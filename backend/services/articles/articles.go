@@ -2,6 +2,7 @@ package articles
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -46,6 +47,7 @@ func (a *Articles) Get(page int) (serializer.Serializer, error) {
 // Find parses the query and sends it to database for querying results
 func (a *Articles) Find(q string) (serializer.Serializer, error) {
 	terms := checkQuery(q)
+	fmt.Println("querying database with ", terms)
 
 	articles, err := a.db.Find(terms)
 	if err != nil {
@@ -76,6 +78,22 @@ func (a *Articles) Store(data core.ArticleSeries) error {
 }
 
 func checkQuery(q string) string {
+	searchYrAndQn := regexp.MustCompile(`^\d{4}\s?-?\s?(q|Q)?\d{1,2}$`)
+
+	if searchYrAndQn.MatchString(q) {
+		fmt.Println("found irregular question search", q)
+		cutYear := regexp.MustCompile(`\d{4}`)
+		year := cutYear.FindString(q)
+		fmt.Println("year - ", year)
+		q = strings.TrimLeft(q, year)
+		cutQnNo := regexp.MustCompile(`(q|Q)?\d{1,2}`)
+		qnNumber := strings.TrimLeft(strings.ToLower(cutQnNo.FindString(q)), "q")
+		fmt.Println("q no - ", qnNumber)
+
+		q = fmt.Sprintf("%s - Q%s", year, qnNumber)
+		fmt.Println("reformatted question term ", q)
+	}
+
 	switch {
 	case strings.Contains(q, " "):
 		return searchExact(q)

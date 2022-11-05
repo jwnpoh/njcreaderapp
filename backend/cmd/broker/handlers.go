@@ -78,18 +78,21 @@ func (b *broker) Store(w http.ResponseWriter, r *http.Request) {
 
 func (b *broker) Authenticate(w http.ResponseWriter, r *http.Request) {
 	var userInput struct {
-		Email    string `json:"username"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
 	s := serializer.NewSerializer(false, "", nil)
 	s.Decode(w, r, &userInput)
 
+	fmt.Println("userInput: ", userInput)
+
 	user, err := b.Users.GetUser("email", userInput.Email)
 	if err != nil {
 		s := serializer.NewSerializer(true, "invalid credentials", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
+		return
 	}
 
 	err = hasher.CheckHash(user.Hash, userInput.Password)
@@ -112,7 +115,7 @@ func (b *broker) Authenticate(w http.ResponseWriter, r *http.Request) {
 	b.Logger.Success(s, r)
 }
 
-func (b *broker) InsertUserTest(w http.ResponseWriter, r *http.Request) {
+func (b *broker) InsertUser(w http.ResponseWriter, r *http.Request) {
 	var u = core.User{
 		Email:     "jwn.poh@gmail.com",
 		Hash:      "testing",
@@ -132,21 +135,29 @@ func (b *broker) InsertUserTest(w http.ResponseWriter, r *http.Request) {
 	b.Logger.Success(s, r)
 }
 
-func (b *broker) GetUserTest(w http.ResponseWriter, r *http.Request) {
-	user, err := b.Users.GetUser("email", "jwn.poh@gmail.com")
+func (b *broker) GetUser(w http.ResponseWriter, r *http.Request) {
+	userID, err := b.Authenticator.AuthenticateToken(r)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to authenticate user", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	user, err := b.Users.GetUser("id", userID)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to get user", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
-		fmt.Println(err)
 		return
 	}
 
 	s := serializer.NewSerializer(false, "successfully retrieved user", user)
+	s.Encode(w, http.StatusAccepted)
 	b.Logger.Success(s, r)
 }
 
-func (b *broker) UpdateUserTest(w http.ResponseWriter, r *http.Request) {
+func (b *broker) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	newPassword := "mypassword"
 
 	u, _ := b.Users.GetUser("email", "jwn.poh@gmail.com")
@@ -163,7 +174,7 @@ func (b *broker) UpdateUserTest(w http.ResponseWriter, r *http.Request) {
 	b.Logger.Success(s, r)
 }
 
-func (b *broker) DeleteUserTest(w http.ResponseWriter, r *http.Request) {
+func (b *broker) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	user, _ := b.Users.GetUser("email", "jwn.poh@gmail.com")
 
 	err := b.Users.DeleteUser(user.ID)
@@ -176,5 +187,28 @@ func (b *broker) DeleteUserTest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s := serializer.NewSerializer(false, "successfully deleted user", user.ID)
+	b.Logger.Success(s, r)
+}
+
+func (b *broker) Logout(w http.ResponseWriter, r *http.Request) {
+	userID, err := b.Authenticator.AuthenticateToken(r)
+
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to authenticate user", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	err = b.Authenticator.DeleteToken(userID)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to log user out", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	s := serializer.NewSerializer(false, "successfully logged user out", nil)
+	s.Encode(w, http.StatusAccepted)
 	b.Logger.Success(s, r)
 }
