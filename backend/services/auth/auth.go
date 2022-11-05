@@ -1,6 +1,10 @@
 package auth
 
 import (
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base32"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strings"
@@ -10,9 +14,9 @@ import (
 )
 
 type AuthDB interface {
-	InsertToken(token *core.Token, user *core.User) error
-	GetToken(tokenString string) (*core.Token, error)
-	DeleteToken(user *core.Token) error
+	InsertToken(token *core.Token) error
+	GetToken(tokenHash string) (*core.Token, error)
+	DeleteToken(userID int) error
 	// CreateToken(userID int, timeToLife time.Duration) (*core.Token, error)
 	// AuthenticateToken(r *http.Request) (*core.User, error)
 }
@@ -26,18 +30,38 @@ func NewAuthenticator(authDB AuthDB) *Authenticator {
 }
 
 func (auth *Authenticator) CreateToken(userID int, timeToLife time.Duration) (*core.Token, error) {
-	// generate random string and insert to DB
+	token := &core.Token{
+		UserID: userID,
+		Expiry: time.Now().Add(timeToLife),
+	}
 
-	return &core.Token{}, nil
-}
-
-func (auth *Authenticator) checkToken(tokenString string) (*core.Token, error) {
-	token, err := auth.db.GetToken(tokenString)
+	randomBytes := make([]byte, 16)
+	_, err := rand.Read(randomBytes)
 	if err != nil {
-		return nil, fmt.Errorf("auth: no user session found %s - %w", tokenString, err)
+		return nil, err
+	}
+
+	token.PlainToken = base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
+	hash := sha256.Sum256([]byte(token.PlainToken))
+	hashed := hash[:]
+	hashString := hex.EncodeToString(hashed)
+	token.Hash = hashString
+
+	err = auth.db.InsertToken(token)
+	if err != nil {
+		return nil, err
 	}
 
 	return token, nil
+}
+
+func (auth *Authenticator) DeleteToken(userID int) error {
+	err := auth.db.DeleteToken(userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (auth *Authenticator) AuthenticateToken(r *http.Request) (int, error) {
@@ -52,14 +76,24 @@ func (auth *Authenticator) AuthenticateToken(r *http.Request) (int, error) {
 	}
 
 	token := headerParts[1]
-	if len(token) != 26 {
-		return 0, fmt.Errorf("authentication token wrong size")
-	}
 
 	tok, err := auth.checkToken(token)
 	if err != nil {
-		return 0, fmt.Errorf("token not found")
+		return 0, err
 	}
 
 	return tok.UserID, nil
+}
+
+func (auth *Authenticator) checkToken(tokenString string) (*core.Token, error) {
+	token, err := auth.db.GetToken(tokenString)
+	if err != nil {
+		return nil, fmt.Errorf("auth: no user session found for %s - %w", tokenString, err)
+	}
+
+	if time.Since(token.Expiry) > 0 {
+		return nil, fmt.Errorf("auth: token has expired")
+	}
+
+	return token, nil
 }

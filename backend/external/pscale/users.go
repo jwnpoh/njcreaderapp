@@ -83,7 +83,7 @@ func (uDB *UsersDB) UpdateUser(id int, field, newValue string) error {
 		return fmt.Errorf("field must be one of 'hash', 'last_login', or 'role'")
 	}
 
-	query := "UPDATE users SET hash = ? WHERE id = ?"
+	query := fmt.Sprintf("UPDATE users SET %s = ? WHERE id = ?", field)
 
 	tx, err := uDB.DB.Begin()
 	if err != nil {
