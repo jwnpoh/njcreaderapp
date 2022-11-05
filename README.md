@@ -29,6 +29,6 @@ The NJC Reader is a full stack web app that is an evolution of the [NJC GP News 
 - [x] articles admin api
 - [ ] articles admin ui
 - [ ] columns feed and admin ui and api
-- [ ] user authentication
+- [x] user authentication
 - [ ] user dashboard
 - [ ] user notebook
