@@ -1,13 +1,14 @@
 <script>
+  import { page } from "$app/stores";
   import "../app.css";
   import Navbar from "$lib/Navbar.svelte";
   import Container from "$lib/Container.svelte";
 
-  let signedIn;
+  let user = $page.data.user;
 </script>
 
 <header>
-  <Navbar {signedIn} />
+  <Navbar {user} />
 </header>
 <main>
   <Container>

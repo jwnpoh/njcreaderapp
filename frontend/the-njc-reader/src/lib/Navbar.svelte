@@ -1,8 +1,13 @@
 <script>
-  let searchTerm = "";
-  let showMenu;
+  export let user;
 
-  export let signedIn;
+  let role;
+  if (user) {
+    role = user.role;
+  }
+  console.log(role);
+
+  let showMenu;
 </script>
 
 <div class="navbar bg-primary text-white fixed top-0 z-10 ">
@@ -36,15 +41,23 @@
           <li><a data-sveltekit-reload href="/articles/1">News Feed</a></li>
           <li><a href="/columns/1">Longer Reads</a></li>
           <li><a href="/about">About</a></li>
-          {#if signedIn}
+          {#if user}
             <li><a href="/feedback">Feedback</a></li>
             <li>
               <a href="/preferences">Preferences</a>
             </li>
+            {#if (role = "admin")}
+              <li>
+                <a href="/admin">Admin dashboard</a>
+              </li>
+            {/if}
           {/if}
           <li>
-            <a class="bg-secondary text-black" href="/sign-in"
-              >{signedIn ? "Log out" : "Log in"}</a
+            <a
+              data-sveltekit-reload
+              class="bg-secondary text-black"
+              href={user ? "/logout" : "/login"}
+              >{user ? "Log out" : "Log in"}</a
             >
           </li>
         </ul>
@@ -57,14 +70,13 @@
     >
   </div>
   <div class="md:navbar-end">
-    <form action="/search/{searchTerm}">
-      <div class="form-control px-3 fixed top-2 right-1">
+    <form method="POST" action="/search">
+      <div class="form-control px-3 fixed top-2 right-1 text-black">
         <input
           type="text"
           placeholder="Search"
           class="input input-bordered"
-          bind:value={searchTerm}
-          name="term"
+          name="query"
         />
       </div>
     </form>

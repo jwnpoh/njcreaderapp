@@ -9,11 +9,11 @@ const config = {
   daisyui: {
     themes: [{
       mytheme: {
-        primary: "#e53935",
-        secondary: "rgb(254, 219, 0)",
-        accent: "#37cdbe",
+        primary: "#990011FF",
+        secondary: "#FAA21C",
+        accent: "#1E5DA3",
         neutral: "rgb(83, 86, 90)",
-        "base-100": "#efefef",
+        "base-100": "#FCF6F5FF",
       },
     },
     ]

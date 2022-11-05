@@ -20,9 +20,10 @@
     <div />
     <div class="inline">
       {#each topics as topic}
-        <a data-sveltekit-reload href="/search/{topic}"
-          ><div class="badge badge-outline mx-1">{topic}</div></a
-        >
+        <form class="inline" action="/search" method="POST">
+          <input type="hidden" value={topic} name="query" />
+          <button class="badge badge-outline ">{topic}</button>
+        </form>
       {/each}
     </div>
     <div class="divider" />
@@ -35,7 +36,10 @@
       <div class="collapse-content px-0 py-0">
         <ul class="list-none">
           {#each questions as question}
-            <li>{question}</li>
+            <form action="/search" method="POST">
+              <input type="hidden" value={question} name="query" />
+              <button class="submit-btn">{question}</button>
+            </form>
             <br />
           {/each}
         </ul>
@@ -43,3 +47,17 @@
     </div>
   </div>
 </div>
+
+<style>
+  .submit-btn {
+    width: 100%;
+    position: relative;
+    background-color: none;
+    text-align: start;
+    cursor: default;
+  }
+
+  .submit-btn:hover {
+    cursor: pointer;
+  }
+</style>
