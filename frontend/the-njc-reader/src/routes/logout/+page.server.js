@@ -5,15 +5,12 @@ export const load = async ({ cookies }) => {
   const session = cookies.get("session");
 
   const res = await logOut(session)
-  console.log(res)
 
   // eat the cookie
   cookies.set("session", "", {
     path: "/",
     Expires: new Date(0),
   })
-
-  console.log("hit the log out")
 
   throw redirect(302, "/login")
 }

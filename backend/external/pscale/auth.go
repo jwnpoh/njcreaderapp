@@ -49,6 +49,28 @@ func (ps *AuthDB) InsertToken(token *core.Token) error {
 	return nil
 }
 
+func (ps *AuthDB) RefreshToken(token *core.Token) error {
+	query := "UPDATE sessions SET expiry = ? WHERE token = ?"
+
+	tx, err := ps.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("PScaleArticles: unable to begin tx for refreshing session token to db - %w", err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(query, token.Expiry, token.PlainToken)
+	if err != nil {
+		return fmt.Errorf("PScaleArticles: unable to insert session token for %d to db - %w", token.UserID, err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("PScaleArticles: unable to commit tx to db - %w", err)
+	}
+
+	return nil
+}
+
 func (ps *AuthDB) GetToken(tokenHash string) (*core.Token, error) {
 	query := "SELECT token, userID, expiry, hash FROM sessions WHERE hash = ?"
 
@@ -78,23 +100,45 @@ func (ps *AuthDB) GetToken(tokenHash string) (*core.Token, error) {
 	return token, nil
 }
 
-func (ps *AuthDB) DeleteToken(userID int) error {
+func (ps *AuthDB) DeleteToken(token string) error {
+	query := "DELETE FROM sessions WHERE token = ?"
+
+	tx, err := ps.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("unable to begin db tx for deleting session token %s - %w", token, err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(query, token)
+	if err != nil {
+		return fmt.Errorf("unable to delete session token %s from database - %w", token, err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("unable to commit tx to db for deleting session token - %w", err)
+	}
+
+	return nil
+}
+
+func (ps *AuthDB) ClearTokens(userID int) error {
 	query := "DELETE FROM sessions WHERE userID = ?"
 
 	tx, err := ps.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("unable to begin db tx for deleting session token for userID %d - %w", userID, err)
+		return fmt.Errorf("unable to begin db tx for clearing session tokens for userID %d - %w", userID, err)
 	}
 	defer tx.Rollback()
 
 	_, err = tx.Exec(query, userID)
 	if err != nil {
-		return fmt.Errorf("unable to delete session token for userID %d from database - %w", userID, err)
+		return fmt.Errorf("unable to clear session tokens for userID %d from database - %w", userID, err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("unable to commit tx to db for updating user - %w", err)
+		return fmt.Errorf("unable to commit tx to db for clearing session tokens - %w", err)
 	}
 
 	return nil

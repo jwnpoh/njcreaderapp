@@ -8,10 +8,6 @@ import (
 )
 
 type UsersDB interface {
-	// InsertUser(*core.User) error
-	// GetUser(field string, value any) (*core.User, error)
-	// DeleteUser(id int) error
-	// UpdateUserPassword(id int, newPasswordHash string) error
 	InsertUser(*core.User) error
 	GetUser(field string, value any) (*core.User, error)
 	DeleteUser(id int) error

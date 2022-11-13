@@ -47,10 +47,8 @@ func (r *FireStoreRepo) Log(v interface{}) error {
 	defer client.Close()
 
 	// add log document to firestore
-	// t := strconv.Itoa(int(time.Now().Unix()))
 	year := strconv.Itoa(time.Now().Year())
 	month := time.Now().Month().String()
-	// date := time.Now().Format("2 Jan 2006 15:04")
 	t := time.Now().UnixMicro()
 	_, err = client.Collection("logs").Doc(year).Collection(month).Doc(strconv.Itoa(int(t))).Set(ctx, v)
 	if err != nil {

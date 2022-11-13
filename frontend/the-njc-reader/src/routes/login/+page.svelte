@@ -40,7 +40,7 @@
       </label>
     </div>
     <br />
-    <button class="btn btn-neutral">Log in</button>
+    <button class="btn btn-md bg-primary mx-3">Log in</button>
   </form>
   {#if form?.invalid}
     <p class="error">Username and password are required.</p>

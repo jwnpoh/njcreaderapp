@@ -22,7 +22,7 @@
         title={article.title}
         url={article.url}
         topics={article.topics}
-        questions={article.questions}
+        question_display={article.question_display}
         date={article.date}
       />
     </div>

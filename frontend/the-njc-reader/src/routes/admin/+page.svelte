@@ -1,0 +1,27 @@
+<script>
+  import { page } from "$app/stores";
+  import Container from "$lib/Container.svelte";
+
+  const userName = $page.data.user.name;
+</script>
+
+<Container>
+  <div class="pt-5 flex justify-center">
+    <p class="text-2xl font-medium">
+      Welcome to the admin dashboard, {userName}! What would you like to do
+      today?
+    </p>
+  </div>
+  <div class="divider" />
+  <div class="grid grid-cols-3 justify-items-center">
+    <button class="btn btn-link text-xl"
+      ><a href="/admin/add-articles">Add article(s)</a></button
+    >
+    <button class="btn btn-link text-xl"
+      ><a href="/admin/edit-articles">Edit article(s)</a></button
+    >
+    <button class="btn btn-link text-xl"
+      ><a href="/admin/delete-articles">Delete article(s)</a></button
+    >
+  </div>
+</Container>

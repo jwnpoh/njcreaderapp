@@ -15,10 +15,10 @@ import (
 
 type AuthDB interface {
 	InsertToken(token *core.Token) error
+	RefreshToken(token *core.Token) error
 	GetToken(tokenHash string) (*core.Token, error)
-	DeleteToken(userID int) error
-	// CreateToken(userID int, timeToLife time.Duration) (*core.Token, error)
-	// AuthenticateToken(r *http.Request) (*core.User, error)
+	DeleteToken(token string) error
+	ClearTokens(userID int) error
 }
 
 type Authenticator struct {
@@ -30,13 +30,18 @@ func NewAuthenticator(authDB AuthDB) *Authenticator {
 }
 
 func (auth *Authenticator) CreateToken(userID int, timeToLife time.Duration) (*core.Token, error) {
+	err := auth.db.ClearTokens(userID)
+	if err != nil {
+		return nil, err
+	}
+
 	token := &core.Token{
 		UserID: userID,
 		Expiry: time.Now().Add(timeToLife),
 	}
 
 	randomBytes := make([]byte, 16)
-	_, err := rand.Read(randomBytes)
+	_, err = rand.Read(randomBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +60,10 @@ func (auth *Authenticator) CreateToken(userID int, timeToLife time.Duration) (*c
 	return token, nil
 }
 
-func (auth *Authenticator) DeleteToken(userID int) error {
-	err := auth.db.DeleteToken(userID)
+func (auth *Authenticator) RefreshToken(token *core.Token) error {
+	token.Expiry = time.Now().Add(12 * time.Hour)
+
+	err := auth.db.RefreshToken(token)
 	if err != nil {
 		return err
 	}
@@ -64,25 +71,34 @@ func (auth *Authenticator) DeleteToken(userID int) error {
 	return nil
 }
 
-func (auth *Authenticator) AuthenticateToken(r *http.Request) (int, error) {
+func (auth *Authenticator) DeleteToken(token string) error {
+	err := auth.db.DeleteToken(token)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (auth *Authenticator) AuthenticateToken(r *http.Request) (*core.Token, error) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		return 0, fmt.Errorf("no authorization header received")
+		return nil, fmt.Errorf("no authorization header received")
 	}
 
 	headerParts := strings.Split(authHeader, " ")
 	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-		return 0, fmt.Errorf("no authorization header received")
+		return nil, fmt.Errorf("no authorization header received")
 	}
 
 	token := headerParts[1]
 
 	tok, err := auth.checkToken(token)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return tok.UserID, nil
+	return tok, nil
 }
 
 func (auth *Authenticator) checkToken(tokenString string) (*core.Token, error) {
@@ -92,6 +108,7 @@ func (auth *Authenticator) checkToken(tokenString string) (*core.Token, error) {
 	}
 
 	if time.Since(token.Expiry) > 0 {
+		err = auth.DeleteToken(token.PlainToken)
 		return nil, fmt.Errorf("auth: token has expired")
 	}
 

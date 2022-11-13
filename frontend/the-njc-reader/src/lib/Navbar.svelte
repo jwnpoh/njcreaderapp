@@ -10,7 +10,7 @@
   let showMenu;
 </script>
 
-<div class="navbar bg-primary text-white fixed top-0 z-10 ">
+<div class="navbar bg-primary text-white fixed top-0 z-50 ">
   <div class="md:navbar-start">
     <div class="dropdown">
       <button
@@ -46,7 +46,7 @@
             <li>
               <a href="/preferences">Preferences</a>
             </li>
-            {#if (role = "admin")}
+            {#if role === "admin"}
               <li>
                 <a href="/admin">Admin dashboard</a>
               </li>

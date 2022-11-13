@@ -7,13 +7,6 @@ import (
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 )
 
-// type PScaleUsersDB interface {
-// 	InsertUser(*core.User) error
-// 	GetUser(field string, value any) (*core.User, error)
-// 	DeleteUser(id int) error
-// 	UpdateUser(id int, field, newValue string) error
-// }
-
 type UsersDB struct {
 	DB *sqlx.DB
 }
@@ -60,9 +53,9 @@ func (uDB *UsersDB) GetUser(field string, value any) (*core.User, error) {
 
 	row := uDB.DB.QueryRowx(query, value)
 
-	var email, hash, role, lastLogin string
+	var email, hash, role, name, lastLogin string
 	var id int
-	err := row.Scan(&id, &email, &hash, &role, &lastLogin)
+	err := row.Scan(&id, &email, &hash, &role, &lastLogin, &name)
 	if err != nil {
 		return nil, fmt.Errorf("error scanning row to get user- %w", err)
 	}
@@ -71,6 +64,7 @@ func (uDB *UsersDB) GetUser(field string, value any) (*core.User, error) {
 		ID:        id,
 		Email:     email,
 		Hash:      hash,
+		Name:      name,
 		Role:      role,
 		LastLogin: lastLogin,
 	}

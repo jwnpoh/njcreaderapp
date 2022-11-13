@@ -32,15 +32,21 @@ func (b *broker) serveRoutes(mux chi.Router) {
 
 	mux.Post("/api/auth", b.Authenticate)
 
-	//test user functions
 	mux.Route("/api/users", func(mux chi.Router) {
 		mux.Use(b.Auth)
 		mux.Post("/logout", b.Logout)
-		mux.Post("/insert-user", b.InsertUser)
 		mux.Post("/get-user", b.GetUser)
+		mux.Post("/insert-user", b.InsertUser)
 		mux.Post("/update-user", b.UpdateUser)
 		mux.Post("/delete-user", b.DeleteUser)
+	})
 
-		mux.Post("/api/articles", b.Store)
+	mux.Route("/api/admin/articles", func(mux chi.Router) {
+		mux.Use(b.Auth)
+		mux.Post("/insert", b.Store)
+		mux.Post("/delete", b.Delete)
+		mux.Get("/update", b.Get100)
+		mux.Put("/update", b.Update)
+		mux.Post("/get-title", b.GetTitle)
 	})
 }

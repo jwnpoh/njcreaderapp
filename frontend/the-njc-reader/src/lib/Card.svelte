@@ -2,7 +2,7 @@
   export let title;
   export let url;
   export let topics;
-  export let questions;
+  export let question_display;
   export let date;
 
   let checkBox;
@@ -35,7 +35,7 @@
       </div>
       <div class="collapse-content px-0 py-0">
         <ul class="list-none">
-          {#each questions as question}
+          {#each question_display as question}
             <form action="/search" method="POST">
               <input type="hidden" value={question} name="query" />
               <button class="submit-btn">{question}</button>
