@@ -2,10 +2,9 @@
   export let user;
 
   let role;
-  if (user) {
+  if (user.loggedIn) {
     role = user.role;
   }
-  console.log(role);
 
   let showMenu;
 </script>
@@ -41,7 +40,7 @@
           <li><a data-sveltekit-reload href="/articles/1">News Feed</a></li>
           <li><a href="/columns/1">Longer Reads</a></li>
           <li><a href="/about">About</a></li>
-          {#if user}
+          {#if user.loggedIn}
             <li><a href="/feedback">Feedback</a></li>
             <li>
               <a href="/preferences">Preferences</a>
@@ -56,8 +55,8 @@
             <a
               data-sveltekit-reload
               class="bg-secondary text-black"
-              href={user ? "/logout" : "/login"}
-              >{user ? "Log out" : "Log in"}</a
+              href={user.loggedIn ? "/logout" : "/login"}
+              >{user.loggedIn ? "Log out" : "Log in"}</a
             >
           </li>
         </ul>

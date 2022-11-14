@@ -7,13 +7,13 @@
 
 <Container>
   <div class="pt-5 flex justify-center">
-    <p class="text-2xl font-medium">
+    <p class="px-5 md:text-2xl font-medium">
       Welcome to the admin dashboard, {userName}! What would you like to do
       today?
     </p>
   </div>
   <div class="divider" />
-  <div class="grid grid-cols-3 justify-items-center">
+  <div class="grid md:grid-cols-3 justify-items-center">
     <button class="btn btn-link text-xl"
       ><a href="/admin/add-articles">Add article(s)</a></button
     >

@@ -1,10 +1,16 @@
-import { redirect } from "@sveltejs/kit";
 
 export const handle = async ({ event, resolve }) => {
   const session = event.cookies.get("session")
 
   if (!session) {
-    redirect(302, "/login")
+    event.locals.user = {
+      email: "",
+      role: "",
+      name: "",
+      loggedIn: false,
+      session: "",
+    }
+    return await resolve(event)
   }
 
   const user = await getUser(session)
@@ -17,6 +23,15 @@ export const handle = async ({ event, resolve }) => {
       loggedIn: true,
       session: session
     }
+  } else {
+    event.locals.user = {
+      email: "",
+      role: "",
+      name: "",
+      loggedIn: false,
+      session: "",
+    }
+
   }
 
   return await resolve(event)
@@ -34,8 +49,5 @@ const getUser = async (session) => {
 
   const res = await fetch("http://localhost:8080/api/users/get-user", requestOptions)
   const user = await res.json()
-  if (res.error) {
-    throw redirect(302, "/login")
-  }
   return user
 }

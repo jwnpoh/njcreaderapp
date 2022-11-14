@@ -7,5 +7,6 @@ export async function load({ fetch }) {
 
   return {
     articles: articles,
+    page: 1,
   };
 }

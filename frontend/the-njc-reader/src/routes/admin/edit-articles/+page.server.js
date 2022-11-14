@@ -1,4 +1,10 @@
-export async function load({ fetch, cookies }) {
+import { redirect } from "@sveltejs/kit"
+
+export async function load({ fetch, cookies, locals }) {
+  if (!locals.user.loggedIn) {
+    throw redirect(302, "/login")
+  }
+
   const session = cookies.get("session")
 
   const myHeaders = new Headers();
@@ -26,6 +32,7 @@ export const actions = {
     const title = formData.get("title")
     const tags = formData.get("tags")
     const date = formData.get("date")
+    const must_read = formData.get("must_read")
     const id = formData.get("id")
 
     if (url.length < 1 || title.length < 1 || tags.length < 1) {
@@ -37,6 +44,7 @@ export const actions = {
         title,
         tags,
         date,
+        must_read,
       })
     }
     const payload = [{
@@ -44,7 +52,8 @@ export const actions = {
       title: title,
       url: url,
       tags: tags,
-      date: date
+      date: date,
+      must_read: must_read
     }];
 
     const session = cookies.get("session")

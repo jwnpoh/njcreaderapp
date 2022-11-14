@@ -24,6 +24,7 @@
         topics={article.topics}
         question_display={article.question_display}
         date={article.date}
+        mustRead={article.must_read}
       />
     </div>
   {/each}

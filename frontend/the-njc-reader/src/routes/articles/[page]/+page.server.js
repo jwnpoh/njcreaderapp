@@ -5,6 +5,7 @@ export async function load({ fetch, params }) {
 
   const articles = data.data;
   const page = params.page;
+  console.log(page)
 
   return {
     articles: articles,

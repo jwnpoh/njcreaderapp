@@ -162,6 +162,11 @@ func (a *Articles) parseNewArticles(input core.ArticlePayload) (core.ArticleSeri
 			}
 		}
 
+		var mustRead bool
+		if item.MustRead == "on" {
+			mustRead = true
+		}
+
 		article := core.Article{
 			ID:              id,
 			Title:           item.Title,
@@ -170,6 +175,7 @@ func (a *Articles) parseNewArticles(input core.ArticlePayload) (core.ArticleSeri
 			Questions:       questions,
 			QuestionDisplay: questionDisplay,
 			PublishedOn:     date,
+			MustRead:        mustRead,
 		}
 
 		data = append(data, article)

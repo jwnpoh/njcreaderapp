@@ -1,4 +1,10 @@
-export async function load({ fetch, cookies }) {
+import { redirect } from "@sveltejs/kit"
+
+export async function load({ fetch, cookies, locals }) {
+  if (!locals.user.loggedIn) {
+    throw redirect(302, "/login")
+  }
+
   const session = cookies.get("session")
 
   const myHeaders = new Headers();

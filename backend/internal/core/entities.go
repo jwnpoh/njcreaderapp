@@ -9,6 +9,7 @@ type Article struct {
 	Questions       []string `json:"questions"`
 	QuestionDisplay []string `json:"question_display"`
 	Date            string   `json:"date"`
+	MustRead        bool     `json:"must_read"`
 	PublishedOn     int64    `json:"published_on,omitempty"`
 }
 
@@ -16,11 +17,12 @@ type Article struct {
 type ArticleSeries []Article
 
 type ArticlePayload []struct {
-	ID    string `json:"id,omitempty"`
-	Title string `json:"title"`
-	URL   string `json:"url"`
-	Tags  string `json:"tags"`
-	Date  string `json:"date"`
+	ID       string `json:"id,omitempty"`
+	Title    string `json:"title"`
+	URL      string `json:"url"`
+	Tags     string `json:"tags"`
+	Date     string `json:"date"`
+	MustRead string `json:"must_read"`
 }
 
 // Question is the entity representing past year questions.

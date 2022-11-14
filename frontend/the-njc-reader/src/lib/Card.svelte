@@ -4,6 +4,7 @@
   export let topics;
   export let question_display;
   export let date;
+  export let mustRead;
 
   let checkBox;
   $: collapseTitle = checkBox
@@ -13,6 +14,9 @@
 
 <div class="card bg-base-100 shadow-lg ">
   <div class="card-body pb-5">
+    {#if mustRead}
+      <div class="badge badge-secondary">Must read!</div>
+    {/if}
     <h2 class="card-title">
       <a href={url} rel="noreferrer" target="_blank">{title}</a>
     </h2>

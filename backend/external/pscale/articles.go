@@ -45,7 +45,7 @@ func (aDB *ArticlesDB) Get(offset, limit int) (*core.ArticleSeries, error) {
 	for rows.Next() {
 		var article core.Article
 		var questions, questionDisplay, topics string
-		err = rows.Scan(&article.ID, &article.Title, &article.URL, &topics, &questions, &questionDisplay, &article.PublishedOn)
+		err = rows.Scan(&article.ID, &article.Title, &article.URL, &topics, &questions, &questionDisplay, &article.PublishedOn, &article.MustRead)
 		if err != nil {
 			return nil, fmt.Errorf("PScaleArticles: error scanning row - %w", err)
 		}
@@ -75,7 +75,7 @@ func (aDB *ArticlesDB) Find(terms string) (*core.ArticleSeries, error) {
 	for rows.Next() {
 		var article core.Article
 		var questions, questionDisplay, topics string
-		err = rows.Scan(&article.ID, &article.Title, &article.URL, &topics, &questions, &questionDisplay, &article.PublishedOn)
+		err = rows.Scan(&article.ID, &article.Title, &article.URL, &topics, &questions, &questionDisplay, &article.PublishedOn, &article.MustRead)
 		if err != nil {
 			return nil, fmt.Errorf("PScaleArticles: error scanning row - %w", err)
 		}
@@ -97,7 +97,7 @@ func (aDB *ArticlesDB) Find(terms string) (*core.ArticleSeries, error) {
 
 // Store stores a slice of articles sent from the front end admin dashboard via the articles service.
 func (aDB *ArticlesDB) Store(data *core.ArticleSeries) error {
-	query := "INSERT INTO articles (title, url, topics, questions, question_display, published_on) VALUES (?, ?, ?, ?, ?, ?)"
+	query := "INSERT INTO articles (title, url, topics, questions, question_display, published_on, must_read) VALUES (?, ?, ?, ?, ?, ?, ?)"
 
 	for _, article := range *data {
 		tx, err := aDB.DB.Begin()
@@ -106,7 +106,7 @@ func (aDB *ArticlesDB) Store(data *core.ArticleSeries) error {
 		}
 		defer tx.Rollback()
 
-		res, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn)
+		res, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.MustRead)
 		if err != nil {
 			return fmt.Errorf("PScaleArticles: unable to add article %s to db - %w", article.Title, err)
 		}
@@ -139,7 +139,7 @@ func (aDB *ArticlesDB) Store(data *core.ArticleSeries) error {
 }
 
 func (aDB *ArticlesDB) Update(data *core.ArticleSeries) error {
-	query := "UPDATE articles SET title = ?, url = ?, topics = ?, questions = ?, question_display= ?, published_on = ? WHERE id = ?"
+	query := "UPDATE articles SET title = ?, url = ?, topics = ?, questions = ?, question_display= ?, published_on = ?, must_read = ? WHERE id = ?"
 
 	for _, article := range *data {
 		tx, err := aDB.DB.Begin()
@@ -148,7 +148,7 @@ func (aDB *ArticlesDB) Update(data *core.ArticleSeries) error {
 		}
 		defer tx.Rollback()
 
-		res, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.ID)
+		res, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.MustRead, article.ID)
 		if err != nil {
 			return fmt.Errorf("PScaleArticles: unable to update article %s in db - %w", article.Title, err)
 		}

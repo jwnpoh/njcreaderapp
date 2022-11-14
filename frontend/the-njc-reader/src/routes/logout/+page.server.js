@@ -5,6 +5,7 @@ export const load = async ({ cookies }) => {
   const session = cookies.get("session");
 
   const res = await logOut(session)
+  console.log(res)
 
   // eat the cookie
   cookies.set("session", "", {

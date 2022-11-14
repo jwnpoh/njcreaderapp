@@ -43,8 +43,8 @@
 </div>
 <form method="POST" action="?/queue">
   <div class="flex pt-5 px-5">
-    <div class="flex-auto">
-      <div class="pt-3">
+    <div class="flex-auto basis-7/12">
+      <div class="">
         <input
           required
           name="url"
@@ -56,7 +56,8 @@
         />
       </div>
     </div>
-    <div class="flex-auto">
+
+    <div class="flex-auto  ">
       <div>
         <label for="date">Published on</label>
         <input type="text" name="date" bind:value={date} hidden />
@@ -69,16 +70,16 @@
       </div>
     </div>
   </div>
-  <div class="flex pt-5 px-5">
+  <div class="flex px-5">
     <input
       name="title"
       type="text"
-      placeholder="Article title (will be auto-populated after the URL is entered)"
+      placeholder="Article title"
       class="input w-full max-w-100"
       bind:value={title}
     />
   </div>
-  <div class="flex py-5 px-5">
+  <div class="flex pt-5 px-5">
     <input
       name="tags"
       type="text"
@@ -86,6 +87,11 @@
       class="input w-full max-w-100"
       bind:value={tags}
     />
+  </div>
+
+  <div class="flex py-5 px-5">
+    <label class="px-2" for="must_read">Must read?</label>
+    <input name="must_read" type="checkbox" class="checkbox" />
   </div>
 
   <button class="btn btn-sm btn-secondary mx-7">Add to queue</button>
@@ -99,7 +105,7 @@
 <div class="px-2 grid gap-10 relative">
   <div class="max-w-sm place-self-center">
     <form method="POST" action="?/send">
-      <button class="btn btn-md btn-primary ">Add to database</button>
+      <button class="btn btn-md btn-primary">Add to database</button>
     </form>
   </div>
   {#if form?.sent}
@@ -115,7 +121,10 @@
   {#each queue as item}
     <form method="POST" action="?/remove">
       <input type="hidden" name="index" value={item.index} />
-      <div class="card bg-base-100 shadow-lg ">
+      <div
+        class="card bg-base-100 shadow-lg"
+        class:bg-secondary={item.must_read}
+      >
         <div class="card-body pb-5">
           <h2 class="card-title">
             <a href={item.url} rel="noreferrer" target="_blank">{item.title}</a>

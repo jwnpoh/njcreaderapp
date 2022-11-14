@@ -9,6 +9,7 @@
   let title;
   let tags;
   let date = new Date();
+  let must_read;
 
   let id;
 
@@ -81,6 +82,15 @@
     />
   </div>
 
+  <div class="flex py-5 px-5">
+    <label class="px-2" for="must_read">Must read?</label>
+    <input
+      name="must_read"
+      bind:checked={must_read}
+      type="checkbox"
+      class="checkbox"
+    />
+  </div>
   <button class="btn btn-sm btn-primary mx-7">Save changes to article</button>
 </form>
 
@@ -101,6 +111,7 @@
       <tr>
         <th>check</th>
         <th>Title</th>
+        <th>Must read?</th>
         <th>Topics</th>
         <th>Questions</th>
         <th>Date</th>
@@ -120,10 +131,12 @@
                 title = article.title;
                 tags =
                   article.topics.join(";") + "; " + article.questions.join(";");
+                must_read = article.must_read;
               }}
             /></th
           >
           <td>{article.title}</td>
+          <td>{article.must_read}</td>
           <td>{article.topics}</td>
           <td>{article.questions}</td>
           <td>{article.date}</td>

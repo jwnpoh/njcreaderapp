@@ -1,8 +1,11 @@
-import { invalid } from "@sveltejs/kit"
+import { invalid, redirect } from "@sveltejs/kit"
 
 let queue = [];
 
-export const load = () => {
+export const load = ({ locals }) => {
+  if (!locals.user.loggedIn) {
+    throw redirect(302, "/login")
+  }
   return {
     queue: queue
   }
@@ -15,6 +18,7 @@ export const actions = {
     const title = formData.get("title")
     const tags = formData.get("tags")
     const date = formData.get("date")
+    const must_read = formData.get("must_read")
 
     if (url.length < 1 || title.length < 1 || tags.length < 1) {
       return invalid(400, {
@@ -24,6 +28,7 @@ export const actions = {
         title,
         tags,
         date,
+        must_read,
         queue
       })
     }
@@ -33,7 +38,8 @@ export const actions = {
       title: title,
       url: url,
       tags: tags,
-      date: date
+      date: date,
+      must_read: must_read
     };
     queue.push(input);
     return {
