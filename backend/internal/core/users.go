@@ -1,10 +1,11 @@
 package core
 
 type User struct {
-	Email     string `json:"email"`
-	Role      string `json:"role"`
-	LastLogin string `json:"lastLogin"`
-	Name      string `json:"name"`
-	ID        int    `json:"-"`
-	Hash      string `json:"-"`
+	ID          int    `json:"-"`
+	Email       string `json:"email"`
+	Role        string `json:"role"`
+	Class       string `json:"class"`
+	LastLogin   string `json:"last_login"`
+	DisplayName string `json:"display_name"`
+	Hash        string `json:"-"`
 }

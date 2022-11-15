@@ -11,7 +11,7 @@ type UsersDB interface {
 	InsertUser(*core.User) error
 	GetUser(field string, value any) (*core.User, error)
 	DeleteUser(id int) error
-	UpdateUser(id int, field, newValue string) error
+	UpdateUser(*core.User) error
 }
 
 type UserManager struct {
@@ -46,15 +46,16 @@ func (um *UserManager) GetUser(field string, value any) (*core.User, error) {
 	return user, nil
 }
 
-func (um *UserManager) UpdateUserPassword(id int, newPassword string) error {
-	newPasswordHash, err := hasher.GenerateHash(newPassword)
+func (um *UserManager) UpdateUser(newUser *core.User) error {
+	newPasswordHash, err := hasher.GenerateHash(newUser.Hash)
 	if err != nil {
 		return fmt.Errorf("userManager: unable to generate hash from user input password - %w", err)
 	}
+	newUser.Hash = newPasswordHash
 
-	err = um.db.UpdateUser(id, "hash", newPasswordHash)
+	err = um.db.UpdateUser(newUser)
 	if err != nil {
-		return fmt.Errorf("userManager: unable to update user %d - %w", id, err)
+		return fmt.Errorf("userManager: unable to update user %d - %w", newUser.ID, err)
 	}
 
 	return nil

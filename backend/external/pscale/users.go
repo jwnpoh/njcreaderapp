@@ -27,7 +27,7 @@ func NewUsersDB(dsn string) (*UsersDB, error) {
 }
 
 func (uDB *UsersDB) InsertUser(user *core.User) error {
-	query := "INSERT INTO users (email, hash, role, last_login) VALUES (?, ?, ?, ?)"
+	query := "INSERT INTO users (email, hash, role, last_login, display_name, class) VALUES (?, ?, ?, ?, ?, ?)"
 
 	tx, err := uDB.DB.Begin()
 	if err != nil {
@@ -35,7 +35,7 @@ func (uDB *UsersDB) InsertUser(user *core.User) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(query, user.Email, user.Hash, user.Role, user.LastLogin)
+	_, err = tx.Exec(query, user.Email, user.Hash, user.Role, user.LastLogin, user.DisplayName, user.Class)
 	if err != nil {
 		return fmt.Errorf("unable to add user %s to db - %w", user.Email, err)
 	}
@@ -53,41 +53,38 @@ func (uDB *UsersDB) GetUser(field string, value any) (*core.User, error) {
 
 	row := uDB.DB.QueryRowx(query, value)
 
-	var email, hash, role, name, lastLogin string
+	var email, hash, role, class, displayName, lastLogin string
 	var id int
-	err := row.Scan(&id, &email, &hash, &role, &lastLogin, &name)
+	err := row.Scan(&id, &email, &hash, &role, &lastLogin, &displayName, &class)
 	if err != nil {
 		return nil, fmt.Errorf("error scanning row to get user- %w", err)
 	}
 
 	user := core.User{
-		ID:        id,
-		Email:     email,
-		Hash:      hash,
-		Name:      name,
-		Role:      role,
-		LastLogin: lastLogin,
+		ID:          id,
+		Email:       email,
+		Hash:        hash,
+		DisplayName: displayName,
+		Role:        role,
+		Class:       class,
+		LastLogin:   lastLogin,
 	}
 
 	return &user, nil
 }
 
-func (uDB *UsersDB) UpdateUser(id int, field, newValue string) error {
-	if field != "hash" && field != "last_login" && field != "role" {
-		return fmt.Errorf("field must be one of 'hash', 'last_login', or 'role'")
-	}
-
-	query := fmt.Sprintf("UPDATE users SET %s = ? WHERE id = ?", field)
+func (uDB *UsersDB) UpdateUser(newUser *core.User) error {
+	query := "UPDATE users SET hash = ?, last_login = ?, display_name = ? WHERE id = ?"
 
 	tx, err := uDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("unable to begin db tx for updating user field %s - %w", field, err)
+		return fmt.Errorf("unable to begin db tx for updating user %d - %w", newUser.ID, err)
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(query, newValue, id)
+	_, err = tx.Exec(query, newUser.Hash, newUser.LastLogin, newUser.DisplayName, newUser.ID)
 	if err != nil {
-		return fmt.Errorf("unable to update user field %s - %w", field, err)
+		return fmt.Errorf("unable to update user %d - %w", newUser.ID, err)
 	}
 
 	err = tx.Commit()
