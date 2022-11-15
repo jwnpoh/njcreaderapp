@@ -27,23 +27,23 @@ func (b *broker) InsertUser(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	var u = core.User{
-		Email:     "joel_poh_weinan@moe.edu.sg",
-		Hash:      "toonpitchgoaltyneHow3",
-		Role:      "admin",
-		LastLogin: time.Now().Format("02 Jan 2006"),
-	}
+	// var u = core.User{
+	// 	Email:     "joel_poh_weinan@moe.edu.sg",
+	// 	Hash:      "testing",
+	// 	Role:      "admin",
+	// 	LastLogin: time.Now().Format("02 Jan 2006"),
+	// }
 
-	err := b.Users.InsertUser(&u)
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to add new user", err)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		fmt.Println(err)
-		return
-	}
-	s := serializer.NewSerializer(false, "successfully added new user", u)
-	s.Encode(w, http.StatusAccepted)
+	// err := b.Users.InsertUser(&u)
+	// if err != nil {
+	// 	s := serializer.NewSerializer(true, "unable to add new user", err)
+	// 	s.ErrorJson(w, err)
+	// 	b.Logger.Error(s, r)
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// s := serializer.NewSerializer(false, "successfully added new user", u)
+	// s.Encode(w, http.StatusAccepted)
 	// b.Logger.Success(s, r)
 }
 
