@@ -6,7 +6,8 @@ export const handle = async ({ event, resolve }) => {
     event.locals.user = {
       email: "",
       role: "",
-      name: "",
+      display_name: "",
+      class: "",
       loggedIn: false,
       session: "",
     }
@@ -19,7 +20,8 @@ export const handle = async ({ event, resolve }) => {
     event.locals.user = {
       email: user.data.email,
       role: user.data.role,
-      name: user.data.name,
+      display_name: user.data.display_name,
+      class: user.data.class,
       loggedIn: true,
       session: session
     }
@@ -27,7 +29,8 @@ export const handle = async ({ event, resolve }) => {
     event.locals.user = {
       email: "",
       role: "",
-      name: "",
+      display_name: "",
+      class: "",
       loggedIn: false,
       session: "",
     }

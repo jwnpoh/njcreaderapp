@@ -2,7 +2,7 @@
   import { page } from "$app/stores";
   import Container from "$lib/Container.svelte";
 
-  const userName = $page.data.user.name;
+  const userName = $page.data.user.display_name;
 </script>
 
 <Container>

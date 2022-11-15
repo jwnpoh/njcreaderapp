@@ -43,7 +43,7 @@
           {#if user.loggedIn}
             <li><a href="/feedback">Feedback</a></li>
             <li>
-              <a href="/preferences">Preferences</a>
+              <a href="/profile">Profile</a>
             </li>
             {#if role === "admin"}
               <li>
