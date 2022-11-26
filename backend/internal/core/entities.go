@@ -2,7 +2,7 @@ package core
 
 // Article is the main entity of the app.
 type Article struct {
-	ID              int      `json:"id,omitempty"`
+	ID              int      `json:"id"`
 	Title           string   `json:"title"`
 	URL             string   `json:"url"`
 	Topics          []string `json:"topics"`
@@ -17,7 +17,7 @@ type Article struct {
 type ArticleSeries []Article
 
 type ArticlePayload []struct {
-	ID       string `json:"id,omitempty"`
+	ID       string `json:"id"`
 	Title    string `json:"title"`
 	URL      string `json:"url"`
 	Tags     string `json:"tags"`
@@ -30,4 +30,47 @@ type Question struct {
 	Year    string
 	Number  string
 	Wording string
+}
+
+type Post struct {
+	ID        int      `json:"id,omitempty"`
+	UserID    int      `json:"user_id"`
+	Author    string   `json:"author"`
+	Likes     int      `json:"likes"`
+	TLDR      string   `json:"tldr"`
+	Examples  string   `json:"examples"`
+	Notes     string   `json:"notes,omitempty"`
+	Tags      []string `json:"tags,omitempty"`
+	Date      string   `json:"date"`
+	Public    bool     `json:"make_public"`
+	CreatedAt int64    `json:"created_at,omitempty"`
+	Article   Article  `json:"article"`
+}
+
+type PostPayload struct {
+	UserID    int      `json:"user_id"`
+	Likes     int      `json:"likes"`
+	TLDR      string   `json:"tldr"`
+	Examples  string   `json:"examples"`
+	Notes     string   `json:"notes,omitempty"`
+	Tags      []string `json:"tags,omitempty"`
+	Date      string   `json:"date"`
+	Public    string   `json:"make_public"`
+	ArticleID string   `json:"article_id,omitempty"`
+}
+
+type Posts []Post
+
+type LikesList struct {
+	PostID     int      `json:"post_id"`
+	LikedByIDs []int    `json:"-"`
+	LikedBy    []string `json:"liked_by"`
+}
+
+type Relations struct {
+	UserID          int      `json:"user_id"`
+	FollowingIDs    []int    `json:"following_ids"`
+	FollowingUsers  []string `json:"following_users"`
+	FollowedByIDs   []int    `json:"followed_by_ids"`
+	FollowedByUsers []string `json:"followed_by_users"`
 }

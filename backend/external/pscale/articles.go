@@ -61,6 +61,26 @@ func (aDB *ArticlesDB) Get(offset, limit int) (*core.ArticleSeries, error) {
 	return &series, nil
 }
 
+func (aDB *ArticlesDB) GetArticle(id int) (*core.Article, error) {
+	query := "SELECT * FROM articles WHERE id = ?"
+
+	row := aDB.DB.QueryRowx(query, id)
+
+	var article core.Article
+	var questions, questionDisplay, topics string
+	err := row.Scan(&article.ID, &article.Title, &article.URL, &topics, &questions, &questionDisplay, &article.PublishedOn, &article.MustRead)
+	if err != nil {
+		return nil, fmt.Errorf("PScaleArticles: error scanning row - %w", err)
+	}
+	article.Questions = strings.Split(questions, "\n")
+	article.QuestionDisplay = strings.Split(questionDisplay, "\n")
+	article.Topics = strings.Split(topics, ",")
+
+	article.Date = time.Unix(article.PublishedOn, 0).Format("Jan 2, 2006")
+
+	return &article, nil
+}
+
 // Find implements a mysql fulltext search of the articles table
 func (aDB *ArticlesDB) Find(terms string) (*core.ArticleSeries, error) {
 	series := make(core.ArticleSeries, 0, 12)

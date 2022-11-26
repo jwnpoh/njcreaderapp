@@ -10,7 +10,7 @@
 </script>
 
 {#if query}
-  <p class="px-10 py-4 italic font-medium text-xl">
+  <p class="px-10 py-5 italic font-medium text-xl">
     Showing results for: "{query}"
   </p>
 {/if}
@@ -19,6 +19,7 @@
   {#each articles as article}
     <div>
       <Card
+        id={article.id}
         title={article.title}
         url={article.url}
         topics={article.topics}

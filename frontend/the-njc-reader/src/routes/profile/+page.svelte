@@ -9,11 +9,16 @@
   let save = false;
   let newPassword;
   const saveChanges = () => {
-    if (newPassword === "" || userName === "") {
+    if (newPassword === "" && userName === data.user.display_name) {
       save = false;
     } else {
       save = true;
     }
+  };
+
+  let password = true;
+  const passwordEnterd = () => {
+    password = false;
   };
 </script>
 
@@ -44,13 +49,15 @@
           on:input={saveChanges}
         />
         {#if save}
-          <h2 class="pt-3 text-md font-semibold">Current password</h2>
+          <h2 class="pt-3 text-md font-extrabold">Current password</h2>
           <input
             required
             name="old_password"
             type="password"
             placeholder="Enter current password to confirm changes."
-            class="input w-full max-w-md text-center bg-neutral bg-opacity-5"
+            class="input w-full max-w-md text-center bg-primary bg-opacity-10"
+            class:bg-primary={password}
+            on:input={passwordEnterd}
           />
         {/if}
         <div class="card-actions justify-end pt-2">

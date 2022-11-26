@@ -22,7 +22,7 @@ func (b *broker) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := b.Articles.Get(n, 10)
+	data, err := b.Articles.Get(n, 8)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to get articles from database", err)
 		s.ErrorJson(w, err)
@@ -30,8 +30,11 @@ func (b *broker) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.Encode(w, http.StatusAccepted)
-	// b.Logger.Success(data, r)
+	err = data.Encode(w, http.StatusAccepted)
+	if err != nil {
+		data.ErrorJson(w, err)
+		b.Logger.Error(data, r)
+	}
 }
 
 // Get100 makes a call to the articles service to retrieve 100 articles from the db for admin editing/deleting.
@@ -44,8 +47,11 @@ func (b *broker) Get100(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.Encode(w, http.StatusAccepted)
-	// b.Logger.Success(data, r)
+	err = data.Encode(w, http.StatusAccepted)
+	if err != nil {
+		data.ErrorJson(w, err)
+		b.Logger.Error(data, r)
+	}
 }
 
 // Find makes a call to the database via the articles service to search for a match of the given search term specified in the url params.
@@ -60,15 +66,18 @@ func (b *broker) Find(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.Encode(w, http.StatusAccepted)
-	// b.Logger.Success(data, r)
+	err = data.Encode(w, http.StatusAccepted)
+	if err != nil {
+		data.ErrorJson(w, err)
+		b.Logger.Error(data, r)
+	}
 }
 
 // Store parses the new article input in the request body and sends it to the db via articles service.
 func (b *broker) Store(w http.ResponseWriter, r *http.Request) {
 	input := make(core.ArticlePayload, 0)
 
-	s := serializer.NewSerializer(false, "", nil)
+	s := serializer.NewSerializer(false, "successfully stored articles", nil)
 	err := s.Decode(w, r, &input)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to decode input data", err)
@@ -90,15 +99,18 @@ func (b *broker) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.Encode(w, http.StatusAccepted)
-	// b.Logger.Success(s, r)
+	err = s.Encode(w, http.StatusAccepted)
+	if err != nil {
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+	}
 }
 
 // Update parses the updated articles and sends the update to the db via the articles service.
 func (b *broker) Update(w http.ResponseWriter, r *http.Request) {
 	input := make(core.ArticlePayload, 0)
 
-	s := serializer.NewSerializer(false, "", nil)
+	s := serializer.NewSerializer(false, "successfully updated article", nil)
 	err := s.Decode(w, r, &input)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to decode input data", err)
@@ -120,15 +132,18 @@ func (b *broker) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.Encode(w, http.StatusAccepted)
-	// b.Logger.Success(s, r)
+	err = s.Encode(w, http.StatusAccepted)
+	if err != nil {
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+	}
 }
 
 // Delete takes a range of article ids and deletes theme from the database.
 func (b *broker) Delete(w http.ResponseWriter, r *http.Request) {
 	input := make([]string, 0)
 
-	s := serializer.NewSerializer(false, "", nil)
+	s := serializer.NewSerializer(false, "successfully deleted articles", nil)
 	err := s.Decode(w, r, &input)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to decode input data", err)
@@ -145,6 +160,9 @@ func (b *broker) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.Encode(w, http.StatusAccepted)
-	// b.Logger.Success(s, r)
+	err = s.Encode(w, http.StatusAccepted)
+	if err != nil {
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+	}
 }

@@ -1,4 +1,8 @@
 <script>
+  import Icon from "svelte-awesome";
+  import bookmark from "svelte-awesome/icons/bookmark";
+
+  export let id;
   export let title;
   export let url;
   export let topics;
@@ -12,41 +16,51 @@
     : "View past year questions";
 </script>
 
-<div class="card bg-base-100 shadow-lg ">
-  <div class="card-body pb-5">
-    {#if mustRead}
-      <div class="badge badge-secondary">Must read!</div>
-    {/if}
-    <h2 class="card-title">
-      <a href={url} rel="noreferrer" target="_blank">{title}</a>
-    </h2>
-    <p>{date}</p>
-    <div />
-    <div class="inline">
-      {#each topics as topic}
-        <form class="inline" action="/search" method="POST">
-          <input type="hidden" value={topic} name="query" />
-          <button class="badge badge-outline ">{topic}</button>
-        </form>
-      {/each}
+<div class="relative">
+  <div class="card bg-base-100 shadow-lg ">
+    <div class="bookmark bg-base-100">
+      <form method="POST" action="/notes/add-note?/newnote">
+        <input name="article_id" type="hidden" hidden value={id} />
+        <button>
+          <Icon data={bookmark} scale={1.8} class="bookmark" />
+        </button>
+      </form>
     </div>
-    <div class="divider" />
-
-    <div class="collapse collapse-arrow">
-      <input type="checkbox" bind:checked={checkBox} />
-      <div class="collapse-title px-0 font-medium">
-        {collapseTitle}
+    <div class="card-body pb-5">
+      {#if mustRead}
+        <div class="badge badge-secondary">Must read!</div>
+      {/if}
+      <h2 class="card-title">
+        <a href={url} rel="noreferrer" target="_blank">{title}</a>
+      </h2>
+      <p>{date}</p>
+      <div />
+      <div class="inline">
+        {#each topics as topic}
+          <form class="inline" action="/search" method="POST">
+            <input type="hidden" value={topic} name="query" />
+            <button class="badge badge-outline ">{topic}</button>
+          </form>
+        {/each}
       </div>
-      <div class="collapse-content px-0 py-0">
-        <ul class="list-none">
-          {#each question_display as question}
-            <form action="/search" method="POST">
-              <input type="hidden" value={question} name="query" />
-              <button class="submit-btn">{question}</button>
-            </form>
-            <br />
-          {/each}
-        </ul>
+      <div class="divider" />
+
+      <div class="collapse collapse-arrow">
+        <input type="checkbox" bind:checked={checkBox} />
+        <div class="collapse-title px-0 font-medium">
+          {collapseTitle}
+        </div>
+        <div class="collapse-content px-0 py-0">
+          <ul class="list-none">
+            {#each question_display as question}
+              <form action="/search" method="POST">
+                <input type="hidden" value={question} name="query" />
+                <button class="submit-btn">{question}</button>
+              </form>
+              <br />
+            {/each}
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -63,5 +77,14 @@
 
   .submit-btn:hover {
     cursor: pointer;
+  }
+
+  .bookmark {
+    position: absolute;
+    top: 0%;
+    right: 1em;
+    width: 25px;
+    height: 30px;
+    color: #faa21c;
   }
 </style>

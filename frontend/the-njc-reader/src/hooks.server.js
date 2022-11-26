@@ -18,6 +18,7 @@ export const handle = async ({ event, resolve }) => {
 
   if (!user.error) {
     event.locals.user = {
+      id: user.data.id,
       email: user.data.email,
       role: user.data.role,
       display_name: user.data.display_name,
@@ -27,6 +28,7 @@ export const handle = async ({ event, resolve }) => {
     }
   } else {
     event.locals.user = {
+      id: "",
       email: "",
       role: "",
       display_name: "",

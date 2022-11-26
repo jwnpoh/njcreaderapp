@@ -5,16 +5,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
-
-	// "github.com/jwnpoh/njcreaderapp/backend/external/pscale"
 
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
 )
 
-type ArticleService interface {
+type ArticlesDB interface {
 	Get(offset, limit int) (*core.ArticleSeries, error)
+	GetArticle(id int) (*core.Article, error)
 	Find(terms string) (*core.ArticleSeries, error)
 	Store(data *core.ArticleSeries) error
 	Update(data *core.ArticleSeries) error
@@ -23,11 +21,11 @@ type ArticleService interface {
 }
 
 type Articles struct {
-	db ArticleService
+	db ArticlesDB
 }
 
 // NewArticlesService returns an articleService object to implement methods to interact with PlanetScale database.
-func NewArticlesService(articlesDB ArticleService) *Articles {
+func NewArticlesService(articlesDB ArticlesDB) *Articles {
 	return &Articles{db: articlesDB}
 }
 
@@ -46,6 +44,15 @@ func (a *Articles) Get(page, limit int) (serializer.Serializer, error) {
 	}
 
 	return serializer.NewSerializer(false, fmt.Sprintf("got articles from page %d", page), articles), nil
+}
+
+func (a *Articles) GetArticle(id int) (serializer.Serializer, error) {
+	article, err := a.db.GetArticle(id)
+	if err != nil {
+		return serializer.NewSerializer(true, "no articles matched the query", nil), err
+	}
+
+	return serializer.NewSerializer(false, "succesfully retrieved article", article), nil
 }
 
 // Find parses the query and sends it to database for querying results
@@ -142,7 +149,7 @@ func (a *Articles) parseNewArticles(input core.ArticlePayload) (core.ArticleSeri
 	data := make(core.ArticleSeries, 0)
 
 	for _, item := range input {
-		date, err := parseUnixTime(item.Date)
+		date, err := core.ParseUnixTime(item.Date)
 		if err != nil {
 			return nil, fmt.Errorf("unable to parse date input - %w", err)
 		}
@@ -189,15 +196,6 @@ func splitTags(tags string) []string {
 	xtags := strings.Split(tags, ";")
 
 	return xtags
-}
-
-func parseUnixTime(date string) (int64, error) {
-	t, err := time.Parse("Jan 02 2006", date)
-	if err != nil {
-		return 0, fmt.Errorf("unable to parse input date - %w", err)
-	}
-	res := t.Unix()
-	return res, nil
 }
 
 func (a *Articles) parseTags(tagsSlice []string) (questions, questionDisplay, topics []string, err error) {

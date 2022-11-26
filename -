@@ -41,14 +41,12 @@ func (b *broker) serveRoutes(mux chi.Router) {
 		mux.Post("/get-user", b.GetUser)
 		mux.Post("/update-user", b.UpdateUser)
 		mux.Post("/delete-user", b.DeleteUser)
-		mux.Get("/friends", b.GetFriends)
 	})
 
 	mux.Route("/api/posts", func(mux chi.Router) {
 		mux.Use(b.Auth)
-		mux.Get("/get-article", b.GetArticle)
-		mux.Get("/public", b.GetPublicFeed)
-		mux.Get("/following", b.GetFollowing)
+		mux.Get("/public-feed", b.GetPublicFeed)
+		mux.Get("/user-feed", b.GetUserFeed)
 		mux.Get("/notebook", b.GetNotebook)
 		mux.Post("/insert", b.InsertPost)
 		mux.Post("/delete", b.DeletePost)

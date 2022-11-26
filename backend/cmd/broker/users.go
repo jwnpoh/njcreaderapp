@@ -11,39 +11,54 @@ import (
 )
 
 func (b *broker) InsertUser(w http.ResponseWriter, r *http.Request) {
-	// var u = core.User{
-	// 	Email:     "jwn.poh@gmail.com",
-	// 	Hash:      "testing",
-	// 	Role:      "admin",
-	// 	LastLogin: time.Now().Format("02 Jan 2006"),
-	// }
+	var u = []core.User{
+		{
+			Email:       "tom@test.com",
+			Hash:        "testing",
+			Role:        "student",
+			DisplayName: "Tom",
+			Class:       "22SH01",
+			LastLogin:   time.Now().Format("02 Jan 2006"),
+		},
+		{
+			Email:       "dick@test.com",
+			Hash:        "testing",
+			Role:        "student",
+			DisplayName: "Dick",
+			Class:       "22SH02",
+			LastLogin:   time.Now().Format("02 Jan 2006"),
+		},
+		{
+			Email:       "harry@test.com",
+			Hash:        "testing",
+			Role:        "student",
+			DisplayName: "Harry",
+			Class:       "22SH03",
+			LastLogin:   time.Now().Format("02 Jan 2006"),
+		},
+		{
+			Email:       "jane@test.com",
+			Hash:        "testing",
+			Role:        "student",
+			DisplayName: "Jane",
+			Class:       "22SH04",
+			LastLogin:   time.Now().Format("02 Jan 2006"),
+		},
+	}
 
-	// err := b.Users.InsertUser(&u)
-	// if err != nil {
-	// 	s := serializer.NewSerializer(true, "unable to add new user", err)
-	// 	s.ErrorJson(w, err)
-	// 	b.Logger.Error(s, r)
-	// 	fmt.Println(err)
-	// 	return
-	// }
+	for _, v := range u {
+		err := b.Users.InsertUser(&v)
+		if err != nil {
+			s := serializer.NewSerializer(true, "unable to add new user", err)
+			s.ErrorJson(w, err)
+			b.Logger.Error(s, r)
+			fmt.Println(err)
+			return
+		}
+	}
 
-	// var u = core.User{
-	// 	Email:     "joel_poh_weinan@moe.edu.sg",
-	// 	Hash:      "testing",
-	// 	Role:      "admin",
-	// 	LastLogin: time.Now().Format("02 Jan 2006"),
-	// }
-
-	// err := b.Users.InsertUser(&u)
-	// if err != nil {
-	// 	s := serializer.NewSerializer(true, "unable to add new user", err)
-	// 	s.ErrorJson(w, err)
-	// 	b.Logger.Error(s, r)
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	// s := serializer.NewSerializer(false, "successfully added new user", u)
-	// s.Encode(w, http.StatusAccepted)
+	s := serializer.NewSerializer(false, "successfully added new users", u)
+	s.Encode(w, http.StatusAccepted)
 	// b.Logger.Success(s, r)
 }
 
@@ -65,8 +80,11 @@ func (b *broker) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s := serializer.NewSerializer(false, "successfully retrieved user", user)
-	s.Encode(w, http.StatusAccepted)
-	// b.Logger.Success(s, r)
+	err = s.Encode(w, http.StatusAccepted)
+	if err != nil {
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+	}
 }
 
 func (b *broker) UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -120,8 +138,11 @@ func (b *broker) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s = serializer.NewSerializer(false, "successfully updated user", newUser.Email)
-	s.Encode(w, http.StatusAccepted)
-	// b.Logger.Success(s, r)
+	err = s.Encode(w, http.StatusAccepted)
+	if err != nil {
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+	}
 }
 
 func (b *broker) DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -137,6 +158,9 @@ func (b *broker) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s := serializer.NewSerializer(false, "successfully deleted user", user.ID)
-	s.Encode(w, http.StatusAccepted)
-	// b.Logger.Success(s, r)
+	err = s.Encode(w, http.StatusAccepted)
+	if err != nil {
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+	}
 }

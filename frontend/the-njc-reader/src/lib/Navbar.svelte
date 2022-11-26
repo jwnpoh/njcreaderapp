@@ -37,11 +37,16 @@
           <li>
             <div class="md:hidden text-xl font-medium">The NJC Reader</div>
           </li>
+          <li class="md:hidden" />
           <li><a data-sveltekit-reload href="/articles/1">News Feed</a></li>
-          <li><a href="/columns/1">Longer Reads</a></li>
+          <li><a href="/columns/1">Long Reads</a></li>
           <li><a href="/about">About</a></li>
           {#if user.loggedIn}
             <li><a href="/feedback">Feedback</a></li>
+            <li />
+            <li>
+              <a href="/notes">Notebook</a>
+            </li>
             <li>
               <a href="/profile">Profile</a>
             </li>
