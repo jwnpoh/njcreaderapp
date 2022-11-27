@@ -26,8 +26,8 @@
           </div>
           <div class="pt-5 px-4">
             <blockquote class="italic link">
-              <a href={note.article.url} target="blank" rel="noreferrer"
-                >{note.article.title}</a
+              <a href={note.article_url} target="blank" rel="noreferrer"
+                >{note.article_title}</a
               >
             </blockquote>
           </div>

@@ -17,18 +17,18 @@
 </script>
 
 <div class="relative">
-  <div class="card bg-base-100 shadow-lg ">
+  <div class="card bg-base-100 shadow-xl ">
     <div class="bookmark bg-base-100">
       <form method="POST" action="/notes/add-note?/newnote">
         <input name="article_id" type="hidden" hidden value={id} />
         <button>
-          <Icon data={bookmark} scale={1.8} class="bookmark" />
+          <Icon data={bookmark} scale={2} class="bookmark" />
         </button>
       </form>
     </div>
     <div class="card-body pb-5">
       {#if mustRead}
-        <div class="badge badge-secondary">Must read!</div>
+        <div class="badge badge-secondary py-3">Must read!</div>
       {/if}
       <h2 class="card-title">
         <a href={url} rel="noreferrer" target="_blank">{title}</a>
@@ -85,6 +85,6 @@
     right: 1em;
     width: 25px;
     height: 30px;
-    color: #faa21c;
+    @apply text-primary;
   }
 </style>

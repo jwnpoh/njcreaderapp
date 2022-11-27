@@ -41,6 +41,8 @@ export const actions = {
   add: async ({ request, cookies, locals }) => {
     const formData = await request.formData()
     const articleID = formData.get("article_id")
+    const articleTitle = formData.get("article_title")
+    const articleURL = formData.get("article_url")
     const tldr = formData.get("tldr")
     const examples = formData.get("examples")
     const notes = formData.get("notes")
@@ -73,6 +75,8 @@ export const actions = {
 
     let payload = {
       article_id: articleID,
+      article_title: articleTitle,
+      article_url: articleURL,
       tldr: tldr,
       examples: examples,
       notes: notes,
@@ -94,6 +98,8 @@ export const actions = {
       return invalid(400, {
         error: true, message: response.message,
         articleID,
+        articleTitle,
+        articleURL,
         tldr,
         examples,
         notes,

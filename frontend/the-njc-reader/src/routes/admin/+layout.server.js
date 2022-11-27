@@ -5,6 +5,11 @@ export const load = async ({ locals }) => {
     throw redirect(302, "/login")
   }
 
+  if (locals.user.role != "admin") {
+    throw redirect(302, "/profile")
+  }
   return {
   }
 }
+
+

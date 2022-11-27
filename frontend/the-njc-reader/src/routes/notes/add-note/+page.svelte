@@ -59,6 +59,20 @@
           </div>
         </div>
 
+        <input
+          name="article_title"
+          type="hidden"
+          hidden
+          class="hidden"
+          value={title}
+        />
+        <input
+          name="article_url"
+          type="hidden"
+          hidden
+          class="hidden"
+          value={url}
+        />
         <div class="pt-2">
           <h2 class="text-lg font-semibold">
             <a href={url} target="_blank" rel="noreferrer">{title}</a>
