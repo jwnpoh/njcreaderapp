@@ -1,4 +1,19 @@
 <script>
+  import dayjs from "dayjs";
+  dayjs().format();
+
+  let greeting;
+  const h = dayjs().hour();
+  if (h > 18 && h < 24) {
+    greeting = "Good evening";
+  }
+  if (h > 0 && h < 12) {
+    greeting = "Good morning";
+  }
+  if (h > 12 && h < 18) {
+    greeting = "Good afternoon";
+  }
+
   export let user;
 
   let role;
@@ -32,12 +47,26 @@
       </button>
       <div class={!showMenu ? "hidden" : ""}>
         <ul
-          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-primary rounded-box w-52"
+          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-primary rounded-box w-64"
         >
           <li>
-            <div class="md:hidden text-xl font-medium">The NJC Reader</div>
+            <div
+              class="md:hidden py-1 text-xl font-medium  hover:cursor-default"
+            >
+              The NJC Reader
+            </div>
           </li>
           <li class="md:hidden" />
+          {#if user.loggedIn}
+            <li>
+              <div
+                class="md:py-1 px-2 font-semibold text-lg  hover:cursor-default"
+              >
+                {greeting}, {user.display_name}!
+              </div>
+            </li>
+            <li />
+          {/if}
           <li><a data-sveltekit-reload href="/articles/1">News Feed</a></li>
           <li><a href="/columns/1">Long Reads</a></li>
           <li><a href="/about">About</a></li>
