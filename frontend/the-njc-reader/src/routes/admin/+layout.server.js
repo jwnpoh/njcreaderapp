@@ -9,6 +9,7 @@ export const load = async ({ locals }) => {
     throw redirect(302, "/profile")
   }
   return {
+    user: locals.user
   }
 }
 
