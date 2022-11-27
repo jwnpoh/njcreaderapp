@@ -33,30 +33,34 @@ type Question struct {
 }
 
 type Post struct {
-	ID        int      `json:"id,omitempty"`
-	UserID    int      `json:"user_id"`
-	Author    string   `json:"author"`
-	Likes     int      `json:"likes"`
-	TLDR      string   `json:"tldr"`
-	Examples  string   `json:"examples"`
-	Notes     string   `json:"notes,omitempty"`
-	Tags      []string `json:"tags,omitempty"`
-	Date      string   `json:"date"`
-	Public    bool     `json:"make_public"`
-	CreatedAt int64    `json:"created_at,omitempty"`
-	Article   Article  `json:"article"`
+	ID           int      `json:"id,omitempty"`
+	UserID       int      `json:"user_id"`
+	Author       string   `json:"author"`
+	Likes        int      `json:"likes"`
+	TLDR         string   `json:"tldr"`
+	Examples     string   `json:"examples"`
+	Notes        string   `json:"notes,omitempty"`
+	Tags         []string `json:"tags,omitempty"`
+	Date         string   `json:"date"`
+	Public       bool     `json:"make_public"`
+	CreatedAt    int64    `json:"created_at,omitempty"`
+	ArticleID    string   `json:"article_id"`
+	ArticleTitle string   `json:"article_title"`
+	ArticleURL   string   `json:"article_url"`
 }
 
 type PostPayload struct {
-	UserID    int      `json:"user_id"`
-	Likes     int      `json:"likes"`
-	TLDR      string   `json:"tldr"`
-	Examples  string   `json:"examples"`
-	Notes     string   `json:"notes,omitempty"`
-	Tags      []string `json:"tags,omitempty"`
-	Date      string   `json:"date"`
-	Public    string   `json:"make_public"`
-	ArticleID string   `json:"article_id,omitempty"`
+	UserID       int      `json:"user_id"`
+	Likes        int      `json:"likes"`
+	TLDR         string   `json:"tldr"`
+	Examples     string   `json:"examples"`
+	Notes        string   `json:"notes,omitempty"`
+	Tags         []string `json:"tags,omitempty"`
+	Date         string   `json:"date"`
+	Public       string   `json:"make_public"`
+	ArticleID    string   `json:"article_id"`
+	ArticleTitle string   `json:"article_title"`
+	ArticleURL   string   `json:"article_url"`
 }
 
 type Posts []Post

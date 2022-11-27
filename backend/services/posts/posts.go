@@ -2,7 +2,6 @@ package posts
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -49,12 +48,6 @@ func (pDB *Posts) GetAllPublicPosts() (serializer.Serializer, error) {
 
 	var data core.Posts
 	for _, v := range *posts {
-		article, err := pDB.GetArticle(v.Article.ID)
-		if err != nil {
-			return nil, fmt.Errorf("unable to get article info for notes from db - %w", err)
-		}
-		v.Article = *article
-
 		user, err := pDB.GetUser("id", v.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("unable to get author info for notes from db - %w", err)
@@ -81,12 +74,6 @@ func (pDB *Posts) GetPublicPosts(userID int) (serializer.Serializer, error) {
 
 	var data core.Posts
 	for _, v := range *posts {
-		article, err := pDB.GetArticle(v.Article.ID)
-		if err != nil {
-			return nil, fmt.Errorf("unable to get article info for notes from db - %w", err)
-		}
-		v.Article = *article
-
 		user, err := pDB.GetUser("id", v.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("unable to get author info for notes from db - %w", err)
@@ -116,12 +103,6 @@ func (pDB *Posts) GetFollowingPosts(userID int) (serializer.Serializer, error) {
 
 	var data core.Posts
 	for _, v := range *posts {
-		article, err := pDB.GetArticle(v.Article.ID)
-		if err != nil {
-			return nil, fmt.Errorf("unable to get article info for notes from db - %w", err)
-		}
-		v.Article = *article
-
 		user, err := pDB.GetUser("id", v.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("unable to get author info for notes from db - %w", err)
@@ -148,12 +129,6 @@ func (pDB *Posts) GetOwnPosts(userID int) (serializer.Serializer, error) {
 
 	var data core.Posts
 	for _, v := range *posts {
-		article, err := pDB.GetArticle(v.Article.ID)
-		if err != nil {
-			return nil, fmt.Errorf("unable to get article info for notes from db - %w", err)
-		}
-		v.Article = *article
-
 		user, err := pDB.GetUser("id", v.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("unable to get author info for notes from db - %w", err)
@@ -217,11 +192,14 @@ func (pDB *Posts) GetLikes(postID int) ([]string, error) {
 
 func parseNewPost(post *core.PostPayload) (*core.Post, error) {
 	newPost := &core.Post{
-		TLDR:     post.TLDR,
-		Examples: post.Examples,
-		Notes:    post.Notes,
-		UserID:   post.UserID,
-		Likes:    post.Likes,
+		TLDR:         post.TLDR,
+		Examples:     post.Examples,
+		Notes:        post.Notes,
+		UserID:       post.UserID,
+		Likes:        post.Likes,
+		ArticleID:    post.ArticleID,
+		ArticleTitle: post.ArticleTitle,
+		ArticleURL:   post.ArticleURL,
 	}
 
 	tags := parsePostTags(post.Tags)
@@ -235,12 +213,6 @@ func parseNewPost(post *core.PostPayload) (*core.Post, error) {
 
 	date := time.Now().Unix()
 	newPost.CreatedAt = date
-
-	articleID, err := strconv.Atoi(post.ArticleID)
-	if err != nil {
-		return nil, fmt.Errorf("unable to parse article id of new note - %w", err)
-	}
-	newPost.Article.ID = articleID
 
 	return newPost, nil
 }
