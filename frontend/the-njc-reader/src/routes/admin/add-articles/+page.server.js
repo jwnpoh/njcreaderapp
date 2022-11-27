@@ -7,6 +7,9 @@ export const load = ({ locals }) => {
   if (!locals.user.loggedIn) {
     throw redirect(302, "/login")
   }
+  if (locals.user.role != "admin") {
+    throw redirect(302, "/profile")
+  }
   return {
     queue: queue,
     API_URL: `${process.env.API_URL}`

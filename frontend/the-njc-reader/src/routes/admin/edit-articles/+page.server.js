@@ -5,6 +5,9 @@ export async function load({ fetch, cookies, locals }) {
   if (!locals.user.loggedIn) {
     throw redirect(302, "/login")
   }
+  if (locals.user.role != "admin") {
+    throw redirect(302, "/profile")
+  }
 
   const session = cookies.get("session")
 
