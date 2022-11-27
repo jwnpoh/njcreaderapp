@@ -1,5 +1,7 @@
+import "dotenv/config"
+
 export async function load({ fetch }) {
-  const queryURL = `http://localhost:8080/api/articles/1`;
+  const queryURL = `${process.env.API_URL}/api/articles/1`;
   const res = await fetch(queryURL);
   const data = await res.json();
 

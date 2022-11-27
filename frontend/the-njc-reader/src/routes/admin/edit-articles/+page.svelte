@@ -1,4 +1,5 @@
 <script>
+  import { page } from "$app/stores";
   import { DateInput } from "date-picker-svelte";
 
   export let data;
@@ -13,16 +14,17 @@
 
   let id;
 
+  const session = $page.data.user.session;
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Authorization", "Bearer " + session);
   const getTitle = async (url) => {
     const payload = { url: url };
-    const res = await fetch(
-      "http://localhost:8080/api/admin/articles/get-title",
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: myHeaders,
-      }
-    );
+    const res = await fetch(`${data.API_URL}/api/admin/articles/get-title`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: myHeaders,
+    });
 
     const response = await res.json();
     title = response.data;
@@ -94,8 +96,15 @@
   <button class="btn btn-sm btn-primary mx-7">Save changes to article</button>
 </form>
 
+{#if form?.sent}
+  <div class="mx-5 my-4 alert alert-success max-w-fit place-self-center">
+    <span>Changes saved successfully.</span>
+  </div>
+{/if}
 {#if form?.error}
-  <p class="mx-7 pt-7 text-primary">{form?.message}</p>
+  <div class="mx-5 my-4 alert alert-error max-w-fit place-self-center">
+    <span class="text-center">{form?.message}</span>
+  </div>
 {/if}
 
 <div class="divider py-3" />

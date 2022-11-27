@@ -1,32 +1,27 @@
 <script>
   import { page } from "$app/stores";
-
   import { DateInput } from "date-picker-svelte";
 
   export let data;
   export let form;
-
-  const session = $page.data.user.session;
 
   let url = form?.url ?? "";
   let title = form?.title ?? "";
   let tags = form?.tags ?? "";
   let date = new Date();
 
+  const session = $page.data.user.session;
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", "Bearer " + session);
 
   const getTitle = async (url) => {
     const payload = { url: url };
-    const res = await fetch(
-      "http://localhost:8080/api/admin/articles/get-title",
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: myHeaders,
-      }
-    );
+    const res = await fetch(`${data.API_URL}/api/admin/articles/get-title`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: myHeaders,
+    });
 
     const response = await res.json();
     title = response.data;
@@ -100,7 +95,7 @@
   <p class="mx-7 pt-7 text-primary">{form?.message}</p>
 {/if}
 
-<div class="divider py-5">Queued articles ({len})</div>
+<div class="divider py-5 font-bold">Queued articles ({len})</div>
 
 <div class="px-2 grid gap-10 relative">
   <div class="max-w-sm place-self-center">
@@ -122,7 +117,7 @@
     <form method="POST" action="?/remove">
       <input type="hidden" name="index" value={item.index} />
       <div
-        class="card bg-base-100 shadow-lg"
+        class="card bg-base-100 shadow-lg w-4/5 mx-auto"
         class:bg-secondary={item.must_read}
       >
         <div class="card-body pb-5">

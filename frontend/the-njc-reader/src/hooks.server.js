@@ -1,3 +1,4 @@
+import "dotenv/config"
 
 export const handle = async ({ event, resolve }) => {
   const session = event.cookies.get("session")
@@ -52,7 +53,7 @@ const getUser = async (session) => {
     headers: myHeaders,
   }
 
-  const res = await fetch("http://localhost:8080/api/users/get-user", requestOptions)
+  const res = await fetch(`${process.env.API_URL}/api/users/get-user`, requestOptions)
   const user = await res.json()
   return user
 }

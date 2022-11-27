@@ -1,4 +1,5 @@
 import { invalid, redirect } from '@sveltejs/kit';
+import "dotenv/config"
 
 export const load = async () => {
   return {
@@ -46,7 +47,7 @@ export const actions = {
 }
 
 const authenticate = async (userObjString) => {
-  const response = await fetch('http://localhost:8080/api/auth', {
+  const response = await fetch(`${process.env.API_URL}/api/auth`, {
     method: 'POST',
     body: userObjString,
     headers: {

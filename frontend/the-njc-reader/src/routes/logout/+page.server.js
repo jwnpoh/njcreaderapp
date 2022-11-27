@@ -1,4 +1,5 @@
 import { redirect } from "@sveltejs/kit";
+import "dotenv/config"
 
 export const load = async ({ cookies }) => {
   // delete session token
@@ -26,7 +27,7 @@ const logOut = async (session) => {
     headers: myHeaders,
   }
 
-  const res = await fetch("http://localhost:8080/api/users/logout", requestOptions)
+  const res = await fetch(`${process.env.API_URL}/api/users/logout`, requestOptions)
   const response = await res.json()
   return response
 }

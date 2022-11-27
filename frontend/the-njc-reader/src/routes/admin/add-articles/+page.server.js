@@ -1,4 +1,5 @@
-import { invalid, redirect } from "@sveltejs/kit"
+import "dotenv/config";
+import { invalid, redirect } from "@sveltejs/kit";
 
 let queue = [];
 
@@ -7,7 +8,8 @@ export const load = ({ locals }) => {
     throw redirect(302, "/login")
   }
   return {
-    queue: queue
+    queue: queue,
+    API_URL: `${process.env.API_URL}`
   }
 }
 
@@ -68,7 +70,7 @@ export const actions = {
 
     let payload = queue
 
-    const res = await fetch("http://localhost:8080/api/admin/articles/insert", {
+    const res = await fetch(`${process.env.API_URL}/api/admin/articles/insert`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: myHeaders,

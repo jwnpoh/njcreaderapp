@@ -1,4 +1,5 @@
 import { invalid, redirect } from "@sveltejs/kit"
+import "dotenv/config"
 
 export const load = async ({ locals }) => {
   if (!locals.user.loggedIn) {
@@ -19,7 +20,6 @@ export const actions = {
     const display_name = formData.get("display_name")
     const email = locals.user.email
 
-    console.log(email, display_name, new_password, old_password)
     const session = cookies.get("session")
 
     const myHeaders = new Headers();
@@ -33,8 +33,7 @@ export const actions = {
       display_name: display_name,
     }
 
-    console.log("payload: ", payload)
-    const res = await fetch("http://localhost:8080/api/users/update-user", {
+    const res = await fetch(`${process.env.API_URL}/api/users/update-user`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: myHeaders,
@@ -45,7 +44,6 @@ export const actions = {
       return invalid(400, { failed: true, message: response.message })
     }
     locals.user.display_name = display_name
-    console.log(locals.user)
     return {
       success: true,
       sent: true

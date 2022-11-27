@@ -1,3 +1,5 @@
+import "dotenv/config"
+
 export const load = async ({ fetch, locals, cookies }) => {
   const userID = locals.user.id;
 
@@ -8,7 +10,7 @@ export const load = async ({ fetch, locals, cookies }) => {
   myHeaders.append("Authorization", "Bearer " + session);
 
   const getNotes = async () => {
-    const res = await fetch(`http://localhost:8080/api/posts/notebook?user=${userID}`, {
+    const res = await fetch(`${process.env.API_URL}/api/posts/notebook?user=${userID}`, {
       method: "GET",
       headers: myHeaders,
     })
@@ -19,7 +21,7 @@ export const load = async ({ fetch, locals, cookies }) => {
 
   // getFollowing
   const getFollowing = async () => {
-    const res = await fetch(`http://localhost:8080/api/posts/following?user=${userID}`, {
+    const res = await fetch(`${process.env.API_URL}/api/posts/following?user=${userID}`, {
       method: "GET",
       headers: myHeaders,
     })
@@ -30,7 +32,7 @@ export const load = async ({ fetch, locals, cookies }) => {
 
   // getPublic
   const getDiscover = async () => {
-    const res = await fetch(`http://localhost:8080/api/posts/public?user=all`, {
+    const res = await fetch(`${process.env.API_URL}/api/posts/public?user=all`, {
       method: "GET",
       headers: myHeaders,
     })

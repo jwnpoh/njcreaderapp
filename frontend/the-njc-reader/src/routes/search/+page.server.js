@@ -1,3 +1,4 @@
+import "dotenv/config"
 let data;
 let q;
 
@@ -19,9 +20,8 @@ export const actions = {
   default: async ({ request }) => {
     const formData = await request.formData()
     const query = await formData.get("query")
-    console.log(query)
 
-    const queryURL = `http://localhost:8080/api/articles/find?term=${query}`;
+    const queryURL = `${process.env.API_URL}/api/articles/find?term=${query}`;
     const res = await fetch(queryURL);
     const response = await res.json();
 

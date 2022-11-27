@@ -1,4 +1,5 @@
 import { invalid, redirect } from "@sveltejs/kit"
+import "dotenv/config"
 
 let data;
 
@@ -27,7 +28,7 @@ export const actions = {
     const formData = await request.formData()
     const articleID = await formData.get("article_id")
 
-    const queryURL = `http://localhost:8080/api/posts/get-article?id=${articleID}`;
+    const queryURL = `${process.env.API_URL}/api/posts/get-article?id=${articleID}`;
     const res = await fetch(queryURL, {
       method: "GET",
       headers: myHeaders,
@@ -63,7 +64,6 @@ export const actions = {
     if (notesTags.length > 0) {
       tags = tags.concat(notesTags)
     }
-    console.log(tags)
 
     const session = cookies.get("session")
 
@@ -83,7 +83,7 @@ export const actions = {
       likes: likes
     }
 
-    const res = await fetch("http://localhost:8080/api/posts/insert", {
+    const res = await fetch(`${process.env.API_URL}/api/posts/insert`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: myHeaders,

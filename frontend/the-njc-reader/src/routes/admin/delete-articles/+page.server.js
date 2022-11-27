@@ -1,4 +1,5 @@
 import { redirect } from "@sveltejs/kit"
+import "dotenv/config"
 
 export async function load({ fetch, cookies, locals }) {
   if (!locals.user.loggedIn) {
@@ -11,7 +12,7 @@ export async function load({ fetch, cookies, locals }) {
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", "Bearer " + session);
 
-  const queryURL = `http://localhost:8080/api/admin/articles/update`;
+  const queryURL = `${process.env.API_URL}/api/admin/articles/update`;
   const res = await fetch(queryURL, {
     method: "GET",
     headers: myHeaders
@@ -36,7 +37,6 @@ export const actions = {
     for (var pair of formData.entries()) {
       payload.push(pair[1])
     }
-    console.log(payload);
 
     const session = cookies.get("session")
 
@@ -44,7 +44,7 @@ export const actions = {
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer " + session);
 
-    const res = await fetch("http://localhost:8080/api/admin/articles/delete", {
+    const res = await fetch(`${process.env.API_URL}/api/admin/articles/delete`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: myHeaders,
