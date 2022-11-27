@@ -12,38 +12,38 @@ import (
 
 func (b *broker) InsertUser(w http.ResponseWriter, r *http.Request) {
 	var u = []core.User{
-		{
-			Email:       "tom@test.com",
-			Hash:        "testing",
-			Role:        "student",
-			DisplayName: "Tom",
-			Class:       "22SH01",
-			LastLogin:   time.Now().Format("02 Jan 2006"),
-		},
-		{
-			Email:       "dick@test.com",
-			Hash:        "testing",
-			Role:        "student",
-			DisplayName: "Dick",
-			Class:       "22SH02",
-			LastLogin:   time.Now().Format("02 Jan 2006"),
-		},
-		{
-			Email:       "harry@test.com",
-			Hash:        "testing",
-			Role:        "student",
-			DisplayName: "Harry",
-			Class:       "22SH03",
-			LastLogin:   time.Now().Format("02 Jan 2006"),
-		},
-		{
-			Email:       "jane@test.com",
-			Hash:        "testing",
-			Role:        "student",
-			DisplayName: "Jane",
-			Class:       "22SH04",
-			LastLogin:   time.Now().Format("02 Jan 2006"),
-		},
+		// {
+		// 	Email:       "tom@test.com",
+		// 	Hash:        "testing",
+		// 	Role:        "student",
+		// 	DisplayName: "Tom",
+		// 	Class:       "22SH01",
+		// 	LastLogin:   time.Now().Format("02 Jan 2006"),
+		// },
+		// {
+		// 	Email:       "dick@test.com",
+		// 	Hash:        "testing",
+		// 	Role:        "student",
+		// 	DisplayName: "Dick",
+		// 	Class:       "22SH02",
+		// 	LastLogin:   time.Now().Format("02 Jan 2006"),
+		// },
+		// {
+		// 	Email:       "harry@test.com",
+		// 	Hash:        "testing",
+		// 	Role:        "student",
+		// 	DisplayName: "Harry",
+		// 	Class:       "22SH03",
+		// 	LastLogin:   time.Now().Format("02 Jan 2006"),
+		// },
+		// {
+		// 	Email:       "jane@test.com",
+		// 	Hash:        "testing",
+		// 	Role:        "student",
+		// 	DisplayName: "Jane",
+		// 	Class:       "22SH04",
+		// 	LastLogin:   time.Now().Format("02 Jan 2006"),
+		// },
 	}
 
 	for _, v := range u {

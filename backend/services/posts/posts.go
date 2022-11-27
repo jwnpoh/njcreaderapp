@@ -43,17 +43,28 @@ func (pDB *Posts) GetAllPublicPosts() (serializer.Serializer, error) {
 		return nil, fmt.Errorf("unable to get posts from db - %w", err)
 	}
 
+	if len(*posts) < 1 {
+		return serializer.NewSerializer(true, "There are currently no public notes from all users. Check back again later, or create your own note now.", nil), nil
+	}
+
 	var data core.Posts
 	for _, v := range *posts {
 		article, err := pDB.GetArticle(v.Article.ID)
 		if err != nil {
-			return nil, fmt.Errorf("unable to get article info for posts from db - %w", err)
+			return nil, fmt.Errorf("unable to get article info for notes from db - %w", err)
 		}
 		v.Article = *article
+
+		user, err := pDB.GetUser("id", v.UserID)
+		if err != nil {
+			return nil, fmt.Errorf("unable to get author info for notes from db - %w", err)
+		}
+		v.Author = user.DisplayName
+
 		data = append(data, v)
 	}
 
-	return serializer.NewSerializer(false, "got all public posts", data), nil
+	return serializer.NewSerializer(false, "got all public notes", data), nil
 }
 
 func (pDB *Posts) GetPublicPosts(userID int) (serializer.Serializer, error) {
@@ -61,20 +72,31 @@ func (pDB *Posts) GetPublicPosts(userID int) (serializer.Serializer, error) {
 
 	posts, err := pDB.db.GetPosts(params, true)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get posts from db - %w", err)
+		return nil, fmt.Errorf("unable to get notes from db - %w", err)
+	}
+
+	if len(*posts) < 1 {
+		return serializer.NewSerializer(true, "This user currently has no public notes.", nil), nil
 	}
 
 	var data core.Posts
 	for _, v := range *posts {
 		article, err := pDB.GetArticle(v.Article.ID)
 		if err != nil {
-			return nil, fmt.Errorf("unable to get article info for posts from db - %w", err)
+			return nil, fmt.Errorf("unable to get article info for notes from db - %w", err)
 		}
 		v.Article = *article
+
+		user, err := pDB.GetUser("id", v.UserID)
+		if err != nil {
+			return nil, fmt.Errorf("unable to get author info for notes from db - %w", err)
+		}
+		v.Author = user.DisplayName
+
 		data = append(data, v)
 	}
 
-	return serializer.NewSerializer(false, "got all user posts", data), nil
+	return serializer.NewSerializer(false, "got all user notes", data), nil
 }
 
 func (pDB *Posts) GetFollowingPosts(userID int) (serializer.Serializer, error) {
@@ -89,20 +111,27 @@ func (pDB *Posts) GetFollowingPosts(userID int) (serializer.Serializer, error) {
 
 	posts, err := pDB.db.GetPosts(params, true)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get posts from db - %w", err)
+		return nil, fmt.Errorf("unable to get notes from db - %w", err)
 	}
 
 	var data core.Posts
 	for _, v := range *posts {
 		article, err := pDB.GetArticle(v.Article.ID)
 		if err != nil {
-			return nil, fmt.Errorf("unable to get article info for posts from db - %w", err)
+			return nil, fmt.Errorf("unable to get article info for notes from db - %w", err)
 		}
 		v.Article = *article
+
+		user, err := pDB.GetUser("id", v.UserID)
+		if err != nil {
+			return nil, fmt.Errorf("unable to get author info for notes from db - %w", err)
+		}
+		v.Author = user.DisplayName
+
 		data = append(data, v)
 	}
 
-	return serializer.NewSerializer(false, "got all posts from following", data), nil
+	return serializer.NewSerializer(false, "got all notes from following", data), nil
 }
 
 func (pDB *Posts) GetOwnPosts(userID int) (serializer.Serializer, error) {
@@ -110,37 +139,48 @@ func (pDB *Posts) GetOwnPosts(userID int) (serializer.Serializer, error) {
 
 	posts, err := pDB.db.GetPosts(params, false)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get posts from db - %w", err)
+		return nil, fmt.Errorf("unable to get notes from db - %w", err)
+	}
+
+	if len(*posts) < 1 {
+		return serializer.NewSerializer(true, "You have not created any note yet.", nil), nil
 	}
 
 	var data core.Posts
 	for _, v := range *posts {
 		article, err := pDB.GetArticle(v.Article.ID)
 		if err != nil {
-			return nil, fmt.Errorf("unable to get article info for posts from db - %w", err)
+			return nil, fmt.Errorf("unable to get article info for notes from db - %w", err)
 		}
 		v.Article = *article
+
+		user, err := pDB.GetUser("id", v.UserID)
+		if err != nil {
+			return nil, fmt.Errorf("unable to get author info for notes from db - %w", err)
+		}
+		v.Author = user.DisplayName
+
 		data = append(data, v)
 	}
 
-	return serializer.NewSerializer(false, "got all user posts", data), nil
+	return serializer.NewSerializer(false, "got all user notes", data), nil
 }
 
 func (pDB *Posts) AddPost(post *core.PostPayload) error {
 	newPost, err := parseNewPost(post)
 	if err != nil {
-		return fmt.Errorf("unable to parse input for new post - %w", err)
+		return fmt.Errorf("unable to parse input for new note - %w", err)
 	}
 
 	author, err := pDB.GetUser("id", newPost.UserID)
 	if err != nil {
-		return fmt.Errorf("unable to get author for new post - %w", err)
+		return fmt.Errorf("unable to get author for new note - %w", err)
 	}
 	newPost.Author = author.DisplayName
 
 	err = pDB.db.AddPost(newPost)
 	if err != nil {
-		return fmt.Errorf("unable to add post - %w", err)
+		return fmt.Errorf("unable to add note - %w", err)
 	}
 
 	return nil
@@ -152,7 +192,7 @@ func (pDB *Posts) DeletePosts(postIDs []string) error {
 	// send to Planetscale
 	err := pDB.db.DeletePosts(ids)
 	if err != nil {
-		return fmt.Errorf("unable to delete posts with ids %s - %w", ids, err)
+		return fmt.Errorf("unable to delete notes with ids %s - %w", ids, err)
 	}
 	return nil
 }
@@ -160,14 +200,14 @@ func (pDB *Posts) DeletePosts(postIDs []string) error {
 func (pDB *Posts) GetLikes(postID int) ([]string, error) {
 	likedByIDs, err := pDB.db.GetLikes(postID)
 	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve likes for post id %d - %w", postID, err)
+		return nil, fmt.Errorf("unable to retrieve likes for note id %d - %w", postID, err)
 	}
 
 	likedByUsers := make([]string, 0, len(likedByIDs))
 	for _, v := range likedByIDs {
 		user, err := pDB.GetUser("id", v)
 		if err != nil {
-			return nil, fmt.Errorf("unable to retrieve users who like post id %d - %w", postID, err)
+			return nil, fmt.Errorf("unable to retrieve users who like note id %d - %w", postID, err)
 		}
 		likedByUsers = append(likedByUsers, user.DisplayName)
 	}
@@ -198,7 +238,7 @@ func parseNewPost(post *core.PostPayload) (*core.Post, error) {
 
 	articleID, err := strconv.Atoi(post.ArticleID)
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse article id of new post - %w", err)
+		return nil, fmt.Errorf("unable to parse article id of new note - %w", err)
 	}
 	newPost.Article.ID = articleID
 
