@@ -2,15 +2,15 @@
   import dayjs from "dayjs";
   dayjs().format();
 
-  let greeting;
+  let greeting = "Hello";
   const h = dayjs().hour();
-  if (h > 18 && h < 24) {
+  if (h >= 18 && h < 24) {
     greeting = "Good evening";
   }
-  if (h > 0 && h < 12) {
+  if (h >= 0 && h < 12) {
     greeting = "Good morning";
   }
-  if (h > 12 && h < 18) {
+  if (h >= 12 && h < 18) {
     greeting = "Good afternoon";
   }
 
