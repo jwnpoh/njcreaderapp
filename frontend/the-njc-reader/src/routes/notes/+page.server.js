@@ -1,6 +1,11 @@
 import "dotenv/config"
+import { redirect } from "@sveltejs/kit"
 
 export const load = async ({ fetch, locals, cookies }) => {
+  if (!locals.user.loggedIn) {
+    throw redirect(302, "/login")
+  }
+
   const userID = locals.user.id;
 
   const session = cookies.get("session");
