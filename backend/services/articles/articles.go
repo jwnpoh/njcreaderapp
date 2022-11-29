@@ -113,14 +113,14 @@ func checkQuery(q string) string {
 	q, _ = formatQuestionString(q)
 
 	switch {
-	case strings.Contains(q, " "):
-		return searchExact(q)
 	case strings.Contains(q, "AND"):
 		return searchAND(q)
 	case strings.Contains(q, "OR"):
 		return searchOR(q)
 	case strings.Contains(q, "NOT"):
 		return searchNOT(q)
+	case strings.Contains(q, " "):
+		return searchExact(q)
 	default:
 		return q
 	}

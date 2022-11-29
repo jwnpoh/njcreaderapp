@@ -14,8 +14,11 @@ func searchAND(q string) string {
 
 	t := strings.Builder{}
 
-	for _, v := range terms {
-		t.WriteString(" +" + v)
+	for i, v := range terms {
+		t.WriteString("+" + v)
+		if i < len(terms) {
+			t.WriteString(" ")
+		}
 	}
 	return t.String()
 }
