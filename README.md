@@ -42,6 +42,7 @@ The NJC Reader is a full stack web app that is an evolution of the [NJC GP News 
 - [x] user authentication
 - [x] user profile ui and api
 - [x] user notebook
+- [x] profanity filter (can never be perfect. Will still need some human moderation)
 - [ ] user notes management - delete notes, edit notes
 - [ ] social relations: following, likes, view public profile, etc.
 - [ ] columns feed and admin ui and api
@@ -49,7 +50,6 @@ The NJC Reader is a full stack web app that is an evolution of the [NJC GP News 
 - [ ] feedback form
 - [ ] user management (add user(s), edit user, delete user)
 - [ ] user password reset
-- [ ] profanity filter
 - [ ] teacher monitoring of classes (maybe/not?)
 - [ ] articles/notes/users stats
 - [ ] favicon, page titles

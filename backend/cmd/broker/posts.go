@@ -1,10 +1,12 @@
 package broker
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
+	"github.com/jwnpoh/njcreaderapp/backend/services/profanity"
 	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
 )
 
@@ -139,6 +141,17 @@ func (b *broker) InsertPost(w http.ResponseWriter, r *http.Request) {
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		return
+	}
+
+	toCheck := []string{input.TLDR, input.Examples, input.Notes}
+	for _, v := range toCheck {
+		profanityCheck := profanity.CheckProfanity(v)
+		if profanityCheck.IsProfane {
+			s := serializer.NewSerializer(true, fmt.Sprintf("Please use clean language on this platform.\nThe system auto-detected the use of the profanity: '%s'.\nIf this is a false positive, please report the false positive via the feedback form.", profanityCheck.Profanity), input.UserID)
+			s.Encode(w, http.StatusBadRequest)
+			b.Logger.Info(s, r)
+			return
+		}
 	}
 
 	date := formatDate(input.Date)
