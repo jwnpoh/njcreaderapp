@@ -18,7 +18,8 @@ export const actions = {
     const new_password = formData.get("new_password")
     const old_password = formData.get("old_password")
     const display_name = formData.get("display_name")
-    const email = locals.user.email
+    // const email = locals.user.email
+    const userID = locals.user.id
 
     const session = cookies.get("session")
 
@@ -27,7 +28,7 @@ export const actions = {
     myHeaders.append("Authorization", "Bearer " + session);
 
     let payload = {
-      email: email,
+      user_id: userID,
       old_password: old_password,
       new_password: new_password,
       display_name: display_name,
