@@ -5,10 +5,12 @@
   import Container from "$lib/Container.svelte";
 
   let user = $page.data.user;
+
+  let showMenu;
 </script>
 
 <header>
-  <Navbar {user} />
+  <Navbar {user} bind:showMenu />
 </header>
 <main>
   <Container>

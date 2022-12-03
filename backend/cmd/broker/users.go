@@ -7,6 +7,7 @@ import (
 
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/hasher"
+	"github.com/jwnpoh/njcreaderapp/backend/services/profanity"
 	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
 )
 
@@ -89,7 +90,7 @@ func (b *broker) GetUser(w http.ResponseWriter, r *http.Request) {
 
 func (b *broker) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	var userInput struct {
-		Email       string `json:"email"`
+		UserID      int    `json:"user_id"`
 		OldPassword string `json:"old_password"`
 		NewPassword string `json:"new_password"`
 		DisplayName string `json:"display_name"`
@@ -98,7 +99,15 @@ func (b *broker) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	s := serializer.NewSerializer(false, "", nil)
 	s.Decode(w, r, &userInput)
 
-	user, err := b.Users.GetUser("email", userInput.Email)
+	profanityCheck := profanity.CheckProfanity(userInput.DisplayName)
+	if profanityCheck.IsProfane {
+		s := serializer.NewSerializer(true, fmt.Sprintf("Please use clean language on this platform.\nThe system auto-detected the use of the profanity: '%s'.\nIf you think this is a mistake, please report the false positive via the feedback form.", profanityCheck.Profanity), userInput.UserID)
+		s.Encode(w, http.StatusBadRequest)
+		b.Logger.Info(s, r)
+		return
+	}
+
+	user, err := b.Users.GetUser("id", userInput.UserID)
 	if err != nil {
 		s := serializer.NewSerializer(true, "invalid credentials", err)
 		s.ErrorJson(w, err)
