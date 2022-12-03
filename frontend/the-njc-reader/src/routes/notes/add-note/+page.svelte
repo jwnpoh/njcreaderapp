@@ -95,7 +95,8 @@
           </p>
           <ul class="pl-5 pb-2 text-md opacity-80">
             <li class="list-disc list-outside">
-              <strong>5W1H</strong> (who, what, when, where, why, how),
+              <strong>Mental Models</strong> (problem, stakeholders, causes, consequences,
+              solutions, implications)
             </li>
             <li class="list-disc list-outside">
               <strong>Paul's Elements of Reasoning</strong> (issue, purpose, point
@@ -165,6 +166,10 @@
             <li class="list-disc list-outside">
               How might I use the content from this article to answer a
               particular past year question?
+            </li>
+            <li class="list-disc list-outside">
+              Does this article remind me of something else I have read or
+              watched?
             </li>
           </ul>
           <textarea
