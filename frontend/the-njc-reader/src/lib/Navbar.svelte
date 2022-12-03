@@ -21,16 +21,16 @@
     role = user.role;
   }
 
-  let showMenu;
+  export let showMenu;
+  const toggleMenu = () => {
+    showMenu = !showMenu;
+  };
 </script>
 
 <div class="navbar bg-primary text-white fixed top-0 z-50 ">
   <div class="md:navbar-start">
     <div class="dropdown">
-      <button
-        class="btn btn-ghost btn-circle"
-        on:click={() => (showMenu = !showMenu)}
-      >
+      <button class="btn btn-ghost btn-circle" on:click={toggleMenu}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5"
