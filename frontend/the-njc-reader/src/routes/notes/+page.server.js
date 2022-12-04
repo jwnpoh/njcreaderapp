@@ -50,7 +50,8 @@ export const load = async ({ fetch, locals, cookies }) => {
   return {
     notes: getNotes(),
     following: getFollowing(),
-    discover: getDiscover()
+    discover: getDiscover(),
+    API_URL: `${process.env.API_URL}`
   }
 }
 

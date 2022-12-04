@@ -13,17 +13,18 @@
   const notes = data.notes;
   const following = data.following;
   const discover = data.discover;
+  const API_URL = data.API_URL;
 </script>
 
 <Container>
   {#if active === "notes"}
-    <NotesContainer data={notes ?? ""} />
+    <NotesContainer data={notes ?? ""} {API_URL} />
   {/if}
   {#if active === "following"}
-    <NotesContainer data={following ?? ""} />
+    <NotesContainer data={following ?? ""} {API_URL} />
   {/if}
   {#if active === "discover"}
-    <NotesContainer data={discover ?? ""} />
+    <NotesContainer data={discover ?? ""} {API_URL} />
   {/if}
 </Container>
 

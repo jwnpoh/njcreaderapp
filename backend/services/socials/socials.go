@@ -11,6 +11,7 @@ import (
 type SocialsDB interface {
 	GetFollowing(userID int) ([]int, error)
 	GetFollowedBy(userID int) ([]int, error)
+	Follow(userID, toFollow int) error
 }
 
 type Socials struct {
@@ -26,7 +27,6 @@ func NewSocialsDB(socialsDB SocialsDB, usersDB users.UsersDB) *Socials {
 }
 
 func (sDB *Socials) GetFriends(userID int) (serializer.Serializer, error) {
-
 	following, err := sDB.db.GetFollowing(userID)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get following ids - %w", err)
@@ -64,4 +64,18 @@ func (sDB *Socials) GetFriends(userID int) (serializer.Serializer, error) {
 	}
 
 	return serializer.NewSerializer(false, "successfully got friends", friends), nil
+}
+
+func (sDB *Socials) Follow(userID, toFollow int) (serializer.Serializer, error) {
+	toFollowUser, err := sDB.GetUser("id", toFollow)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get user info to follow - %w", err)
+	}
+
+	err = sDB.db.Follow(userID, toFollow)
+	if err != nil {
+		return nil, fmt.Errorf("unable to follow user %s - %w", toFollowUser.DisplayName, err)
+	}
+
+	return serializer.NewSerializer(false, fmt.Sprintf("successfully followed user %s", toFollowUser.DisplayName), nil), nil
 }

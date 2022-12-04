@@ -32,3 +32,27 @@ func (b *broker) GetFriends(w http.ResponseWriter, r *http.Request) {
 		b.Logger.Error(data, r)
 	}
 }
+
+func (b *broker) Follow(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		UserID   int `json:"user_id"`
+		ToFollow int `json:"to_follow"`
+	}
+
+	s := serializer.NewSerializer(false, "", nil)
+	s.Decode(w, r, &input)
+
+	data, err := b.Socials.Follow(input.UserID, input.ToFollow)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to follow user", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	err = data.Encode(w, http.StatusAccepted)
+	if err != nil {
+		data.ErrorJson(w, err)
+		b.Logger.Error(data, r)
+	}
+}

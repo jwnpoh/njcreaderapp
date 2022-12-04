@@ -30,14 +30,14 @@ func NewSocialsDB(dsn string) (*SocialsDB, error) {
 func (sDB *SocialsDB) GetFollowing(userID int) ([]int, error) {
 	following := make([]int, 0)
 
-	query := "SELECT follows FROM following WHERE user_id = ?"
+	query := "SELECT follows FROM follows WHERE user_id = ?"
 
 	rows, err := sDB.DB.Queryx(query, userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return following, nil
 		}
-		return nil, fmt.Errorf("PScaleSocials: unable to query following table - %w", err)
+		return nil, fmt.Errorf("PScaleSocials: unable to get follows - %w", err)
 	}
 
 	for rows.Next() {
@@ -56,14 +56,14 @@ func (sDB *SocialsDB) GetFollowing(userID int) ([]int, error) {
 func (sDB *SocialsDB) GetFollowedBy(userID int) ([]int, error) {
 	followedBy := make([]int, 0)
 
-	query := "SELECT follows FROM followed_by WHERE user_id = ?"
+	query := "SELECT user_id FROM follows WHERE follows = ?"
 
 	rows, err := sDB.DB.Queryx(query, userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return followedBy, nil
 		}
-		return nil, fmt.Errorf("PScaleSocials: unable to query followed_by table - %w", err)
+		return nil, fmt.Errorf("PScaleSocials: unable to get followed by - %w", err)
 	}
 
 	for rows.Next() {
@@ -77,4 +77,26 @@ func (sDB *SocialsDB) GetFollowedBy(userID int) ([]int, error) {
 	}
 
 	return followedBy, nil
+}
+
+func (sDB *SocialsDB) Follow(userID, toFollow int) error {
+	tx, err := sDB.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("PScalePosts: unable to begin tx for following user - %w", err)
+	}
+	defer tx.Rollback()
+
+	query := "INSERT INTO follows (user_id, follows) VALUES (?, ?)"
+
+	_, err = tx.Exec(query, userID, toFollow)
+	if err != nil {
+		return fmt.Errorf("PScalePosts: unable to add following relation to db - %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("PScalePosts: unable to commit tx to add post to db - %w", err)
+	}
+
+	return nil
 }

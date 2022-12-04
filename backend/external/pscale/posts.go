@@ -70,6 +70,8 @@ func (pDB *PostsDB) GetPosts(userIDs []int, public bool) (*core.Posts, error) {
 		query += " AND public = true"
 	}
 
+	query += " ORDER BY created_at DESC"
+
 	rows, err := pDB.DB.Queryx(query)
 	if err != nil {
 		return nil, fmt.Errorf("PScalePosts: unable to query posts table - %w", err)
@@ -165,7 +167,7 @@ func (pDB *PostsDB) GetLikes(postID int) ([]int, error) {
 
 func parseQuery(userIDs []int) string {
 	if len(userIDs) == 1 {
-		return fmt.Sprintf("SELECT * FROM posts WHERE user_id = %d ORDER BY created_at DESC", userIDs[0])
+		return fmt.Sprintf("SELECT * FROM posts WHERE user_id = %d", userIDs[0])
 	}
 
 	params := strings.Builder{}
@@ -178,7 +180,7 @@ func parseQuery(userIDs []int) string {
 	}
 
 	query := strings.Builder{}
-	query.WriteString(fmt.Sprintf("SELECT * FROM posts WHERE user_id IN (%s) ORDER BY created_at DESC", params))
+	query.WriteString(fmt.Sprintf("SELECT * FROM posts WHERE user_id IN (%s)", params.String()))
 
 	return query.String()
 }

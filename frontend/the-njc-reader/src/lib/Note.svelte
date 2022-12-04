@@ -1,4 +1,6 @@
 <script>
+  import { page } from "$app/stores";
+
   import dayjs from "dayjs";
   import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -7,9 +9,29 @@
   import heartO from "svelte-awesome/icons/heartO";
 
   export let note;
+  export let API_URL;
 
   dayjs().format();
   dayjs.extend(relativeTime);
+
+  const user_id = $page.data.user.id;
+  const session = $page.data.user.session;
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Authorization", "Bearer " + session);
+
+  const addFollow = async (to_follow) => {
+    const payload = { user_id: user_id, to_follow: to_follow };
+    const res = await fetch(`${API_URL}/api/users/follow`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: myHeaders,
+    });
+
+    const response = await res.json();
+    const msg = await response.message;
+    console.log(msg);
+  };
 </script>
 
 <div class="flex place-content-center">
@@ -17,7 +39,14 @@
     <div class="card-body py-5">
       <div class="chat chat-start relative">
         <div class="chat-header">
-          {note.author ?? "anonymous"}
+          <button
+            on:click={() => {
+              addFollow(note.user_id);
+            }}
+          >
+            {note.author ?? "anonymous"}
+            {note.user_id ?? "anonymous"}
+          </button>
           <time class="text-xs opacity-50">{dayjs(note.date).fromNow()}</time>
         </div>
         <div class="chat-bubble ">
