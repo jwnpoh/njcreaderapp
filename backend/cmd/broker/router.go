@@ -51,8 +51,10 @@ func (b *broker) serveRoutes(mux chi.Router) {
 		mux.Get("/public", b.GetPublicFeed)
 		mux.Get("/following", b.GetFollowing)
 		mux.Get("/notebook", b.GetNotebook)
+		mux.Get("/get-liked-posts", b.GetLikedPosts)
 		mux.Post("/insert", b.InsertPost)
 		mux.Post("/delete", b.DeletePost)
+		mux.Post("/like", b.Like)
 	})
 
 	mux.Route("/api/admin/articles", func(mux chi.Router) {

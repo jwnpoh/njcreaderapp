@@ -17,7 +17,7 @@ type PostsDB interface {
 	GetPosts(userIDs []int, public bool) (*core.Posts, error)
 	AddPost(post *core.Post) error
 	DeletePosts(postIDs string) error
-	GetLikes(postID int) ([]int, error)
+	GetLikes(id int, userOrPost string) ([]int, error)
 }
 
 type Posts struct {
@@ -172,22 +172,31 @@ func (pDB *Posts) DeletePosts(postIDs []string) error {
 	return nil
 }
 
-func (pDB *Posts) GetLikes(postID int) ([]string, error) {
-	likedByIDs, err := pDB.db.GetLikes(postID)
+func (pDB *Posts) GetLikes(postID int) (serializer.Serializer, error) {
+	likedByIDs, err := pDB.db.GetLikes(postID, "post")
 	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve likes for note id %d - %w", postID, err)
+		return serializer.NewSerializer(true, fmt.Sprintf("unable to retrieve likes for note id %d - %v", postID, err), nil), err
 	}
 
 	likedByUsers := make([]string, 0, len(likedByIDs))
 	for _, v := range likedByIDs {
 		user, err := pDB.GetUser("id", v)
 		if err != nil {
-			return nil, fmt.Errorf("unable to retrieve users who like note id %d - %w", postID, err)
+			return serializer.NewSerializer(true, fmt.Sprintf("unable to retrieve users who like note id %d - %v", postID, err), nil), err
 		}
 		likedByUsers = append(likedByUsers, user.DisplayName)
 	}
 
-	return likedByUsers, nil
+	return serializer.NewSerializer(false, "successfully retrieved post likes", likedByUsers), nil
+}
+
+func (pDB *Posts) GetLikedPosts(userID int) (serializer.Serializer, error) {
+	likedPosts, err := pDB.db.GetLikes(userID, "user")
+	if err != nil {
+		return serializer.NewSerializer(true, fmt.Sprintf("unable to retrieve likes by user id %d - %v", userID, err), nil), err
+	}
+
+	return serializer.NewSerializer(false, "successfully retrieved posts liked by user", likedPosts), nil
 }
 
 func parseNewPost(post *core.PostPayload) (*core.Post, error) {

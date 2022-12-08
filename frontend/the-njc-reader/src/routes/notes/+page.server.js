@@ -43,14 +43,31 @@ export const load = async ({ fetch, locals, cookies }) => {
     })
 
     const notes = await res.json()
+    let note_likes = {}
+    for (var note of notes.data) {
+      note_likes[note.id] = note.likes
+    }
+    locals.user.note_likes = note_likes
     return notes
+  }
 
+  // get user's liked posts
+  const getLikedNotes = async () => {
+    const res = await fetch(`${process.env.API_URL}/api/posts/get-liked-posts?user=${userID}`, {
+      method: "GET",
+      headers: myHeaders,
+    })
+
+    const likes = await res.json()
+    locals.user.liked_articles = likes.data
+    return likes
   }
 
   return {
     notes: getNotes(),
     following: getFollowing(),
     discover: getDiscover(),
+    liked_notes: getLikedNotes(),
     API_URL: `${process.env.API_URL}`
   }
 }

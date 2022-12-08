@@ -9,6 +9,7 @@
   import heartO from "svelte-awesome/icons/heartO";
 
   export let note;
+  export let liked_notes;
   export let API_URL;
 
   dayjs().format();
@@ -30,7 +31,31 @@
 
     const response = await res.json();
     const msg = await response.message;
-    console.log(msg);
+  };
+
+  let liked;
+  $: if (liked_notes.includes(note.id)) {
+    liked = true;
+  }
+
+  let note_likes = $page.data.user.note_likes;
+  const updateLikes = async (like) => {
+    const payload = { user_id: user_id, post_id: note.id, like: like };
+    await fetch(`${API_URL}/api/posts/like`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: myHeaders,
+    });
+
+    if (like) {
+      note_likes[note.id]++;
+      liked_notes.push(note.id);
+    } else {
+      note_likes[note.id]--;
+      liked_notes.splice(liked_notes.indexOf(note.id));
+    }
+
+    liked = like;
   };
 </script>
 
@@ -45,7 +70,6 @@
             }}
           >
             {note.author ?? "anonymous"}
-            {note.user_id ?? "anonymous"}
           </button>
           <time class="text-xs opacity-50">{dayjs(note.date).fromNow()}</time>
         </div>
@@ -62,12 +86,41 @@
           </div>
         </div>
         <div class="absolute top-1 right-0 flex">
-          <button
-            class="btn btn-xs text-primary border-none bg-transparent hover:bg-transparent "
-          >
-            <Icon data={heartO} />
-          </button>
-          <p class="text-sm translate-y-0.5">38</p>
+          {#if !note.public}
+            <p class="text-neutral text-sm italic">Private note</p>
+          {:else if note.public}
+            {#if note.user_id == user_id}
+              <p class="text-neutral text-sm italic">
+                {#if note_likes[note.id] > 0}
+                  <Icon class="text-primary" data={heart} />
+                {:else}
+                  <Icon class="text-primary" data={heartO} />
+                {/if}
+                {note_likes[note.id]}
+                {note_likes[note.id] > 1 ? "likes" : "like"} received
+              </p>
+            {:else if liked}
+              <button
+                class="btn btn-xs text-primary border-none bg-transparent hover:bg-transparent "
+                on:click={() => {
+                  updateLikes(false);
+                }}
+              >
+                <Icon data={heart} />
+              </button>
+              <p class="text-sm translate-y-0.5">{note_likes[note.id]}</p>
+            {:else}
+              <button
+                class="btn btn-xs text-primary border-none bg-transparent hover:bg-transparent "
+                on:click={() => {
+                  updateLikes(true);
+                }}
+              >
+                <Icon data={heartO} />
+              </button>
+              <p class="text-sm translate-y-0.5">{note_likes[note.id]}</p>
+            {/if}
+          {/if}
         </div>
       </div>
     </div>

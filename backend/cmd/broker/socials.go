@@ -56,3 +56,28 @@ func (b *broker) Follow(w http.ResponseWriter, r *http.Request) {
 		b.Logger.Error(data, r)
 	}
 }
+
+func (b *broker) Like(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		UserID int  `json:"user_id"`
+		PostID int  `json:"post_id"`
+		Like   bool `json:"like"`
+	}
+
+	s := serializer.NewSerializer(false, "", nil)
+	s.Decode(w, r, &input)
+
+	data, err := b.Socials.Like(input.UserID, input.PostID, input.Like)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to update like", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	err = data.Encode(w, http.StatusAccepted)
+	if err != nil {
+		data.ErrorJson(w, err)
+		b.Logger.Error(data, r)
+	}
+}

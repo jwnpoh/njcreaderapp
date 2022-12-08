@@ -12,6 +12,8 @@ type SocialsDB interface {
 	GetFollowing(userID int) ([]int, error)
 	GetFollowedBy(userID int) ([]int, error)
 	Follow(userID, toFollow int) error
+	Like(userID, postID int) error
+	Unlike(userID, postID int) error
 }
 
 type Socials struct {
@@ -78,4 +80,26 @@ func (sDB *Socials) Follow(userID, toFollow int) (serializer.Serializer, error) 
 	}
 
 	return serializer.NewSerializer(false, fmt.Sprintf("successfully followed user %s", toFollowUser.DisplayName), nil), nil
+}
+
+func (sDB *Socials) Like(userID, postID int, like bool) (serializer.Serializer, error) {
+	if !like {
+		return sDB.unlike(userID, postID)
+	}
+
+	err := sDB.db.Like(userID, postID)
+	if err != nil {
+		return nil, fmt.Errorf("error liking post - %w", err)
+	}
+
+	return serializer.NewSerializer(false, "liked post", nil), nil
+}
+
+func (sDB *Socials) unlike(userID, postID int) (serializer.Serializer, error) {
+	err := sDB.db.Unlike(userID, postID)
+	if err != nil {
+		return nil, fmt.Errorf("error unliking post - %w", err)
+	}
+
+	return serializer.NewSerializer(false, "unliked post", nil), nil
 }
