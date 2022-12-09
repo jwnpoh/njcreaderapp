@@ -70,6 +70,8 @@ func (pDB *PostsDB) GetPosts(userIDs []int, public bool) (*core.Posts, error) {
 		query += " AND public = true"
 	}
 
+	query += " ORDER BY created_at DESC"
+
 	rows, err := pDB.DB.Queryx(query)
 	if err != nil {
 		return nil, fmt.Errorf("PScalePosts: unable to query posts table - %w", err)
@@ -141,23 +143,32 @@ func (pDB *PostsDB) DeletePosts(postIDs string) error {
 	return nil
 }
 
-func (pDB *PostsDB) GetLikes(postID int) ([]int, error) {
+func (pDB *PostsDB) GetLikes(id int, userOrPost string) ([]int, error) {
 	likedBys := make([]int, 0)
 
-	query := "SELECT liked_by FROM likes_list WHERE post_id = ?"
+	var query string
 
-	rows, err := pDB.DB.Queryx(query, postID)
+	switch userOrPost {
+	case "post":
+		query = "SELECT liked_by FROM likes_list WHERE post_id = ?"
+	case "user":
+		query = "SELECT post_id FROM likes_list WHERE liked_by = ?"
+	default:
+		return nil, fmt.Errorf("PScalePosts: error interpreting 'user' or 'post'")
+	}
+
+	rows, err := pDB.DB.Queryx(query, id)
 	if err != nil {
 		return nil, fmt.Errorf("PScalePosts: unable to query likes_list table - %w", err)
 	}
 
-	var id int
+	var resID int
 	for rows.Next() {
-		err = rows.Scan(&id)
+		err = rows.Scan(&resID)
 		if err != nil {
 			return nil, fmt.Errorf("PScalePosts: error scanning row - %w", err)
 		}
-		likedBys = append(likedBys, id)
+		likedBys = append(likedBys, resID)
 	}
 
 	return likedBys, nil
@@ -165,7 +176,7 @@ func (pDB *PostsDB) GetLikes(postID int) ([]int, error) {
 
 func parseQuery(userIDs []int) string {
 	if len(userIDs) == 1 {
-		return fmt.Sprintf("SELECT * FROM posts WHERE user_id = %d ORDER BY created_at DESC", userIDs[0])
+		return fmt.Sprintf("SELECT * FROM posts WHERE user_id = %d", userIDs[0])
 	}
 
 	params := strings.Builder{}
@@ -178,7 +189,7 @@ func parseQuery(userIDs []int) string {
 	}
 
 	query := strings.Builder{}
-	query.WriteString(fmt.Sprintf("SELECT * FROM posts WHERE user_id IN (%s) ORDER BY created_at DESC", params))
+	query.WriteString(fmt.Sprintf("SELECT * FROM posts WHERE user_id IN (%s)", params.String()))
 
 	return query.String()
 }

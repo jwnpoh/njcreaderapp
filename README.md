@@ -21,18 +21,20 @@ The NJC Reader is a full stack web app that is an evolution of the [NJC GP News 
 - User management (to be implemented)
 - Monitoring of teaching classes (to be implemented)
 
-### Technologies/Platforms/Frameworks
+### Open source
 #### Backend
 - [Go](https://go.dev/)
 - [Go-chi](https://go-chi.io/)
 - [sqlx](http://jmoiron.github.io/sqlx/)
-- [Planetscale](https://planetscale.com/)
-- [Firebase/Firestore](https://firebase.google.com/)
+- [go-away](https://github.com/TwiN/go-away)
 
 #### Frontend
 - [Svelte/SvelteKit](https://kit.svelte.dev/)
 - [daisyUI](https://daisyui.com/)
 - [Tailwind CSS](https://tailwindcss.com/)
+- [Svelte-Awesome](https://github.com/RobBrazier/svelte-awesome#more-advanced-cases)
+- [Date Picker Svelte](https://github.com/probablykasper/date-picker-svelte)
+- [dotenv](https://github.com/motdotla/dotenv)
 
 ### Progress tracking
 - [x] articles feed api
@@ -43,8 +45,10 @@ The NJC Reader is a full stack web app that is an evolution of the [NJC GP News 
 - [x] user profile ui and api
 - [x] user notebook
 - [x] profanity filter (can never be perfect. Will still need some human moderation)
+- [x] social relations: following 
+- [x] social relations: likes
+- [x] social relations: view public profile
 - [ ] user notes management - delete notes, edit notes
-- [ ] social relations: following, likes, view public profile, etc.
 - [ ] columns feed and admin ui and api
 - [ ] about page
 - [ ] feedback form

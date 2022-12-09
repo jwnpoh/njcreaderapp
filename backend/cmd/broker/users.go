@@ -3,8 +3,10 @@ package broker
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/hasher"
 	"github.com/jwnpoh/njcreaderapp/backend/services/profanity"
@@ -167,6 +169,33 @@ func (b *broker) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s := serializer.NewSerializer(false, "successfully deleted user", user.ID)
+	err = s.Encode(w, http.StatusAccepted)
+	if err != nil {
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+	}
+}
+
+func (b *broker) ViewUser(w http.ResponseWriter, r *http.Request) {
+	q := chi.URLParam(r, "user")
+
+	userID, err := strconv.Atoi(q)
+	if err != nil {
+		s := serializer.NewSerializer(true, "something went wrong with the page number", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	user, err := b.Users.GetUser("id", userID)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to get user", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	s := serializer.NewSerializer(false, "successfully retrieved user", user)
 	err = s.Encode(w, http.StatusAccepted)
 	if err != nil {
 		s.ErrorJson(w, err)

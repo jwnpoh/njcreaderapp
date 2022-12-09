@@ -7,12 +7,23 @@ export const load = async ({ fetch, locals, cookies }) => {
   }
 
   const userID = locals.user.id;
-
   const session = cookies.get("session");
 
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", "Bearer " + session);
+
+  // getPublic
+  const getDiscover = async () => {
+    const res = await fetch(`${process.env.API_URL}/api/posts/public?user=all`, {
+      method: "GET",
+      headers: myHeaders,
+    })
+
+    const notes = await res.json()
+
+    return notes
+  }
 
   const getNotes = async () => {
     const res = await fetch(`${process.env.API_URL}/api/posts/notebook?user=${userID}`, {
@@ -35,22 +46,13 @@ export const load = async ({ fetch, locals, cookies }) => {
     return notes
   }
 
-  // getPublic
-  const getDiscover = async () => {
-    const res = await fetch(`${process.env.API_URL}/api/posts/public?user=all`, {
-      method: "GET",
-      headers: myHeaders,
-    })
 
-    const notes = await res.json()
-    return notes
-
-  }
 
   return {
     notes: getNotes(),
     following: getFollowing(),
-    discover: getDiscover()
+    discover: getDiscover(),
+    API_URL: `${process.env.API_URL}`
   }
 }
 

@@ -42,7 +42,7 @@ type Post struct {
 	Notes        string   `json:"notes,omitempty"`
 	Tags         []string `json:"tags,omitempty"`
 	Date         string   `json:"date"`
-	Public       bool     `json:"make_public"`
+	Public       bool     `json:"public"`
 	CreatedAt    int64    `json:"created_at,omitempty"`
 	ArticleID    string   `json:"article_id"`
 	ArticleTitle string   `json:"article_title"`
@@ -57,7 +57,7 @@ type PostPayload struct {
 	Notes        string   `json:"notes,omitempty"`
 	Tags         []string `json:"tags,omitempty"`
 	Date         string   `json:"date"`
-	Public       string   `json:"make_public"`
+	Public       string   `json:"public"`
 	ArticleID    string   `json:"article_id"`
 	ArticleTitle string   `json:"article_title"`
 	ArticleURL   string   `json:"article_url"`
