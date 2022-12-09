@@ -8,7 +8,7 @@ import (
 )
 
 func (b *broker) GetFriends(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query().Get("userid")
+	q := r.URL.Query().Get("user")
 
 	userID, err := strconv.Atoi(q)
 	if err != nil {
@@ -35,14 +35,15 @@ func (b *broker) GetFriends(w http.ResponseWriter, r *http.Request) {
 
 func (b *broker) Follow(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		UserID   int `json:"user_id"`
-		ToFollow int `json:"to_follow"`
+		UserID   int  `json:"user_id"`
+		ToFollow int  `json:"to_follow"`
+		Follow   bool `json:"follow"`
 	}
 
 	s := serializer.NewSerializer(false, "", nil)
 	s.Decode(w, r, &input)
 
-	data, err := b.Socials.Follow(input.UserID, input.ToFollow)
+	data, err := b.Socials.Follow(input.UserID, input.ToFollow, input.Follow)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to follow user", err)
 		s.ErrorJson(w, err)

@@ -101,6 +101,27 @@ func (sDB *SocialsDB) Follow(userID, toFollow int) error {
 	return nil
 }
 
+func (sDB *SocialsDB) UnFollow(userID, toUnFollow int) error {
+	tx, err := sDB.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("PScaleSocials: unable to begin tx for unfollowing user - %w", err)
+	}
+	defer tx.Rollback()
+
+	query := "DELETE FROM follows WHERE user_id = ? AND follows = ?"
+	_, err = tx.Exec(query, userID, toUnFollow)
+	if err != nil {
+		return fmt.Errorf("PScaleSocials: unable to add like to posts table in db - %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("PScaleSocials: unable to commit tx to add like to db - %w", err)
+	}
+
+	return nil
+}
+
 func (sDB *SocialsDB) Like(userID, postID int) error {
 	tx, err := sDB.DB.Begin()
 	if err != nil {

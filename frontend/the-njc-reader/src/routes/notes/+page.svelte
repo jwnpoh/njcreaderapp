@@ -14,18 +14,17 @@
   const following = data.following;
   const discover = data.discover;
   const API_URL = data.API_URL;
-  let liked_notes = data.liked_notes.data;
 </script>
 
 <Container>
   {#if active === "notes"}
-    <NotesContainer data={notes ?? ""} bind:liked_notes {API_URL} />
+    <NotesContainer data={notes ?? ""} {API_URL} />
   {/if}
   {#if active === "following"}
-    <NotesContainer data={following ?? ""} bind:liked_notes {API_URL} />
+    <NotesContainer data={following ?? ""} {API_URL} />
   {/if}
   {#if active === "discover"}
-    <NotesContainer data={discover ?? ""} bind:liked_notes {API_URL} />
+    <NotesContainer data={discover ?? ""} {API_URL} />
   {/if}
 </Container>
 

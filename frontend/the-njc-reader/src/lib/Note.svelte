@@ -9,7 +9,6 @@
   import heartO from "svelte-awesome/icons/heartO";
 
   export let note;
-  export let liked_notes;
   export let API_URL;
 
   dayjs().format();
@@ -17,28 +16,15 @@
 
   const user_id = $page.data.user.id;
   const session = $page.data.user.session;
+  const liked_notes = $page.data.user.liked_notes;
+  let note_likes = $page.data.user.note_likes;
+
+  $: liked = liked_notes.includes(note.id) ? true : false;
+
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", "Bearer " + session);
 
-  const addFollow = async (to_follow) => {
-    const payload = { user_id: user_id, to_follow: to_follow };
-    const res = await fetch(`${API_URL}/api/users/follow`, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: myHeaders,
-    });
-
-    const response = await res.json();
-    const msg = await response.message;
-  };
-
-  let liked;
-  $: if (liked_notes.includes(note.id)) {
-    liked = true;
-  }
-
-  let note_likes = $page.data.user.note_likes;
   const updateLikes = async (like) => {
     const payload = { user_id: user_id, post_id: note.id, like: like };
     await fetch(`${API_URL}/api/posts/like`, {
@@ -64,13 +50,9 @@
     <div class="card-body py-5">
       <div class="chat chat-start relative">
         <div class="chat-header">
-          <button
-            on:click={() => {
-              addFollow(note.user_id);
-            }}
-          >
+          <a href="/profile/{note.user_id}">
             {note.author ?? "anonymous"}
-          </button>
+          </a>
           <time class="text-xs opacity-50">{dayjs(note.date).fromNow()}</time>
         </div>
         <div class="chat-bubble ">

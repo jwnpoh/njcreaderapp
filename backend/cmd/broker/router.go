@@ -43,6 +43,7 @@ func (b *broker) serveRoutes(mux chi.Router) {
 		mux.Post("/delete-user", b.DeleteUser)
 		mux.Get("/friends", b.GetFriends)
 		mux.Post("/follow", b.Follow)
+		mux.Get("/{user}", b.ViewUser)
 	})
 
 	mux.Route("/api/posts", func(mux chi.Router) {
