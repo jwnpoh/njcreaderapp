@@ -53,50 +53,54 @@
 </script>
 
 <Container>
-  <div class="grid pt-4 justify-center items-center">
-    <h1 class="card-title pb-2 text-2xl">
-      Viewing {userInfo.display_name}'s Public Profile
-      {#if userInfo.id != user_id}
-        <button
-          class="btn btn-xs btn-info rounded-full text-xs px-3 place-self-end"
-          class:btn-outline={!isFriend}
-          on:click={() => {
-            updateFollows(userInfo.id);
-          }}>{isFriend ? "Following" : "Follow"}</button
-        >
-      {/if}
-    </h1>
-    <h2 class="text-xl text-neutral opacity-80 italic font-semibold">
-      {userInfo.class}
-    </h2>
-  </div>
-  <div class="grid justify-center items-center ">
-    <div class="stats shadow mt-4">
-      <div class="stat place-items-center ">
-        <div class="stat-figure text-secondary" />
-        <div class="stat-title text-sm">Public notes</div>
-        <div class="stat-value ">
-          {userNotesCount}
+  <div class="px-10">
+    <div class="grid pt-4 justify-center items-center">
+      <h1 class="card-title pb-2 text-2xl">
+        Viewing {userInfo.display_name}'s Public Profile
+      </h1>
+      <h2 class="pb-2 text-xl text-neutral opacity-80 italic font-semibold">
+        {userInfo.class}
+        {#if userInfo.id != user_id}
+          <button
+            class="btn btn-sm md:btn-xs btn-info rounded-full text-xs px-3 ml-2 place-self-end"
+            class:btn-outline={!isFriend}
+            on:click={() => {
+              updateFollows(userInfo.id);
+            }}>{isFriend ? "Following" : "Follow"}</button
+          >
+        {/if}
+      </h2>
+    </div>
+    <div class="flex justify-center items-center ">
+      <div
+        class="stats stats-vertical w-9/12 md:w-7/12 md:stats-horizontal shadow mt-4"
+      >
+        <div class="stat place-items-center ">
+          <div class="stat-figure text-secondary" />
+          <div class="stat-title text-sm">Public notes</div>
+          <div class="stat-value ">
+            {userNotesCount}
+          </div>
+        </div>
+
+        <div class="stat place-items-center ">
+          <div class="stat-figure text-secondary" />
+          <div class="stat-title">Followers</div>
+          <div class="stat-value ">{followersCount}</div>
+        </div>
+
+        <div class="stat place-items-center ">
+          <div class="stat-figure text-secondary" />
+          <div class="stat-title">Following</div>
+          <div class="stat-value ">{followingCount}</div>
         </div>
       </div>
-
-      <div class="stat place-items-center ">
-        <div class="stat-figure text-secondary" />
-        <div class="stat-title">Followers</div>
-        <div class="stat-value ">{followersCount}</div>
-      </div>
-
-      <div class="stat place-items-center ">
-        <div class="stat-figure text-secondary" />
-        <div class="stat-title">Following</div>
-        <div class="stat-value ">{followingCount}</div>
-      </div>
     </div>
+    <div class="grid pt-20 justify-center items-center">
+      <h1 class="card-title pb-2 text-2xl">
+        {userInfo.display_name}'s Public Notes
+      </h1>
+    </div>
+    <NotesContainer data={userNotes ?? ""} {API_URL} />
   </div>
-  <div class="grid pt-20 justify-center items-center">
-    <h1 class="card-title pb-2 text-2xl">
-      {userInfo.display_name}'s Public Notes
-    </h1>
-  </div>
-  <NotesContainer data={userNotes ?? ""} {API_URL} />
 </Container>

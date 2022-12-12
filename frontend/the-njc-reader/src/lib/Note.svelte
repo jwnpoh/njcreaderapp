@@ -53,9 +53,11 @@
           <a href="/profile/{note.user_id}">
             {note.author ?? "anonymous"}
           </a>
-          <time class="text-xs opacity-50">{dayjs(note.date).fromNow()}</time>
+          <time class="block text-xs opacity-50"
+            >{dayjs(note.date).fromNow()}</time
+          >
         </div>
-        <div class="chat-bubble ">
+        <div class="chat-bubble pt-2">
           <div>
             {note.tldr}
           </div>
