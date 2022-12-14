@@ -49,9 +49,9 @@ export const load = async ({ fetch, locals, cookies }) => {
 
 
   return {
-    notes: getNotes(),
     following: getFollowing(),
     discover: getDiscover(),
+    notes: getNotes(),
     API_URL: `${process.env.API_URL}`
   }
 }

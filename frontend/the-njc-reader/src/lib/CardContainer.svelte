@@ -15,51 +15,53 @@
   </p>
 {/if}
 
-<div class="px-10 grid md:grid-cols-2 gap-10">
-  {#each articles as article}
-    <div>
-      <Card
-        id={article.id}
-        title={article.title}
-        url={article.url}
-        topics={article.topics}
-        question_display={article.question_display}
-        date={article.date}
-        mustRead={article.must_read}
-      />
-    </div>
-  {/each}
-</div>
-
-{#if page}
-  <div class="flex justify-center pt-10">
-    {#if page > 1}
-      <div class="flex-initial btn-group grid grid-cols-2 ">
-        <button
-          class="btn btn-outline"
-          on:click={() => {
-            page--;
-            navigate(page);
-          }}>Previous page</button
-        >
-        <button
-          class="btn btn-outline"
-          on:click={() => {
-            page++;
-            navigate(page);
-          }}>Next page</button
-        >
+<div class="container mx-auto">
+  <div class="py-5 px-10 grid md:grid-cols-2 gap-10">
+    {#each articles as article}
+      <div>
+        <Card
+          id={article.id}
+          title={article.title}
+          url={article.url}
+          topics={article.topics}
+          question_display={article.question_display}
+          date={article.date}
+          mustRead={article.must_read}
+        />
       </div>
-    {:else}
-      <div class="flex-initial btn-group grid ">
-        <button
-          class="btn btn-outline"
-          on:click={() => {
-            page++;
-            navigate(page);
-          }}>Next page</button
-        >
-      </div>
-    {/if}
+    {/each}
   </div>
-{/if}
+
+  {#if page}
+    <div class="flex justify-center pt-10">
+      {#if page > 1}
+        <div class="flex-initial btn-group grid grid-cols-2 ">
+          <button
+            class="btn btn-outline"
+            on:click={() => {
+              page--;
+              navigate(page);
+            }}>Previous page</button
+          >
+          <button
+            class="btn btn-outline"
+            on:click={() => {
+              page++;
+              navigate(page);
+            }}>Next page</button
+          >
+        </div>
+      {:else}
+        <div class="flex-initial btn-group grid ">
+          <button
+            class="btn btn-outline"
+            on:click={() => {
+              page++;
+              navigate(page);
+            }}>Next page</button
+          >
+        </div>
+      {/if}
+    </div>
+  {/if}
+</div>

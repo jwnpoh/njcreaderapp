@@ -1,10 +1,12 @@
 <script>
   import { page } from "$app/stores";
   import Container from "$lib/Container.svelte";
+  import PageTitle from "$lib/PageTitle.svelte";
 
   const userName = $page.data.user.display_name;
 </script>
 
+<PageTitle>Admin dashboard</PageTitle>
 <Container>
   <div class="pt-5 flex justify-center">
     <p class="px-5 md:text-2xl font-medium">

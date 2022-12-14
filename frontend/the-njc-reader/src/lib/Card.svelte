@@ -17,12 +17,12 @@
 </script>
 
 <div class="relative">
-  <div class="card bg-base-100 shadow-xl ">
+  <div class="card bg-base-100 box-shadow ">
     <div class="bookmark bg-base-100">
       <form method="POST" action="/notes/add-note?/newnote">
         <input name="article_id" type="hidden" hidden value={id} />
         <button>
-          <Icon data={bookmark} scale={2} class="bookmark" />
+          <Icon data={bookmark} scale={2} class="bookmark text-primary" />
         </button>
       </form>
     </div>
@@ -67,6 +67,9 @@
 </div>
 
 <style>
+  .box-shadow {
+    box-shadow: 1px 0 8px 0 rgb(0 0 0 / 0.1);
+  }
   .submit-btn {
     width: 100%;
     position: relative;
@@ -81,10 +84,14 @@
 
   .bookmark {
     position: absolute;
-    top: 0%;
-    right: 1em;
+    top: -1%;
+    right: 1.5em;
     width: 25px;
     height: 30px;
-    @apply text-primary;
+  }
+
+  .bookmark:hover {
+    transform: scaleY(1.5);
+    transition: 300ms cubic-bezier(0.19, 1, 0.22, 1);
   }
 </style>

@@ -9,7 +9,6 @@
   const session = $page.data.user.session;
   const userInfo = data.userInfo;
   const userNotes = data.userNotes;
-  let liked_notes = data.liked_notes.data;
   const friends = data.friends;
   const API_URL = data.API_URL;
 
@@ -37,18 +36,19 @@
     });
 
     const response = await res.json();
-    console.log(response);
 
-    if (follow) {
-      friends.data.followed_by_ids.push(user_id);
-      followersCount++;
-    } else {
-      friends.data.followed_by_ids.splice(
-        friends.data.followed_by_ids.indexOf(user_id)
-      );
-      followersCount--;
+    if (!response.error) {
+      if (follow) {
+        friends.data.followed_by_ids.push(user_id);
+        followersCount++;
+      } else {
+        friends.data.followed_by_ids.splice(
+          friends.data.followed_by_ids.indexOf(user_id)
+        );
+        followersCount--;
+      }
+      isFriend = !isFriend;
     }
-    isFriend = !isFriend;
   };
 </script>
 
@@ -60,18 +60,18 @@
       </h1>
       <h2 class="pb-2 text-xl text-neutral opacity-80 italic font-semibold">
         {userInfo.class}
-        {#if userInfo.id != user_id}
-          <button
-            class="btn btn-sm md:btn-xs btn-info rounded-full text-xs px-3 ml-2 place-self-end"
-            class:btn-outline={!isFriend}
-            on:click={() => {
-              updateFollows(userInfo.id);
-            }}>{isFriend ? "Following" : "Follow"}</button
-          >
-        {/if}
       </h2>
+      {#if userInfo.id != user_id}
+        <button
+          class="btn btn-sm md:btn-xs btn-info text-info bg-opacity-30 rounded-full text-xs"
+          class:btn-outline={!isFriend}
+          on:click={() => {
+            updateFollows(userInfo.id);
+          }}>{isFriend ? "Following" : "Follow"}</button
+        >
+      {/if}
     </div>
-    <div class="flex justify-center items-center ">
+    <div class="flex pt-3 justify-center items-center ">
       <div
         class="stats stats-vertical w-9/12 md:w-7/12 md:stats-horizontal shadow mt-4"
       >

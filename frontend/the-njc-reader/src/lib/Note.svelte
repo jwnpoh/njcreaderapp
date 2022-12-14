@@ -76,16 +76,16 @@
             {#if note.user_id == user_id}
               <p class="text-neutral text-sm italic">
                 {#if note_likes[note.id] > 0}
-                  <Icon class="text-primary" data={heart} />
+                  <Icon class="text-primary " data={heart} />
                 {:else}
-                  <Icon class="text-primary" data={heartO} />
+                  <Icon class="text-primary " data={heartO} />
                 {/if}
                 {note_likes[note.id]}
                 {note_likes[note.id] > 1 ? "likes" : "like"} received
               </p>
             {:else if liked}
               <button
-                class="btn btn-xs text-primary border-none bg-transparent hover:bg-transparent "
+                class="btn btn-xs text-primary border-none bg-transparent hover:bg-transparent heart "
                 on:click={() => {
                   updateLikes(false);
                 }}
@@ -95,7 +95,7 @@
               <p class="text-sm translate-y-0.5">{note_likes[note.id]}</p>
             {:else}
               <button
-                class="btn btn-xs text-primary border-none bg-transparent hover:bg-transparent "
+                class="btn btn-xs text-primary border-none bg-transparent hover:bg-transparent heart "
                 on:click={() => {
                   updateLikes(true);
                 }}
@@ -112,4 +112,8 @@
 </div>
 
 <style>
+  .heart:hover {
+    transform: scale(1.15);
+    transition: 300ms cubic-bezier(0.19, 1, 0.22, 1);
+  }
 </style>

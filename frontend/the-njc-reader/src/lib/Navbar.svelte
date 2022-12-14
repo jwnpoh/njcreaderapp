@@ -66,6 +66,9 @@
               </div>
             </li>
             <li />
+            <li>
+              <a href="/notes">Noteworthy news</a>
+            </li>
           {/if}
           <li><a data-sveltekit-reload href="/articles/1">News Feed</a></li>
           <li><a href="/columns/1">Long Reads</a></li>
@@ -73,17 +76,14 @@
           {#if user.loggedIn}
             <li><a href="/feedback">Feedback</a></li>
             <li />
-            <li>
-              <a href="/notes">Notebook</a>
-            </li>
-            <li>
-              <a href="/profile">Profile</a>
-            </li>
             {#if role === "admin"}
               <li>
                 <a href="/admin">Admin dashboard</a>
               </li>
             {/if}
+            <li>
+              <a href="/user-profile">Profile</a>
+            </li>
           {/if}
           <li>
             <a
@@ -107,8 +107,8 @@
       <div class="form-control px-3 fixed top-2 right-1 text-black">
         <input
           type="text"
-          placeholder="Search"
-          class="input input-bordered"
+          placeholder="Search articles"
+          class="input input-bordered "
           name="query"
         />
       </div>
