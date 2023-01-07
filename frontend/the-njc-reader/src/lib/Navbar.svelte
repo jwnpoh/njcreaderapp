@@ -67,7 +67,7 @@
             </li>
             <li />
             <li>
-              <a href="/notes">Noteworthy news</a>
+              <a href="/notes">Notebook</a>
             </li>
           {/if}
           <li><a data-sveltekit-reload href="/articles/1">News Feed</a></li>
