@@ -37,6 +37,33 @@ func (b *broker) GetArticle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetPost gets the post information to pass back to the frontend in order for the user to edit a note.
+func (b *broker) GetPost(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query().Get("id")
+
+	id, err := strconv.Atoi(q)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to parse article id requested", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	data, err := b.Posts.GetPost(id)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to get article from database", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	err = data.Encode(w, http.StatusAccepted)
+	if err != nil {
+		data.ErrorJson(w, err)
+		b.Logger.Error(data, r)
+	}
+}
+
 // GetPublicFeed gets all public notes of all users.
 func (b *broker) GetPublicFeed(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("user")
@@ -181,10 +208,9 @@ func (b *broker) InsertPost(w http.ResponseWriter, r *http.Request) {
 
 // DeletePost deletes posts specified in the slice of postIDs specified in the POST request.
 func (b *broker) DeletePost(w http.ResponseWriter, r *http.Request) {
-	var input []string
+	var input int
 
-	s := serializer.NewSerializer(false, "", nil)
-	err := s.Decode(w, r, &input)
+	err := serializer.NewSerializer(false, "", nil).Decode(w, r, &input)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to decode input data", err)
 		s.ErrorJson(w, err)
@@ -192,7 +218,7 @@ func (b *broker) DeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = b.Posts.DeletePosts(input)
+	err = b.Posts.DeletePost(input)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to delete posts", err)
 		s.ErrorJson(w, err)
@@ -203,6 +229,59 @@ func (b *broker) DeletePost(w http.ResponseWriter, r *http.Request) {
 	err = serializer.NewSerializer(false, "successfully deleted posts", nil).Encode(w, http.StatusAccepted)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to delete posts", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+}
+
+func (b *broker) UpdatePost(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		PostID string            `json:"post_id"`
+		Post   *core.PostPayload `json:"post"`
+	}
+
+	err := serializer.NewSerializer(false, "", nil).Decode(w, r, &input)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to decode input data", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	id, err := strconv.Atoi(input.PostID)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to convert post_id from string to int", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	toCheck := []string{input.Post.TLDR, input.Post.Examples, input.Post.Notes}
+	for _, v := range toCheck {
+		profanityCheck := profanity.CheckProfanity(v)
+		if profanityCheck.IsProfane {
+			s := serializer.NewSerializer(true, fmt.Sprintf("Please use clean language on this platform.\nThe system auto-detected the use of the profanity: '%s'.\nIf this is a false positive, please report the false positive via the feedback form.", profanityCheck.Profanity), input.Post.UserID)
+			s.Encode(w, http.StatusBadRequest)
+			b.Logger.Info(s, r)
+			return
+		}
+	}
+
+	date := formatDate(input.Post.Date)
+	input.Post.Date = date
+
+	err = b.Posts.UpdatePost(id, input.Post)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to add new post", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	err = serializer.NewSerializer(false, "successfully added post", nil).Encode(w, http.StatusAccepted)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to add post", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		return

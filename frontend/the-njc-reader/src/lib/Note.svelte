@@ -95,10 +95,13 @@
         <div class="absolute top-1 right-0 flex">
           {#if !note.public}
             <p class="text-neutral text-sm italic pr-1">Private note</p>
-            <button
-              class="btn btn-xs text-neutral border-none bg-transparent hover:bg-transparent"
-              ><Icon data={edit} /></button
-            >
+            <form method="POST" action="/notes/edit-note?/edit">
+              <input name="note_id" type="hidden" hidden value={note.id} />
+              <button
+                class="btn btn-xs text-neutral border-none bg-transparent hover:bg-transparent"
+                ><Icon data={edit} /></button
+              >
+            </form>
             <button
               class="btn btn-xs text-neutral border-none bg-transparent hover:bg-transparent"
               on:click={deleteNote(note.id)}><Icon data={trashO} /></button
@@ -111,13 +114,20 @@
                 {:else}
                   <Icon class="text-primary " data={heartO} />
                 {/if}
-                {note_likes[note.id]}
+                {#if !note_likes[note.id]}
+                  0
+                {:else}
+                  {note_likes[note.id]}
+                {/if}
                 {note_likes[note.id] > 1 ? "likes" : "like"} received
               </p>
-              <button
-                class="btn btn-xs text-neutral border-none bg-transparent hover:bg-transparent"
-                ><Icon data={edit} /></button
-              >
+              <form method="POST" action="/notes/edit-note?/edit">
+                <input name="note_id" type="hidden" hidden value={note.id} />
+                <button
+                  class="btn btn-xs text-neutral border-none bg-transparent hover:bg-transparent"
+                  ><Icon data={edit} /></button
+                >
+              </form>
               <button
                 class="btn btn-xs text-neutral border-none bg-transparent hover:bg-transparent"
                 on:click={deleteNote(note.id)}><Icon data={trashO} /></button

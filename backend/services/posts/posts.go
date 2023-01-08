@@ -16,7 +16,9 @@ type PostsDB interface {
 	GetAllPublicPosts() (*core.Posts, error)
 	GetPosts(userIDs []int, public bool) (*core.Posts, error)
 	AddPost(post *core.Post) error
-	DeletePosts(postIDs string) error
+	GetPost(postID int) (*core.Post, error)
+	DeletePost(postID int) error
+	UpdatePost(postID int, post *core.Post) error
 	GetLikes(id int, userOrPost string) ([]int, error)
 }
 
@@ -161,14 +163,42 @@ func (pDB *Posts) AddPost(post *core.PostPayload) error {
 	return nil
 }
 
-func (pDB *Posts) DeletePosts(postIDs []string) error {
-	ids := strings.Join(postIDs, ", ")
-
-	// send to Planetscale
-	err := pDB.db.DeletePosts(ids)
+func (pDB *Posts) GetPost(postID int) (serializer.Serializer, error) {
+	// get from Planetscale
+	post, err := pDB.db.GetPost(postID)
 	if err != nil {
-		return fmt.Errorf("unable to delete notes with ids %s - %w", ids, err)
+		return nil, fmt.Errorf("unable to delete note with id %d - %w", postID, err)
 	}
+
+	return serializer.NewSerializer(false, "got note", post), nil
+}
+
+func (pDB *Posts) DeletePost(postID int) error {
+	// send to Planetscale
+	err := pDB.db.DeletePost(postID)
+	if err != nil {
+		return fmt.Errorf("unable to delete note with id %d - %w", postID, err)
+	}
+	return nil
+}
+
+func (pDB *Posts) UpdatePost(postID int, post *core.PostPayload) error {
+	newPost, err := parseNewPost(post)
+	if err != nil {
+		return fmt.Errorf("unable to parse input for new note - %w", err)
+	}
+
+	author, err := pDB.GetUser("id", newPost.UserID)
+	if err != nil {
+		return fmt.Errorf("unable to get author for new note - %w", err)
+	}
+	newPost.Author = author.DisplayName
+
+	err = pDB.db.UpdatePost(postID, newPost)
+	if err != nil {
+		return fmt.Errorf("unable to add note - %w", err)
+	}
+
 	return nil
 }
 

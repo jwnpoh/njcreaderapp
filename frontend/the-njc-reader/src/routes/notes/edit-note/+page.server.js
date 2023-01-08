@@ -14,7 +14,7 @@ export const load = async ({ locals }) => {
 }
 
 export const actions = {
-  newnote: async ({ request, locals, cookies }) => {
+  edit: async ({ request, locals, cookies }) => {
     if (!locals.user.loggedIn) {
       throw redirect(302, "/login")
     }
@@ -26,9 +26,9 @@ export const actions = {
     myHeaders.append("Authorization", "Bearer " + session);
 
     const formData = await request.formData()
-    const articleID = await formData.get("article_id")
+    const noteID = await formData.get("note_id")
 
-    const queryURL = `${process.env.API_URL}/api/posts/get-article?id=${articleID}`;
+    const queryURL = `${process.env.API_URL}/api/posts/get-post?id=${noteID}`;
     const res = await fetch(queryURL, {
       method: "GET",
       headers: myHeaders,
@@ -38,8 +38,9 @@ export const actions = {
 
     data = response.data;
   },
-  add: async ({ request, cookies, locals }) => {
+  save: async ({ request, cookies, locals }) => {
     const formData = await request.formData()
+    const noteID = formData.get("note_id")
     const articleID = formData.get("article_id")
     const articleTitle = formData.get("article_title")
     const articleURL = formData.get("article_url")
@@ -74,20 +75,25 @@ export const actions = {
     myHeaders.append("Authorization", "Bearer " + session);
 
     let payload = {
-      article_id: articleID,
-      article_title: articleTitle,
-      article_url: articleURL,
-      tldr: tldr,
-      examples: examples,
-      notes: notes,
-      tags: tags,
-      public: makePublic,
-      date: date,
-      user_id: userID,
-      likes: likes
+      post_id: noteID,
+      post: {
+        article_id: articleID,
+        article_title: articleTitle,
+        article_url: articleURL,
+        tldr: tldr,
+        examples: examples,
+        notes: notes,
+        tags: tags,
+        public: makePublic,
+        date: date,
+        user_id: userID,
+        likes: likes
+      },
     }
 
-    const res = await fetch(`${process.env.API_URL}/api/posts/insert`, {
+    console.log(payload)
+
+    const res = await fetch(`${process.env.API_URL}/api/posts/update`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: myHeaders,
@@ -97,6 +103,7 @@ export const actions = {
     if (response.error) {
       return invalid(400, {
         error: true, message: response.message,
+        noteID,
         articleID,
         articleTitle,
         articleURL,
@@ -111,5 +118,5 @@ export const actions = {
       success: true,
       sent: true
     }
-  }
+  },
 }

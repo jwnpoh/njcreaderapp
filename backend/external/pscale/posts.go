@@ -99,7 +99,6 @@ func (pDB *PostsDB) GetPosts(userIDs []int, public bool) (*core.Posts, error) {
 }
 
 func (pDB *PostsDB) AddPost(post *core.Post) error {
-
 	query := "INSERT INTO posts (user_id, author, likes, tldr, examples, notes, tags, created_at, public, article_id, article_title, article_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 	tx, err := pDB.DB.Begin()
@@ -121,8 +120,31 @@ func (pDB *PostsDB) AddPost(post *core.Post) error {
 	return nil
 }
 
-func (pDB *PostsDB) DeletePosts(postIDs string) error {
-	query := fmt.Sprintf("DELETE FROM posts WHERE id in (%s)", postIDs)
+func (pDB *PostsDB) GetPost(id int) (*core.Post, error) {
+	var post core.Post
+
+	query := "SELECT * FROM posts WHERE id = ?"
+
+	row := pDB.DB.QueryRowx(query, id)
+
+	var tags, author sql.NullString
+	err := row.Scan(&post.ID, &post.UserID, &author, &post.Likes, &post.TLDR, &post.Examples, &post.Notes, &tags, &post.CreatedAt, &post.Public, &post.ArticleID, &post.ArticleTitle, &post.ArticleURL)
+	if err != nil {
+		return nil, fmt.Errorf("PScalePosts: error scanning row - %w", err)
+	}
+	if tags.Valid {
+		post.Tags = strings.Split(tags.String, ",")
+	}
+	if author.Valid {
+		post.Author = author.String
+	}
+	post.Date = time.Unix(post.CreatedAt, 0).Format("Jan 2, 2006 15:04:05")
+
+	return &post, nil
+}
+
+func (pDB *PostsDB) DeletePost(postID int) error {
+	query := fmt.Sprintf("DELETE FROM posts WHERE id = %d", postID)
 
 	tx, err := pDB.DB.Begin()
 	if err != nil {
@@ -138,6 +160,28 @@ func (pDB *PostsDB) DeletePosts(postIDs string) error {
 	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("PScalePosts: unable to commit tx to delete posts from db - %w", err)
+	}
+
+	return nil
+}
+
+func (pDB *PostsDB) UpdatePost(postID int, post *core.Post) error {
+	query := "UPDATE posts SET user_id = ?, author = ?, likes = ?, tldr = ?, examples = ?, notes = ?, tags = ?, created_at = ?, public = ?, article_id = ?, article_title = ?, article_url = ? WHERE id = ?"
+
+	tx, err := pDB.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("PScalePosts: unable to begin tx for adding post to db - %w", err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(query, post.UserID, post.Author, post.Likes, post.TLDR, post.Examples, post.Notes, strings.Join(post.Tags, ","), post.CreatedAt, post.Public, post.ArticleID, post.ArticleTitle, post.ArticleURL, postID)
+	if err != nil {
+		return fmt.Errorf("PScalePosts: unable to add post to db - %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("PScalePosts: unable to commit tx to add post to db - %w", err)
 	}
 
 	return nil
