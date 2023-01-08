@@ -2,14 +2,10 @@
   export let data;
   export let form;
 
-  let article = data.data;
-
-  let url = article.url;
-  let title = article.title;
-
-  let tldr = form?.tldr ?? "";
-  let examples = form?.examples ?? "";
-  let notes = form?.notes ?? "";
+  let note = data.data;
+  let tldr = note.tldr;
+  let examples = note.examples;
+  let notes = note.notes;
 
   let tldrTags = form?.tldrTags ?? [];
   let examplesTags = form?.examplesTags ?? [];
@@ -31,22 +27,23 @@
   };
 </script>
 
-<form method="POST" action="?/add">
+<form method="POST" action="?/save">
+  <input name="note_id" type="hidden" hidden class="hidden" value={note.id} />
   <input
     name="article_id"
     type="hidden"
     hidden
     class="hidden"
-    value={article.id}
+    value={note.article_id}
   />
   <div class="flex pt-4 md:pt-6 justify-center items-center ">
     <div
-      class="card w-11/12 md:w-10/12 shadow-md shadow-yellow-200 bg-yellow-300 bg-opacity-10"
+      class="card w-11/12 md:w-10/12 shadow-sm shadow-yellow-200 bg-yellow-300 bg-opacity-10"
     >
       <div class="card-body px-6 md:px-12">
         <div class="lg:inline-flex">
           <h1 class="card-title min-w-fit flex-1 pb-2 text-3xl underline">
-            Create note
+            Edit note
           </h1>
           <div
             class="alert alert-success bg-opacity-50 flex-shrink lg:mx-10 py-3"
@@ -64,18 +61,20 @@
           type="hidden"
           hidden
           class="hidden"
-          value={title}
+          value={note.article_title}
         />
         <input
           name="article_url"
           type="hidden"
           hidden
           class="hidden"
-          value={url}
+          value={note.article_url}
         />
         <div class="pt-2">
           <h2 class="text-lg font-semibold">
-            <a href={url} target="_blank" rel="noreferrer">{title}</a>
+            <a href={note.article_url} target="_blank" rel="noreferrer"
+              >{note.article_title}</a
+            >
           </h2>
         </div>
 
@@ -184,10 +183,17 @@
 
         <div class="flex py-2 ">
           <label class="px-2" for="make_public">Make note public?</label>
-          <input name="make_public" type="checkbox" class="checkbox" />
+          <input
+            name="make_public"
+            type="checkbox"
+            class="checkbox"
+            bind:checked={note.public}
+          />
         </div>
         <div class="py-2">
-          <button class="btn btn-sm btn-secondary ">Save to notebook</button>
+          <button class="btn btn-sm btn-secondary "
+            >Save changes to notebook</button
+          >
         </div>
         {#if form?.error}
           <p class="text-primary">{form?.message}</p>
