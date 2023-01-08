@@ -61,7 +61,7 @@ func (auth *Authenticator) CreateToken(userID int, timeToLife time.Duration) (*c
 }
 
 func (auth *Authenticator) RefreshToken(token *core.Token) error {
-	token.Expiry = time.Now().Add(12 * time.Hour)
+	token.Expiry = time.Now().Add(24 * time.Hour)
 
 	err := auth.db.RefreshToken(token)
 	if err != nil {

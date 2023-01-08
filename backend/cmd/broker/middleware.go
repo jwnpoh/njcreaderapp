@@ -18,6 +18,12 @@ func (b *broker) Auth(next http.Handler) http.Handler {
 		}
 
 		err = b.Authenticator.RefreshToken(tok)
+		if err != nil {
+			s := serializer.NewSerializer(true, fmt.Sprintf("%v", err), nil)
+			s.ErrorJson(w, err)
+			b.Logger.Error(s, r)
+			return
+		}
 
 		next.ServeHTTP(w, r)
 	})
