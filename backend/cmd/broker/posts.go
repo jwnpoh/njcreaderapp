@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/profanity"
@@ -175,7 +176,7 @@ func (b *broker) InsertPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	toCheck := []string{input.TLDR, input.Examples, input.Notes}
+	toCheck := []string{input.TLDR, input.Examples, input.Notes, strings.Join(input.Tags, ",")}
 	for _, v := range toCheck {
 		profanityCheck := profanity.CheckProfanity(v)
 		if profanityCheck.IsProfane {
@@ -185,6 +186,9 @@ func (b *broker) InsertPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	// tags := removeDuplicateTags(input.Tags)
+	// input.Tags = tags
 
 	date := formatDate(input.Date)
 	input.Date = date
@@ -257,7 +261,7 @@ func (b *broker) UpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	toCheck := []string{input.Post.TLDR, input.Post.Examples, input.Post.Notes}
+	toCheck := []string{input.Post.TLDR, input.Post.Examples, input.Post.Notes, strings.Join(input.Post.Tags, ",")}
 	for _, v := range toCheck {
 		profanityCheck := profanity.CheckProfanity(v)
 		if profanityCheck.IsProfane {

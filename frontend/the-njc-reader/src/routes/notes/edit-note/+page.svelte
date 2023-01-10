@@ -29,6 +29,8 @@
 
 <form method="POST" action="?/save">
   <input name="note_id" type="hidden" hidden class="hidden" value={note.id} />
+  <input name="likes" type="hidden" hidden class="hidden" value={note.likes} />
+  <input name="tags" type="hidden" hidden class="hidden" value={note.tags} />
   <input
     name="article_id"
     type="hidden"

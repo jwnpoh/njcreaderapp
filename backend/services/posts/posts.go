@@ -257,12 +257,25 @@ func parseNewPost(post *core.PostPayload) (*core.Post, error) {
 }
 
 func parsePostTags(input []string) []string {
+	xinput := make([]string, 0, len(input))
+	for _, v := range input {
+		preTags := strings.Split(v, ",")
+		xinput = append(xinput, preTags...)
+	}
+
 	tags := make([]string, 0, len(input))
 
-	for _, v := range input {
+	listOfTags := make(map[string]bool)
+
+	for _, v := range xinput {
 		tag := strings.TrimSpace(v)
 		tag = strings.ReplaceAll(tag, "#", "")
-		tags = append(tags, tag)
+		tag = strings.ToLower(tag)
+
+		if !listOfTags[tag] {
+			listOfTags[tag] = true
+			tags = append(tags, tag)
+		}
 	}
 
 	return tags

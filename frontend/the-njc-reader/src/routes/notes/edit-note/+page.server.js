@@ -48,15 +48,17 @@ export const actions = {
     const examples = formData.get("examples")
     const notes = formData.get("notes")
     const makePublic = formData.get("make_public")
+    const likes = formData.get("likes");
+    const noteTags = formData.get("tags");
     const date = new Date().toDateString()
     const userID = locals.user.id;
-    const likes = 0;
 
     const tldrTags = formData.get("tldr_tags")
     const examplesTags = formData.get("examples_tags")
     const notesTags = formData.get("notes_tags")
 
     let tags = [];
+    tags = tags.concat(noteTags);
 
     if (tldrTags.length > 0) {
       tags = tags.concat(tldrTags)
@@ -87,11 +89,9 @@ export const actions = {
         public: makePublic,
         date: date,
         user_id: userID,
-        likes: likes
+        likes: parseInt(likes),
       },
     }
-
-    console.log(payload)
 
     const res = await fetch(`${process.env.API_URL}/api/posts/update`, {
       method: "POST",
