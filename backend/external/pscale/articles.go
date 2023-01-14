@@ -119,13 +119,13 @@ func (aDB *ArticlesDB) Find(terms string) (*core.ArticleSeries, error) {
 func (aDB *ArticlesDB) Store(data *core.ArticleSeries) error {
 	query := "INSERT INTO articles (title, url, topics, questions, question_display, published_on, must_read) VALUES (?, ?, ?, ?, ?, ?, ?)"
 
-	for _, article := range *data {
-		tx, err := aDB.DB.Begin()
-		if err != nil {
-			return fmt.Errorf("PScaleArticles: unable to begin tx for adding articles input to db - %w", err)
-		}
-		defer tx.Rollback()
+	tx, err := aDB.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("PScaleArticles: unable to begin tx for adding articles input to db - %w", err)
+	}
+	defer tx.Rollback()
 
+	for i, article := range *data {
 		res, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.MustRead)
 		if err != nil {
 			return fmt.Errorf("PScaleArticles: unable to add article %s to db - %w", article.Title, err)
@@ -149,9 +149,11 @@ func (aDB *ArticlesDB) Store(data *core.ArticleSeries) error {
 			}
 		}
 
-		err = tx.Commit()
-		if err != nil {
-			return fmt.Errorf("PScaleArticles: unable to commit tx to insert articles to db - %w", err)
+		if i == len(*data)-1 {
+			err = tx.Commit()
+			if err != nil {
+				return fmt.Errorf("PScaleArticles: unable to commit tx to insert articles to db - %w", err)
+			}
 		}
 	}
 
@@ -161,13 +163,13 @@ func (aDB *ArticlesDB) Store(data *core.ArticleSeries) error {
 func (aDB *ArticlesDB) Update(data *core.ArticleSeries) error {
 	query := "UPDATE articles SET title = ?, url = ?, topics = ?, questions = ?, question_display= ?, published_on = ?, must_read = ? WHERE id = ?"
 
-	for _, article := range *data {
-		tx, err := aDB.DB.Begin()
-		if err != nil {
-			return fmt.Errorf("PScaleArticles: unable to begin tx for updating articles in db - %w", err)
-		}
-		defer tx.Rollback()
+	tx, err := aDB.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("PScaleArticles: unable to begin tx for updating articles in db - %w", err)
+	}
+	defer tx.Rollback()
 
+	for i, article := range *data {
 		res, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.MustRead, article.ID)
 		if err != nil {
 			return fmt.Errorf("PScaleArticles: unable to update article %s in db - %w", article.Title, err)
@@ -190,9 +192,11 @@ func (aDB *ArticlesDB) Update(data *core.ArticleSeries) error {
 			}
 		}
 
-		err = tx.Commit()
-		if err != nil {
-			return fmt.Errorf("PScaleArticles: unable to commit tx to update articles in db - %w", err)
+		if i == len(*data)-1 {
+			err = tx.Commit()
+			if err != nil {
+				return fmt.Errorf("PScaleArticles: unable to commit tx to update articles in db - %w", err)
+			}
 		}
 	}
 
