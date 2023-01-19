@@ -154,7 +154,7 @@ func (b *broker) Delete(w http.ResponseWriter, r *http.Request) {
 
 	err = b.Articles.Delete(input)
 	if err != nil {
-		s := serializer.NewSerializer(true, "unable to store input data", err)
+		s := serializer.NewSerializer(true, "unable to delete articles", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		return
