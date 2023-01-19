@@ -10,6 +10,7 @@ import (
 	"github.com/jwnpoh/njcreaderapp/backend/services/articles"
 	"github.com/jwnpoh/njcreaderapp/backend/services/auth"
 	"github.com/jwnpoh/njcreaderapp/backend/services/logger"
+	"github.com/jwnpoh/njcreaderapp/backend/services/long"
 	"github.com/jwnpoh/njcreaderapp/backend/services/posts"
 	"github.com/jwnpoh/njcreaderapp/backend/services/socials"
 	"github.com/jwnpoh/njcreaderapp/backend/services/users"
@@ -24,6 +25,7 @@ type broker struct {
 	Port          string
 	Logger        logger.Logger
 	Articles      *articles.Articles
+	Longs         *long.Longs
 	Authenticator *auth.Authenticator
 	Users         *users.UserManager
 	Posts         *posts.Posts
@@ -33,6 +35,11 @@ type broker struct {
 // NewBrokerService creates a new BrokerService.
 func NewBrokerService(config config.Config) BrokerService {
 	articlesDB, err := pscale.NewArticlesDB(config.DSN)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	longsDB, err := pscale.NewLongsDB(config.DSN)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,6 +68,7 @@ func NewBrokerService(config config.Config) BrokerService {
 		Port:          config.Port,
 		Logger:        logger.NewAppLogger(),
 		Articles:      articles.NewArticlesService(articlesDB),
+		Longs:         long.NewLongService(longsDB),
 		Authenticator: auth.NewAuthenticator(authDB),
 		Users:         users.NewUserManager(usersDB),
 		Posts:         posts.NewPostsDB(postsDB, articlesDB, socialsDB, usersDB),

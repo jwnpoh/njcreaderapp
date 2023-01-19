@@ -25,6 +25,23 @@ type ArticlePayload []struct {
 	MustRead string `json:"must_read"`
 }
 
+// Long is the entity that represents articles in the longer reads section
+type Long struct {
+	ID    int    `json:"id,omitempty"`
+	Title string `json:"title,omitempty"`
+	URL   string `json:"url,omitempty"`
+	Topic string `json:"topic,omitempty"`
+}
+
+// LongSeries is a slice of Longs to transport between database, appilcation, and frontend.
+type LongSeries []Long
+
+// LongPayload is a slice of Longs to be parsed into from the payload received from the frontend via the longer reads insertLong method
+type LongPayload []Long
+
+// LongTopics is a slice of strings representing all topics for long articles in the database.
+type LongTopics []string
+
 // Question is the entity representing past year questions.
 type Question struct {
 	Year    string

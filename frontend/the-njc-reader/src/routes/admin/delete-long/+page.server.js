@@ -15,7 +15,7 @@ export async function load({ fetch, cookies, locals }) {
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", "Bearer " + session);
 
-  const queryURL = `${process.env.API_URL}/api/admin/articles/update`;
+  const queryURL = `${process.env.API_URL}/api/admin/long/update`;
   const res = await fetch(queryURL, {
     method: "GET",
     headers: myHeaders
@@ -47,7 +47,7 @@ export const actions = {
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer " + session);
 
-    const res = await fetch(`${process.env.API_URL}/api/admin/articles/delete`, {
+    const res = await fetch(`${process.env.API_URL}/api/admin/long/delete`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: myHeaders,
