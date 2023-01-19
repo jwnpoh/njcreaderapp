@@ -7,10 +7,3 @@ CREATE TABLE long(
   topic VARCHAR(200) NOT NULL,
   FULLTEXT search (title, topic)
 );
-
-DROP TABLE IF EXISTS long_topics;
-
-CREATE TABLE long_topics(
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  topic VARCHAR(255) UNIQUE NOT NULL
-);
