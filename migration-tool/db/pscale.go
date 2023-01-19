@@ -81,7 +81,7 @@ func PscaleAdd(a *ArticlesDBByDate, db *sqlx.DB) error {
 			}
 			tx, _ = db.Begin()
 			defer tx.Rollback()
-			fmt.Printf("Committed articles up to %d", i)
+			fmt.Printf("Committed articles up to %d\r", i)
 		}
 		count++
 		fmt.Printf("Added %v/%v articles\r", count, a.Len())
