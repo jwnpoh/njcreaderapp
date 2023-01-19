@@ -1,4 +1,5 @@
 <script>
+  import PageTitle from "$lib/PageTitle.svelte";
   import { page } from "$app/stores";
   import { DateInput } from "date-picker-svelte";
 
@@ -31,6 +32,7 @@
   let len = queue.length;
 </script>
 
+<PageTitle>Add articles</PageTitle>
 <div class="px-5 pt-5 ">
   <a href="/admin" class="btn-link"
     ><p class="align-middle">&#8678; Back to admin dashboard</p></a
