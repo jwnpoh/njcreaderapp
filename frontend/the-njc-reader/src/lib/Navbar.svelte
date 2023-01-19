@@ -71,7 +71,7 @@
             </li>
           {/if}
           <li><a data-sveltekit-reload href="/articles/1">News Feed</a></li>
-          <li><a href="/columns/1">Long Reads</a></li>
+          <li><a href="/long">Long Reads</a></li>
           <li><a href="/about">About</a></li>
           {#if user.loggedIn}
             <li><a href="/feedback">Feedback</a></li>

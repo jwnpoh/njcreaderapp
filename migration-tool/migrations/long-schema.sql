@@ -5,13 +5,12 @@ CREATE TABLE long(
   title VARCHAR(255) UNIQUE NOT NULL,
   url VARCHAR(2083) NOT NULL,
   topic VARCHAR(200) NOT NULL,
-  FULLTEXT search (title, topic )
+  FULLTEXT search (title, topic)
 );
 
 DROP TABLE IF EXISTS long_topics;
 
 CREATE TABLE long_topics(
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  topic VARCHAR(255) NOT NULL,
-  long_id INT
+  topic VARCHAR(255) UNIQUE NOT NULL
 );

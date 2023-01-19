@@ -29,6 +29,8 @@ func (b *broker) SetupRouter() chi.Router {
 func (b *broker) serveRoutes(mux chi.Router) {
 	mux.Get("/api/articles/{page}", b.Get)
 	mux.Get("/api/articles/find", b.Find)
+	mux.Get("/api/long", b.GetLongTopics)
+	mux.Get("/api/long/{topic}", b.GetLong)
 
 	mux.Post("/api/auth", b.Authenticate)
 
@@ -67,5 +69,13 @@ func (b *broker) serveRoutes(mux chi.Router) {
 		mux.Get("/update", b.Get100)
 		mux.Put("/update", b.Update)
 		mux.Post("/get-title", b.GetTitle)
+	})
+
+	mux.Route("/api/admin/long", func(mux chi.Router) {
+		mux.Use(b.Auth)
+		mux.Post("/insert", b.StoreLong)
+		mux.Get("/update", b.UpdateLong)
+		mux.Put("/update", b.UpdateLong)
+		mux.Post("/delete", b.DeleteLong)
 	})
 }

@@ -8,22 +8,53 @@
 
 <PageTitle>Admin dashboard</PageTitle>
 <Container>
-  <div class="pt-5 flex justify-center">
+  <div class="flex justify-center">
     <p class="px-5 md:text-2xl font-medium">
       Welcome to the admin dashboard, {userName}! What would you like to do
       today?
     </p>
   </div>
   <div class="divider" />
-  <div class="grid md:grid-cols-3 justify-items-center">
-    <button class="btn btn-link text-xl"
-      ><a href="/admin/add-articles">Add article(s)</a></button
-    >
-    <button class="btn btn-link text-xl"
-      ><a href="/admin/edit-articles">Edit article(s)</a></button
-    >
-    <button class="btn btn-link text-xl"
-      ><a href="/admin/delete-articles">Delete article(s)</a></button
-    >
+  <div
+    class="grid gap-6 lg:grid-cols-2 justify-center place-content-center px-60"
+  >
+    <div class="card bg-base-100 box-shadow min-w-max">
+      <div class="card-body pb-5">
+        <div class="grid justify-items-center">
+          <h3 class="px-5 text-xl md:text-2xl font-medium">News Feed</h3>
+          <button class="btn btn-link text-xl"
+            ><a href="/admin/add-articles">Add article(s)</a></button
+          >
+          <button class="btn btn-link text-xl"
+            ><a href="/admin/edit-articles">Edit article(s)</a></button
+          >
+          <button class="btn btn-link text-xl"
+            ><a href="/admin/delete-articles">Delete article(s)</a></button
+          >
+        </div>
+      </div>
+    </div>
+    <div class="card bg-base-100 box-shadow min-w-max">
+      <div class="card-body pb-5">
+        <div class="grid justify-items-center">
+          <h3 class="px-5 text-xl md:text-2xl font-medium">Longer Reads</h3>
+          <button class="btn btn-link text-xl"
+            ><a href="/admin/add-long">Add article(s)</a></button
+          >
+          <button class="btn btn-link text-xl"
+            ><a href="/admin/edit-long">Edit article(s)</a></button
+          >
+          <button class="btn btn-link text-xl"
+            ><a href="/admin/delete-long">Delete article(s)</a></button
+          >
+        </div>
+      </div>
+    </div>
   </div>
 </Container>
+
+<style>
+  .box-shadow {
+    box-shadow: 1px 0 8px 0 rgb(0 0 0 / 0.1);
+  }
+</style>

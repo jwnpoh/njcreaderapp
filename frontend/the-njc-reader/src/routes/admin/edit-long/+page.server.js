@@ -15,31 +15,45 @@ export async function load({ fetch, cookies, locals }) {
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", "Bearer " + session);
 
-  const queryURL = `${process.env.API_URL}/api/admin/articles/update`;
+  const queryURL = `${process.env.API_URL}/api/admin/long/update`;
   const res = await fetch(queryURL, {
     method: "GET",
     headers: myHeaders
   });
 
   const data = await res.json();
-  if (data.error) {
-    throw redirect(302, "/login")
-  }
-
   const articles = data.data;
 
   return {
     articles: articles,
+    API_URL: `${process.env.API_URL}`
   };
 }
 
 export const actions = {
-  delete: async ({ request, cookies }) => {
+  edit: async ({ request, cookies }) => {
     const formData = await request.formData()
-    let payload = [];
-    for (var pair of formData.entries()) {
-      payload.push(pair[1])
+    const url = formData.get("url")
+    const title = formData.get("title")
+    const topic = formData.get("topic")
+    const id = parseInt(formData.get("id"))
+
+    if (url.length < 1 || title.length < 1) {
+      return invalid(400, {
+        error: true,
+        message: "All fields must be filled.",
+        id,
+        url,
+        title,
+        topic,
+      })
     }
+    const payload = {
+      id: id,
+      title: title,
+      url: url,
+      topic: topic,
+    };
 
     const session = cookies.get("session")
 
@@ -47,8 +61,8 @@ export const actions = {
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer " + session);
 
-    const res = await fetch(`${process.env.API_URL}/api/admin/articles/delete`, {
-      method: "POST",
+    const res = await fetch(`${process.env.API_URL}/api/admin/long/update`, {
+      method: "PUT",
       body: JSON.stringify(payload),
       headers: myHeaders,
     });
