@@ -41,6 +41,7 @@ export const actions = {
 
     return {
       success: true,
+      sent: true
     }
   },
 }

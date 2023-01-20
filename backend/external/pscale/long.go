@@ -1,7 +1,6 @@
 package pscale
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -115,18 +114,6 @@ func (lDB *LongsDB) Store(data *core.LongPayload) error {
 			return fmt.Errorf("PScaleLong: unable to add long article %s to db - %w", long.Title, err)
 		}
 
-		var count int
-		res := lDB.DB.QueryRowx("SELECT COUNT(*) FROM long_topics WHERE topic = ?", long.Topic)
-		res.Scan(&count)
-		if count > 0 {
-			continue
-		}
-
-		_, err = tx.Exec("INSERT INTO long_topics (topic) VALUES (?)", long.Topic)
-		if err != nil {
-			return fmt.Errorf("PScaleLong: unable to add long article topic %s to db - %w", long.Topic, err)
-		}
-
 		if i == len(*data)-1 {
 			err = tx.Commit()
 			if err != nil {
@@ -149,15 +136,6 @@ func (lDB *LongsDB) Update(data *core.Long) error {
 	_, err = tx.Exec(query, data.Title, data.URL, data.Topic, data.ID)
 	if err != nil {
 		return fmt.Errorf("PScaleLong: unable to add long article %s to db - %w", data.Title, err)
-	}
-
-	res := lDB.DB.QueryRowx("SELECT topic FROM long_topics WHERE topic = ?", data.Topic)
-	err = res.Err()
-	if err != nil {
-		if err != sql.ErrNoRows {
-			return fmt.Errorf("PScaleLong: unable to add long article %s to db, error encountered when checking topics - %w", data.Title, err)
-		}
-		_, err = tx.Exec("INSERT INTO long_topics (topic) VALUES (?)", data.Topic)
 	}
 
 	err = tx.Commit()
