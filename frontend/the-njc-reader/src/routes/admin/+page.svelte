@@ -1,22 +1,20 @@
 <script>
   import { page } from "$app/stores";
-  import Container from "$lib/Container.svelte";
   import PageTitle from "$lib/PageTitle.svelte";
 
   const userName = $page.data.user.display_name;
 </script>
 
 <PageTitle>Admin dashboard</PageTitle>
-<Container>
-  <div class="flex justify-center">
-    <p class="px-5 md:text-2xl font-medium">
-      Welcome to the admin dashboard, {userName}! What would you like to do
+  <div class="flex justify-center pt-6">
+    <p class="px-5 md:text-2xl font-medium text-center">
+      Welcome to the admin dashboard, {userName}!<br> What would you like to do
       today?
     </p>
   </div>
   <div class="divider" />
   <div
-    class="grid gap-6 lg:grid-cols-2 justify-center place-content-center px-60"
+    class="grid gap-6 lg:grid-cols-2 justify-center place-content-center md:px-60"
   >
     <div class="card bg-base-100 box-shadow min-w-max">
       <div class="card-body pb-5">
@@ -51,7 +49,6 @@
       </div>
     </div>
   </div>
-</Container>
 
 <style>
   .box-shadow {
