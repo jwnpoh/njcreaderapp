@@ -33,6 +33,7 @@ func (b *broker) serveRoutes(mux chi.Router) {
 	mux.Get("/api/long/{topic}", b.GetLong)
 
 	mux.Post("/api/auth", b.Authenticate)
+	mux.Post("/api/users/reset-password", b.ResetPassword)
 
 	// will modify to protected route Post method api
 	mux.Get("/insert-user", b.InsertUser)

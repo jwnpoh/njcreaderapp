@@ -42,6 +42,7 @@
     <br />
     <button class="btn btn-md bg-primary mx-3">Log in</button>
   </form>
+
   {#if form?.invalid}
     <p class="error">Username and password are required.</p>
   {/if}
@@ -49,6 +50,8 @@
   {#if form?.credentials}
     <p class="error">Invalid credentials.</p>
   {/if}
+
+  <a href="/reset-password" class="link italic">Forgot password?</a>
 </div>
 
 <style>

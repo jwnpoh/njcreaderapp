@@ -202,3 +202,71 @@ func (b *broker) ViewUser(w http.ResponseWriter, r *http.Request) {
 		b.Logger.Error(s, r)
 	}
 }
+
+func (b *broker) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var userEmail string
+
+	s := serializer.NewSerializer(false, "", nil)
+	s.Decode(w, r, &userEmail)
+
+	user, err := b.Users.GetUser("email", userEmail)
+	if err != nil {
+		s := serializer.NewSerializer(true, "user not found", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	t, err := time.Parse("02 Jan 2006", user.LastLogin)
+	if err != nil {
+		s := serializer.NewSerializer(true, "user not found", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	if time.Since(t) < 1*time.Minute {
+		if err != nil {
+			s := serializer.NewSerializer(true, "operation not allowed", err)
+			s.ErrorJson(w, err)
+			b.Logger.Error(s, r)
+			return
+		}
+	}
+
+	newRandPassword := core.GenerateRandomString()
+
+	newUser := &core.User{
+		ID:          user.ID,
+		Email:       user.Email,
+		Role:        user.Role,
+		Class:       user.Class,
+		LastLogin:   time.Now().Format("02 Jan 2006"),
+		DisplayName: user.DisplayName,
+		Hash:        newRandPassword,
+	}
+
+	err = b.Users.UpdateUser(newUser)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to reset password. try again or contact system adminstrator", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		fmt.Println(err)
+		return
+	}
+
+	s, err = b.Mailer.ResetPassword(newUser, newRandPassword)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to reset password. try again or contact system adminstrator", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		fmt.Println(err)
+		return
+	}
+
+	err = serializer.NewSerializer(false, "successfully reset password.", nil).Encode(w, http.StatusAccepted)
+	if err != nil {
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+	}
+}

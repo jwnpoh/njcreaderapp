@@ -1,4 +1,4 @@
-*The NJC Reader is currently still WIP.*
+*The NJC Reader is currently WIP.*
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/jwnpoh/njcreaderapp/backend)](https://goreportcard.com/report/github.com/jwnpoh/njcreaderapp/backend)
 [![CodeFactor](https://www.codefactor.io/repository/github/jwnpoh/njcreaderapp/badge)](https://www.codefactor.io/repository/github/jwnpoh/njcreaderapp)
@@ -52,11 +52,11 @@ The NJC Reader is a full stack web app that is an evolution of the [NJC GP News 
 - [x] user notes management - delete notes, edit notes
 - [x] longer reads admin ui and api
 - [x] longer reads feed api
+- [x] user password reset
 - [ ] longer reads feed ui
 - [ ] conditional display of welcome messages for articles and longer reads pages
 - [ ] about page
 - [ ] favicon
-- [ ] user password reset
 - [ ] user management (add user(s), edit user, delete user)
 - [ ] social relations: notification/activity view
 - [ ] feedback form
