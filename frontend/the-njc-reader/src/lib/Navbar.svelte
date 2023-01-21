@@ -15,13 +15,13 @@
   }
 
   export let user;
+  export let showMenu;
 
   let role;
   if (user.loggedIn) {
     role = user.role;
   }
 
-  export let showMenu;
   const toggleMenu = () => {
     showMenu = !showMenu;
   };
