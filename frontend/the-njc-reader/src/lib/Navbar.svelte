@@ -70,7 +70,7 @@
               <a href="/notes">Notebook</a>
             </li>
           {/if}
-          <li><a data-sveltekit-reload href="/articles/1">News Feed</a></li>
+          <li><a data-sveltekit-reload href="/articles">News Feed</a></li>
           <li><a href="/long">Long Reads</a></li>
           <li><a href="/about">About</a></li>
           {#if user.loggedIn}

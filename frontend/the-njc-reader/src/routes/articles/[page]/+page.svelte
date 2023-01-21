@@ -1,11 +1,14 @@
 <script>
+  import { page } from "$app/stores";
   import CardContainer from "$lib/CardContainer.svelte";
   import PageTitle from "$lib/PageTitle.svelte";
 
   export let data;
   $: articles = data.articles;
-  $: page = data.page;
+  $: pageNo = data.page;
+
+  let user = $page.data.user;
 </script>
 
 <PageTitle>News Feed</PageTitle>
-<CardContainer {articles} {page} />
+<CardContainer {articles} page={pageNo} loggedIn={user.loggedIn} />
