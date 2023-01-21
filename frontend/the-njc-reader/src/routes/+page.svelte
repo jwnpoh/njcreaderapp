@@ -11,10 +11,7 @@
 </script>
 
 <PageTitle>News Feed</PageTitle>
-<<<<<<< HEAD
 {#if !user.loggedIn}
-=======
->>>>>>> 89d09d93a93ebc8fffd13df72811b004711dbc6a
 <div class="grid gap-6  my-6 md:px-52">
   <h1 class="font-bold text-2xl">Welcome!</h1>
   <p class="text-xl">
