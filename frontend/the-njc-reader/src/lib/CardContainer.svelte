@@ -3,6 +3,7 @@
   export let articles;
   export let page;
   export let query;
+export let loggedIn;
 
   const navigate = (p) => {
     window.location.href = `/articles/${p}`;
@@ -27,6 +28,7 @@
           question_display={article.question_display}
           date={article.date}
           mustRead={article.must_read}
+          {loggedIn}
         />
       </div>
     {/each}

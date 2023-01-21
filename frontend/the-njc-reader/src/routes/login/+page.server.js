@@ -42,7 +42,7 @@ export const actions = {
       secure: process.env.NODE_ENV == "production",
     })
 
-    throw redirect(302, "/notes")
+    throw redirect(302, "/articles")
   }
 }
 

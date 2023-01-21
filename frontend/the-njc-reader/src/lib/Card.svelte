@@ -9,6 +9,7 @@
   export let question_display;
   export let date;
   export let mustRead;
+  export let loggedIn;
 
   let checkBox;
   $: collapseTitle = checkBox
@@ -18,14 +19,16 @@
 
 <div class="relative">
   <div class="card bg-base-100 box-shadow ">
-    <div class="bookmark bg-base-100">
-      <form method="POST" action="/notes/add-note?/newnote">
-        <input name="article_id" type="hidden" hidden value={id} />
-        <button>
-          <Icon data={bookmark} scale={2} class="bookmark text-primary" />
-        </button>
-      </form>
-    </div>
+    {#if loggedIn}
+      <div class="bookmark bg-base-100">
+        <form method="POST" action="/notes/add-note?/newnote">
+          <input name="article_id" type="hidden" hidden value={id} />
+          <button>
+            <Icon data={bookmark} scale={2} class="bookmark text-primary" />
+          </button>
+        </form>
+      </div>
+    {/if}
     <div class="card-body pb-5">
       {#if mustRead}
         <div class="badge badge-secondary py-3">Must read!</div>
