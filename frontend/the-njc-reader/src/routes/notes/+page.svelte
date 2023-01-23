@@ -1,7 +1,6 @@
 <script>
   import { Icon } from "svelte-awesome";
   import book from "svelte-awesome/icons/book";
-  import users from "svelte-awesome/icons/users";
   import feed from "svelte-awesome/icons/feed";
   import globe from "svelte-awesome/icons/globe";
 
@@ -58,17 +57,4 @@
     ><Icon data={book} scale={1.6} />
     <p class="text-xs md:text-sm">My Notes</p></button
   >
-  <button
-    class:active={active === "activity"}
-    on:click={() => (active = "activity")}
-  >
-    <div class="indicator">
-      <span
-        class="indicator-item badge badge-xs badge-accent w-fit translate-x-8 md:translate-x-10"
-        >new</span
-      >
-      <Icon data={users} scale={1.6} />
-    </div>
-    <p class="text-xs md:text-sm">Activity</p>
-  </button>
 </div>
