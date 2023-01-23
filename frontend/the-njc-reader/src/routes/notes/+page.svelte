@@ -18,7 +18,7 @@
 </script>
 
 <Container>
-  <PageTitle>Notebook</PageTitle>
+  <PageTitle>The Social Notebook</PageTitle>
   {#if active === "following"}
     <NotesContainer
       data={following ?? ""}

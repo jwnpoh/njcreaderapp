@@ -53,9 +53,7 @@
             <div
               class="md:hidden py-1 text-xl font-medium  hover:cursor-default"
             >
-          <a href="/">
-              The NJC Reader
-            </a>
+              <a href="/"> The NJC Reader </a>
             </div>
           </li>
           <li class="md:hidden" />
@@ -68,15 +66,16 @@
               </div>
             </li>
             <li />
+          {/if}
+            <li><a data-sveltekit-reload href="/articles">News Feed</a></li>
+          {#if user.loggedIn}
+            <li><a href="/long">Long Reads</a></li>
             <li>
-              <a href="/notes">Notebook</a>
+              <a href="/notes">The Social Notebook</a>
             </li>
           {/if}
-          <li><a data-sveltekit-reload href="/articles">News Feed</a></li>
-          <li><a href="/long">Long Reads</a></li>
           <li><a href="/about">About</a></li>
           {#if user.loggedIn}
-            <li><a href="/feedback">Feedback</a></li>
             <li />
             {#if role === "admin"}
               <li>

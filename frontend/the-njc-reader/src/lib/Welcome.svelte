@@ -5,12 +5,11 @@
   </p>
   <p class="text-lg">
     Your teachers have curated articles which are relevant to our course for
-    your daily reading. Each article is also appended with relevant past year 'A' Level essay
-    questions so that you can practise making connections
-    between the news you read and the issues discussed.
+    your daily reading. Each article is appended with relevant past year 'A' Level essay
+    questions for you to practise making connections between the news you read and the issues discussed.
   </p>
 
-  <p class="text-lg">Log in to enjoy more features!</p>
+  <p class="text-lg">Log in to enjoy more features such as the Social Notebook and Longer Reads!</p>
 
   <p class="text-lg">We hope that you find this resource helpful!</p>
 </div>
