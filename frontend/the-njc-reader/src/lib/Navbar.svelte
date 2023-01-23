@@ -53,7 +53,9 @@
             <div
               class="md:hidden py-1 text-xl font-medium  hover:cursor-default"
             >
+          <a href="/">
               The NJC Reader
+            </a>
             </div>
           </li>
           <li class="md:hidden" />

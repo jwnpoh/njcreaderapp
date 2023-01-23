@@ -6,11 +6,12 @@
 </script>
 
 <PageTitle>Longer Reads - {topic}</PageTitle>
-<div class="grid gap-6  mt-6 md:px-60">
-  {#each articles as article, index}
-    <div class="min-w-full text-lg">
-      {index+1}. <a href="{article.url}" class="link" rel="noreferrer" target="_blank">{article.title}</a>
-    </div>
+<div class="mt-6 px-10 md:px-20 lg:px-60 text-justify">
+<ul class="list-decimal list-outside">
+  {#each articles as article}
+    <li class="min-w-full text-lg py-2">
+      <a href="{article.url}" class="link" rel="noreferrer" target="_blank">{article.title}</a>
+    </li>
   {/each}
-</div>
+</ul></div>
 
