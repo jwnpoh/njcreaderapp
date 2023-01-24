@@ -12,10 +12,17 @@ type MailServiceConfig struct {
 	Password string
 }
 
+type SheetsConfig struct {
+	Credentials string
+	SheetID     string
+	SheetName   string
+}
+
 type Config struct {
 	Port string
 	DSN  string
 	MailServiceConfig
+	SheetsConfig
 }
 
 func LoadConfig() (Config, error) {
@@ -29,6 +36,11 @@ func LoadConfig() (Config, error) {
 			Port:     os.Getenv("SMTP_PORT"),
 			Username: os.Getenv("SMTP_USER"),
 			Password: os.Getenv("SMTP_PASS"),
+		},
+		SheetsConfig: SheetsConfig{
+			Credentials: os.Getenv("SHEET_CREDENTIALS"),
+			SheetID:     os.Getenv("SHEET_ID"),
+			SheetName:   os.Getenv("SHEET_NAME"),
 		},
 	}
 

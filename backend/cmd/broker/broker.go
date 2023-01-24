@@ -1,12 +1,14 @@
 package broker
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/jwnpoh/njcreaderapp/backend/cmd/config"
 	"github.com/jwnpoh/njcreaderapp/backend/external/pscale"
+	"github.com/jwnpoh/njcreaderapp/backend/external/sheets"
 	"github.com/jwnpoh/njcreaderapp/backend/services/articles"
 	"github.com/jwnpoh/njcreaderapp/backend/services/auth"
 	"github.com/jwnpoh/njcreaderapp/backend/services/logger"
@@ -41,6 +43,11 @@ func NewBrokerService(config config.Config) BrokerService {
 		log.Fatal(err)
 	}
 
+	sheetsDB, err := sheets.NewSheetsService(context.Background(), config.SheetsConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	longsDB, err := pscale.NewLongsDB(config.DSN)
 	if err != nil {
 		log.Fatal(err)
@@ -71,7 +78,7 @@ func NewBrokerService(config config.Config) BrokerService {
 	broker := broker{
 		Port:          config.Port,
 		Logger:        logger.NewAppLogger(),
-		Articles:      articles.NewArticlesService(articlesDB),
+		Articles:      articles.NewArticlesService(articlesDB, sheetsDB),
 		Longs:         long.NewLongService(longsDB),
 		Authenticator: auth.NewAuthenticator(authDB),
 		Users:         users.NewUserManager(usersDB),

@@ -21,12 +21,13 @@ type ArticlesDB interface {
 }
 
 type Articles struct {
-	db ArticlesDB
+	db     ArticlesDB
+	sheets ArticlesDB
 }
 
 // NewArticlesService returns an articleService object to implement methods to interact with PlanetScale database.
-func NewArticlesService(articlesDB ArticlesDB) *Articles {
-	return &Articles{db: articlesDB}
+func NewArticlesService(articlesDB, sheetsDB ArticlesDB) *Articles {
+	return &Articles{db: articlesDB, sheets: sheetsDB}
 }
 
 // Get gets up to 10 documents per page from PScale and serves them in pages of 10 articles each.
@@ -78,6 +79,12 @@ func (a *Articles) Store(input core.ArticlePayload) error {
 	err = a.db.Store(&data)
 	if err != nil {
 		return fmt.Errorf("unable to store articles - %w", err)
+	}
+
+	// send to SheetsDB
+	err = a.sheets.Store(&data)
+	if err != nil {
+		return fmt.Errorf("unable to store articles in Sheets DB - %w", err)
 	}
 
 	return nil

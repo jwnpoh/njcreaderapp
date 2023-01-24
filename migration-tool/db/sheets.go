@@ -80,16 +80,7 @@ func newSheetsService(ctx context.Context) (*sheets.Service, error) {
 		return nil, fmt.Errorf("unable to read client secret file: %v", err)
 	}
 
-	// b := os.Getenv("CREDENTIALS")
-	// If modifying these scopes, delete your previously saved token.json.
-	// config, err := google.ConfigFromJSON(b, "https://www.googleapis.com/auth/spreadsheets")
-	// if err != nil {
-	// 	return nil, fmt.Errorf("unable to parse client secret file to config: %v", err)
-	// }
-	// client := getClient(config)
-
 	srv, err := sheets.NewService(ctx, option.WithCredentialsJSON([]byte(b)))
-	// srv, err := sheets.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
 		return srv, fmt.Errorf("unable to retrieve Sheets client: %v", err)
 	}
@@ -105,9 +96,6 @@ type sheetData struct {
 
 func getsheetData(srv *sheets.Service) (*sheetData, error) {
 	var sd sheetData
-
-	// sd.ID = "1Na9O_kaUSjde-drLyHIZevG847XgzF3FbakgaePDHuw" // DB old
-	// sd.Range = "feed"
 
 	sd.ID = "1nY3sFjXXonSL43C3vPpfnEZO5b4SBXVSfhWdJkUzJS4" // DB new
 	sd.Range = "Articles"
@@ -218,54 +206,6 @@ start:
 
 // MigrateArticles backs up the articles database to a predefined, hard-coded Google Sheet.
 func MigrateArticles(ctx context.Context, database *ArticlesDBByDate) error {
-	// srv, err := newSheetsService(ctx)
-	// if err != nil {
-	// 	return fmt.Errorf("unable to start Sheets service: %w", err)
-	// }
-
-	// backupSheetID := "1nY3sFjXXonSL43C3vPpfnEZO5b4SBXVSfhWdJkUzJS4"
-	// backupSheetName := "Articles"
-
-	// var valueRange sheets.ValueRange
-	// valueRange.Values = make([][]interface{}, 0, len(*database))
-
-	// for _, j := range *database {
-	// 	sTopics := strings.Builder{}
-	// 	for i, k := range j.Topics {
-	// 		if i == len(j.Topics)-1 {
-	// 			sTopics.WriteString(string(k))
-	// 			break
-	// 		}
-	// 		sTopics.WriteString(string(k) + "\n")
-	// 	}
-	// 	sQuestions := strings.Builder{}
-	// 	sQuestionsKey := strings.Builder{}
-	// 	for i, l := range j.Questions {
-	// 		if i == len(j.Questions)-1 {
-	// 			sQuestions.WriteString(fmt.Sprint(l.Year) + " " + fmt.Sprint(l.Number) + " " + l.Wording)
-	// 			sQuestionsKey.WriteString(fmt.Sprint(l.Year) + " " + fmt.Sprint(l.Number))
-	// 			break
-	// 		}
-	// 		sQuestions.WriteString(fmt.Sprint(l.Year) + " " + fmt.Sprint(l.Number) + " " + l.Wording + "\n")
-	// 		sQuestionsKey.WriteString(fmt.Sprint(l.Year) + " " + fmt.Sprint(l.Number) + "\n")
-	// 	}
-	// 	record := make([]interface{}, 0, 6)
-	// 	record = append(record, j.Title, j.URL, sTopics.String(), sQuestionsKey.String(), sQuestions.String(), j.DisplayDate)
-	// 	valueRange.Values = append(valueRange.Values, record)
-	// }
-
-	// _, err = srv.Spreadsheets.Values.Update(backupSheetID, backupSheetName, &valueRange).ValueInputOption("RAW").Do()
-	// if err != nil {
-	// 	return fmt.Errorf("unable to backup data to backup sheet: %w", err)
-	// }
-
-	// repo, err := NewFireStoreApp(projectID)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// err = Add(database, repo)
-
 	godotenv.Load(".env")
 	db, err := newDB(os.Getenv("DSN"))
 	if err != nil {
