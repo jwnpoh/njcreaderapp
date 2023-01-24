@@ -9,7 +9,7 @@ const config = {
   daisyui: {
     themes: [{
       mytheme: {
-        primary: "#990011FF",
+        primary: "#990011",
         secondary: "#FAA21C",
         accent: "#437D00",
         neutral: "#53565A",

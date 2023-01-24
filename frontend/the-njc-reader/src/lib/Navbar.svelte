@@ -27,7 +27,7 @@
   };
 </script>
 
-<div class="navbar bg-primary text-white fixed top-0 z-50 ">
+<div class="navbar bg-primary-focus text-white fixed top-0 z-50 ">
   <div class="md:navbar-start">
     <div class="dropdown">
       <button class="btn btn-ghost btn-circle" on:click={toggleMenu}>
@@ -47,7 +47,7 @@
       </button>
       <div class={!showMenu ? "hidden" : ""}>
         <ul
-          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-primary rounded-box w-64"
+          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-primary-focus rounded-box w-64"
         >
           <li>
             <div
