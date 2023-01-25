@@ -26,6 +26,7 @@
     "date-picker-svelte": "^2.2.1",
     "dayjs": "^1.11.6",
     "dotenv": "^16.0.3",
+    "papaparse": "^5.3.2",
     "svelte-awesome": "^3.0.0"
   }
 }

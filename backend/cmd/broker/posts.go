@@ -187,9 +187,6 @@ func (b *broker) InsertPost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// tags := removeDuplicateTags(input.Tags)
-	// input.Tags = tags
-
 	date := formatDate(input.Date)
 	input.Date = date
 

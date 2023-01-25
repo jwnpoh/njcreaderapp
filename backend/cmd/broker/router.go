@@ -35,15 +35,10 @@ func (b *broker) serveRoutes(mux chi.Router) {
 	mux.Post("/api/auth", b.Authenticate)
 	mux.Post("/api/users/reset-password", b.ResetPassword)
 
-	// will modify to protected route Post method api
-	mux.Get("/insert-user", b.InsertUser)
-
 	mux.Route("/api/users", func(mux chi.Router) {
 		mux.Use(b.Auth)
 		mux.Post("/logout", b.Logout)
 		mux.Post("/get-user", b.GetUser)
-		mux.Post("/update-user", b.UpdateUser)
-		mux.Post("/delete-user", b.DeleteUser)
 		mux.Get("/friends", b.GetFriends)
 		mux.Post("/follow", b.Follow)
 		mux.Get("/{user}", b.ViewUser)
@@ -61,6 +56,13 @@ func (b *broker) serveRoutes(mux chi.Router) {
 		mux.Post("/delete", b.DeletePost)
 		mux.Post("/update", b.UpdatePost)
 		mux.Post("/like", b.Like)
+	})
+
+	mux.Route("/api/admin/users", func(mux chi.Router) {
+		mux.Use(b.Auth)
+		mux.Post("/insert-users", b.InsertUsers)
+		mux.Post("/update-user", b.UpdateUser)
+		mux.Post("/delete-user", b.DeleteUser)
 	})
 
 	mux.Route("/api/admin/articles", func(mux chi.Router) {

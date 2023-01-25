@@ -26,23 +26,32 @@ func NewUsersDB(dsn string) (*UsersDB, error) {
 	return &UsersDB{DB: db}, nil
 }
 
-func (uDB *UsersDB) InsertUser(user *core.User) error {
+func (uDB *UsersDB) InsertUsers(users *[]core.User) error {
 	query := "INSERT INTO users (email, hash, role, last_login, display_name, class) VALUES (?, ?, ?, ?, ?, ?)"
 
 	tx, err := uDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("unable to begin tx for adding articles input to db - %w", err)
+		return fmt.Errorf("PScaleUsers: unable to begin tx for adding articles input to db - %w", err)
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(query, user.Email, user.Hash, user.Role, user.LastLogin, user.DisplayName, user.Class)
-	if err != nil {
-		return fmt.Errorf("unable to add user %s to db - %w", user.Email, err)
-	}
+	for i, user := range *users {
+		_, err = tx.Exec(query, user.Email, user.Hash, user.Role, user.LastLogin, user.DisplayName, user.Class)
+		if err != nil {
+			return fmt.Errorf("PScaleUsers: unable to add user %s to db - %w", user.Email, err)
+		}
 
-	err = tx.Commit()
-	if err != nil {
-		return fmt.Errorf("unable to commit tx to db - %w", err)
+		if i >= 0 && i%200 == 0 || i == len(*users)-1 {
+			err = tx.Commit()
+			if err != nil {
+				return fmt.Errorf("PScaleUsers: unable to commit tx to db - %w", err)
+			}
+			tx, err = uDB.DB.Begin()
+			if err != nil {
+				return fmt.Errorf("PScaleUsers: unable to begin tx for adding articles input to db - %w", err)
+			}
+			defer tx.Rollback()
+		}
 	}
 
 	return nil
@@ -57,7 +66,7 @@ func (uDB *UsersDB) GetUser(field string, value any) (*core.User, error) {
 	var id int
 	err := row.Scan(&id, &email, &hash, &role, &lastLogin, &displayName, &class)
 	if err != nil {
-		return nil, fmt.Errorf("error scanning row to get user- %w", err)
+		return nil, fmt.Errorf("PScaleUsers: error scanning row to get user- %w", err)
 	}
 
 	user := core.User{
@@ -78,18 +87,18 @@ func (uDB *UsersDB) UpdateUser(newUser *core.User) error {
 
 	tx, err := uDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("unable to begin db tx for updating user %d - %w", newUser.ID, err)
+		return fmt.Errorf("PScaleUsers: unable to begin db tx for updating user %d - %w", newUser.ID, err)
 	}
 	defer tx.Rollback()
 
 	_, err = tx.Exec(query, newUser.Hash, newUser.LastLogin, newUser.DisplayName, newUser.ID)
 	if err != nil {
-		return fmt.Errorf("unable to update user %d - %w", newUser.ID, err)
+		return fmt.Errorf("PScaleUsers: unable to update user %d - %w", newUser.ID, err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("unable to commit tx to db for updating user - %w", err)
+		return fmt.Errorf("PScaleUsers: unable to commit tx to db for updating user - %w", err)
 	}
 
 	return nil
@@ -100,18 +109,18 @@ func (uDB *UsersDB) DeleteUser(id int) error {
 
 	tx, err := uDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("unable to begin db tx for deleting user %d - %w", id, err)
+		return fmt.Errorf("PScaleUsers: unable to begin db tx for deleting user %d - %w", id, err)
 	}
 	defer tx.Rollback()
 
 	_, err = tx.Exec(query, id)
 	if err != nil {
-		return fmt.Errorf("unable to delete user %d - %w", id, err)
+		return fmt.Errorf("PScaleUsers: unable to delete user %d - %w", id, err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("unable to commit tx to db for updating user - %w", err)
+		return fmt.Errorf("PScaleUsers: unable to commit tx to db for updating user - %w", err)
 	}
 
 	return nil

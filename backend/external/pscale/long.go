@@ -114,11 +114,16 @@ func (lDB *LongsDB) Store(data *core.LongPayload) error {
 			return fmt.Errorf("PScaleLong: unable to add long article %s to db - %w", long.Title, err)
 		}
 
-		if i == len(*data)-1 {
+		if i >= 0 && i%200 == 0 || i == len(*data)-1 {
 			err = tx.Commit()
 			if err != nil {
 				return fmt.Errorf("PScaleLong: unable to commit tx to store long articlesn db - %w", err)
 			}
+			tx, err = lDB.DB.Begin()
+			if err != nil {
+				return fmt.Errorf("PScaleLong: unable to begin tx to add long articles to db - %w", err)
+			}
+			defer tx.Rollback()
 		}
 	}
 	return nil

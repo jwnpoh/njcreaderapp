@@ -55,9 +55,10 @@ The NJC Reader is a full stack web app that is an evolution of the [NJC GP News 
 - [x] user password reset
 - [x] longer reads feed ui
 - [x] conditional display of welcome messages for articles and longer reads pages
+- [x] user management - add users (via CSV file upload)
+- [ ] user management - delete user
 - [ ] about page
 - [ ] favicon
-- [ ] user management (add user(s), edit user, delete user)
 - [ ] social relations: notification/activity view
 - [ ] feedback form
 - [ ] teacher monitoring of classes (maybe/not?)

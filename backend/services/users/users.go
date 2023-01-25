@@ -8,7 +8,7 @@ import (
 )
 
 type UsersDB interface {
-	InsertUser(*core.User) error
+	InsertUsers(*[]core.User) error
 	GetUser(field string, value any) (*core.User, error)
 	DeleteUser(id int) error
 	UpdateUser(*core.User) error
@@ -22,14 +22,20 @@ func NewUserManager(usersDB UsersDB) *UserManager {
 	return &UserManager{db: usersDB}
 }
 
-func (um *UserManager) InsertUser(user *core.User) error {
-	hash, err := hasher.GenerateHash(user.Hash)
-	if err != nil {
-		return fmt.Errorf("userManager: unable to generate hash from user input password - %w", err)
-	}
-	user.Hash = hash
+func (um *UserManager) InsertUsers(users *[]core.User) error {
+	data := make([]core.User, 0, len(*users))
 
-	err = um.db.InsertUser(user)
+	for _, user := range *users {
+		hash, err := hasher.GenerateHash("password")
+		if err != nil {
+			return fmt.Errorf("userManager: unable to generate hash from user input password - %w", err)
+		}
+		user.Hash = hash
+
+		data = append(data, user)
+	}
+
+	err := um.db.InsertUsers(&data)
 	if err != nil {
 		return fmt.Errorf("userManager: unable to insert new user - %w", err)
 	}

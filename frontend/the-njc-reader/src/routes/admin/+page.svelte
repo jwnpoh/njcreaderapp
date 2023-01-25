@@ -48,6 +48,19 @@
         </div>
       </div>
     </div>
+    <div class="card bg-base-100 box-shadow min-w-max">
+      <div class="card-body pb-5">
+        <div class="grid justify-items-center">
+          <h3 class="px-5 text-xl md:text-2xl font-medium">Manage users</h3>
+          <button class="btn btn-link text-xl"
+            ><a href="/admin/add-users">Add users</a></button
+          >
+          <button class="btn btn-link text-xl"
+            ><a href="/admin/delete-users">Delete users</a></button
+          >
+        </div>
+      </div>
+    </div>
   </div>
 
 <style>
