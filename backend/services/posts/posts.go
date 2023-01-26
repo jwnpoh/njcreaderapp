@@ -114,7 +114,7 @@ func (pDB *Posts) GetFollowingPosts(userID int) (serializer.Serializer, error) {
 		data = append(data, v)
 	}
 
-	return serializer.NewSerializer(false, "got all notes from following", data), nil
+	return serializer.NewSerializer(false, "There are currently no notes from the people that you are following. Try again later, or create your own note now.", data), nil
 }
 
 func (pDB *Posts) GetOwnPosts(userID int) (serializer.Serializer, error) {

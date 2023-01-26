@@ -74,8 +74,10 @@ const getDiscover = async (session) => {
   const notes = await res.json()
 
   let note_likes = {}
-  for (var note of notes.data) {
-    note_likes[note.id] = note.likes
+  if (notes.data) {
+    for (var note of notes.data) {
+      note_likes[note.id] = note.likes
+    }
   }
   return note_likes
 }
