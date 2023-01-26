@@ -1,4 +1,5 @@
 <script>
+  import { invalidateAll } from "$app/navigation";
   import { Icon } from "svelte-awesome";
   import book from "svelte-awesome/icons/book";
   import feed from "svelte-awesome/icons/feed";
@@ -11,10 +12,14 @@
   let active = "following";
 
   export let data;
-  const notes = data.notes;
-  const following = data.following;
-  const discover = data.discover;
+  $: notes = data.notes;
+  $: following = data.following;
+  $: discover = data.discover;
   const API_URL = data.API_URL;
+
+  const refresh = () => {
+    invalidateAll();
+  }
 </script>
 
 <Container>
@@ -38,7 +43,7 @@
   {/if}
 </Container>
 
-<div class="btm-nav">
+<button class="btm-nav" on:click={refresh}>
   <button
     class:active={active === "following"}
     on:click={() => (active = "following")}
@@ -57,4 +62,4 @@
     ><Icon data={book} scale={1.6} />
     <p class="text-xs md:text-sm">My Notes</p></button
   >
-</div>
+</button>

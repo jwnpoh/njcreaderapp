@@ -17,7 +17,6 @@
   dayjs.extend(relativeTime);
 
   const user_id = $page.data.user.id;
-  const user_class = $page.data.user.class;
   const session = $page.data.user.session;
   const liked_notes = $page.data.user.liked_notes;
   let note_likes = $page.data.user.note_likes;
@@ -70,7 +69,7 @@
             {note.author ?? "anonymous"}
           </a>
             <p class="text-neutral text-xs italic inline px-1">
-            {user_class}
+            {note.author_class}
             </p>
           <time class="block text-xs opacity-50"
             >{dayjs(note.date).fromNow()}</time
@@ -85,7 +84,7 @@
             </blockquote>
           </div>
           <div class="py-2">
-            <h3 class="italic font-semibold">TL;DR</h3>
+            <h3 class="font-semibold">TL;DR</h3>
             {note.tldr}
           </div>
           <div class="inline">

@@ -53,6 +53,7 @@ type Post struct {
 	ID           int      `json:"id,omitempty"`
 	UserID       int      `json:"user_id"`
 	Author       string   `json:"author"`
+	AuthorClass  string   `json:"author_class"`
 	Likes        int      `json:"likes"`
 	TLDR         string   `json:"tldr"`
 	Examples     string   `json:"examples"`

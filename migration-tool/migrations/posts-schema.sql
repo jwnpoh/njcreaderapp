@@ -4,6 +4,7 @@ CREATE TABLE posts (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   author VARCHAR(50) NOT NULL,
+  author_class VARCHAR(50) NOT NULL,
   likes INT NOT NULL,
   tldr VARCHAR(255) NOT NULL,
   examples TEXT NOT NULL,

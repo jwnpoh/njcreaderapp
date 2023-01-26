@@ -154,6 +154,7 @@ func (pDB *Posts) AddPost(post *core.PostPayload) error {
 		return fmt.Errorf("unable to get author for new note - %w", err)
 	}
 	newPost.Author = author.DisplayName
+	newPost.AuthorClass = author.Class
 
 	err = pDB.db.AddPost(newPost)
 	if err != nil {
@@ -193,6 +194,7 @@ func (pDB *Posts) UpdatePost(postID int, post *core.PostPayload) error {
 		return fmt.Errorf("unable to get author for new note - %w", err)
 	}
 	newPost.Author = author.DisplayName
+	newPost.AuthorClass = author.Class
 
 	err = pDB.db.UpdatePost(postID, newPost)
 	if err != nil {

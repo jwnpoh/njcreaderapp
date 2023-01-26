@@ -42,8 +42,8 @@ func (pDB *PostsDB) GetAllPublicPosts() (*core.Posts, error) {
 
 	for rows.Next() {
 		var post core.Post
-		var tags, author sql.NullString
-		err = rows.Scan(&post.ID, &post.UserID, &author, &post.Likes, &post.TLDR, &post.Examples, &post.Notes, &tags, &post.CreatedAt, &post.Public, &post.ArticleID, &post.ArticleTitle, &post.ArticleURL)
+		var tags, author, authorClass sql.NullString
+		err = rows.Scan(&post.ID, &post.UserID, &author, &authorClass, &post.Likes, &post.TLDR, &post.Examples, &post.Notes, &tags, &post.CreatedAt, &post.Public, &post.ArticleID, &post.ArticleTitle, &post.ArticleURL)
 		if err != nil {
 			return nil, fmt.Errorf("PScalePosts: error scanning row - %w", err)
 		}
@@ -52,6 +52,9 @@ func (pDB *PostsDB) GetAllPublicPosts() (*core.Posts, error) {
 		}
 		if author.Valid {
 			post.Author = author.String
+		}
+		if authorClass.Valid {
+			post.AuthorClass = authorClass.String
 		}
 		post.Date = time.Unix(post.CreatedAt, 0).Format("Jan 2, 2006 15:04:05")
 
@@ -79,8 +82,8 @@ func (pDB *PostsDB) GetPosts(userIDs []int, public bool) (*core.Posts, error) {
 
 	for rows.Next() {
 		var post core.Post
-		var tags, author sql.NullString
-		err = rows.Scan(&post.ID, &post.UserID, &author, &post.Likes, &post.TLDR, &post.Examples, &post.Notes, &tags, &post.CreatedAt, &post.Public, &post.ArticleID, &post.ArticleTitle, &post.ArticleURL)
+		var tags, author, authorClass sql.NullString
+		err = rows.Scan(&post.ID, &post.UserID, &author, &authorClass, &post.Likes, &post.TLDR, &post.Examples, &post.Notes, &tags, &post.CreatedAt, &post.Public, &post.ArticleID, &post.ArticleTitle, &post.ArticleURL)
 		if err != nil {
 			return nil, fmt.Errorf("PScalePosts: error scanning row - %w", err)
 		}
@@ -89,6 +92,9 @@ func (pDB *PostsDB) GetPosts(userIDs []int, public bool) (*core.Posts, error) {
 		}
 		if author.Valid {
 			post.Author = author.String
+		}
+		if authorClass.Valid {
+			post.AuthorClass = authorClass.String
 		}
 		post.Date = time.Unix(post.CreatedAt, 0).Format("Jan 2, 2006 15:04:05")
 
@@ -99,7 +105,7 @@ func (pDB *PostsDB) GetPosts(userIDs []int, public bool) (*core.Posts, error) {
 }
 
 func (pDB *PostsDB) AddPost(post *core.Post) error {
-	query := "INSERT INTO posts (user_id, author, likes, tldr, examples, notes, tags, created_at, public, article_id, article_title, article_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	query := "INSERT INTO posts (user_id, author, author_class, likes, tldr, examples, notes, tags, created_at, public, article_id, article_title, article_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 	tx, err := pDB.DB.Begin()
 	if err != nil {
@@ -107,7 +113,7 @@ func (pDB *PostsDB) AddPost(post *core.Post) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(query, post.UserID, post.Author, post.Likes, post.TLDR, post.Examples, post.Notes, strings.Join(post.Tags, ","), post.CreatedAt, post.Public, post.ArticleID, post.ArticleTitle, post.ArticleURL)
+	_, err = tx.Exec(query, post.UserID, post.Author, post.AuthorClass, post.Likes, post.TLDR, post.Examples, post.Notes, strings.Join(post.Tags, ","), post.CreatedAt, post.Public, post.ArticleID, post.ArticleTitle, post.ArticleURL)
 	if err != nil {
 		return fmt.Errorf("PScalePosts: unable to add post to db - %w", err)
 	}
@@ -127,8 +133,8 @@ func (pDB *PostsDB) GetPost(id int) (*core.Post, error) {
 
 	row := pDB.DB.QueryRowx(query, id)
 
-	var tags, author sql.NullString
-	err := row.Scan(&post.ID, &post.UserID, &author, &post.Likes, &post.TLDR, &post.Examples, &post.Notes, &tags, &post.CreatedAt, &post.Public, &post.ArticleID, &post.ArticleTitle, &post.ArticleURL)
+	var tags, author, authorClass sql.NullString
+	err := row.Scan(&post.ID, &post.UserID, &author, &authorClass, &post.Likes, &post.TLDR, &post.Examples, &post.Notes, &tags, &post.CreatedAt, &post.Public, &post.ArticleID, &post.ArticleTitle, &post.ArticleURL)
 	if err != nil {
 		return nil, fmt.Errorf("PScalePosts: error scanning row - %w", err)
 	}
@@ -137,6 +143,9 @@ func (pDB *PostsDB) GetPost(id int) (*core.Post, error) {
 	}
 	if author.Valid {
 		post.Author = author.String
+	}
+	if authorClass.Valid {
+		post.AuthorClass = authorClass.String
 	}
 	post.Date = time.Unix(post.CreatedAt, 0).Format("Jan 2, 2006 15:04:05")
 
@@ -166,7 +175,7 @@ func (pDB *PostsDB) DeletePost(postID int) error {
 }
 
 func (pDB *PostsDB) UpdatePost(postID int, post *core.Post) error {
-	query := "UPDATE posts SET user_id = ?, author = ?, likes = ?, tldr = ?, examples = ?, notes = ?, tags = ?, created_at = ?, public = ?, article_id = ?, article_title = ?, article_url = ? WHERE id = ?"
+	query := "UPDATE posts SET user_id = ?, author = ?, author_class = ?, likes = ?, tldr = ?, examples = ?, notes = ?, tags = ?, created_at = ?, public = ?, article_id = ?, article_title = ?, article_url = ? WHERE id = ?"
 
 	tx, err := pDB.DB.Begin()
 	if err != nil {
@@ -174,7 +183,7 @@ func (pDB *PostsDB) UpdatePost(postID int, post *core.Post) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(query, post.UserID, post.Author, post.Likes, post.TLDR, post.Examples, post.Notes, strings.Join(post.Tags, ","), post.CreatedAt, post.Public, post.ArticleID, post.ArticleTitle, post.ArticleURL, postID)
+	_, err = tx.Exec(query, post.UserID, post.Author, post.AuthorClass, post.Likes, post.TLDR, post.Examples, post.Notes, strings.Join(post.Tags, ","), post.CreatedAt, post.Public, post.ArticleID, post.ArticleTitle, post.ArticleURL, postID)
 	if err != nil {
 		return fmt.Errorf("PScalePosts: unable to add post to db - %w", err)
 	}
