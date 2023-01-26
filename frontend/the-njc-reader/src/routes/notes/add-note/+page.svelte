@@ -41,7 +41,7 @@
   />
   <div class="flex pt-4 md:pt-6 justify-center items-center ">
     <div
-      class="card w-11/12 md:w-10/12 shadow-md shadow-yellow-200 bg-yellow-300 bg-opacity-10"
+      class="card w-11/12 md:w-10/12 shadow-md bg-yellow-300 bg-opacity-10"
     >
       <div class="card-body px-6 md:px-12">
         <div class="lg:inline-flex">

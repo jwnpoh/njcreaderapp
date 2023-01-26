@@ -17,6 +17,7 @@
   dayjs.extend(relativeTime);
 
   const user_id = $page.data.user.id;
+  const user_class = $page.data.user.class;
   const session = $page.data.user.session;
   const liked_notes = $page.data.user.liked_notes;
   let note_likes = $page.data.user.note_likes;
@@ -68,6 +69,9 @@
           <a href="/profile/{note.user_id}">
             {note.author ?? "anonymous"}
           </a>
+            <p class="text-neutral text-xs italic inline px-1">
+            {user_class}
+            </p>
           <time class="block text-xs opacity-50"
             >{dayjs(note.date).fromNow()}</time
           >
