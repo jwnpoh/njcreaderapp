@@ -38,6 +38,7 @@ func (b *broker) serveRoutes(mux chi.Router) {
 	mux.Route("/api/users", func(mux chi.Router) {
 		mux.Use(b.Auth)
 		mux.Post("/logout", b.Logout)
+		mux.Post("/update-user", b.UpdateUser)
 		mux.Post("/get-user", b.GetUser)
 		mux.Get("/friends", b.GetFriends)
 		mux.Post("/follow", b.Follow)
@@ -61,7 +62,6 @@ func (b *broker) serveRoutes(mux chi.Router) {
 	mux.Route("/api/admin/users", func(mux chi.Router) {
 		mux.Use(b.Auth)
 		mux.Post("/insert-users", b.InsertUsers)
-		mux.Post("/update-user", b.UpdateUser)
 		mux.Post("/delete-user", b.DeleteUser)
 	})
 

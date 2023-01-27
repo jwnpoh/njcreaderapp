@@ -18,7 +18,6 @@ export const actions = {
     const new_password = formData.get("new_password")
     const old_password = formData.get("old_password")
     const display_name = formData.get("display_name")
-    // const email = locals.user.email
     const userID = locals.user.id
 
     const session = cookies.get("session")
