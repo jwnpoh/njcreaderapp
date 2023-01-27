@@ -1,9 +1,9 @@
 <script>
-  import dayjs from "dayjs";
-  dayjs().format();
+  var date = new Date();
+
 
   let greeting = "Hello";
-  const h = dayjs().hour();
+  const h = date.getHours();
   if (h >= 18 && h < 24) {
     greeting = "Good evening";
   }
@@ -30,7 +30,10 @@
 <div class="navbar bg-primary-focus text-white fixed top-0 z-50 ">
   <div class="md:navbar-start">
     <div class="dropdown">
-      <button class="btn btn-ghost btn-circle" on:click={toggleMenu}>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label tabindex="0" class="btn btn-ghost btn-circle" on:click={toggleMenu}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5"
@@ -44,9 +47,11 @@
             d="M4 6h16M4 12h16M4 18h7"
           /></svg
         >
-      </button>
+      </label>
       <div class={!showMenu ? "hidden" : ""}>
+        <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
         <ul
+        tabindex="0"
           class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-primary-focus rounded-box w-64"
         >
           <li>
