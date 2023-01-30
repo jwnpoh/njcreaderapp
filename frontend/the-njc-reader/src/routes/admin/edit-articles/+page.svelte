@@ -10,7 +10,7 @@
   let url;
   let title;
   let tags;
-  let date = new Date();
+  let date;
   let must_read;
 
   let id;
@@ -146,6 +146,7 @@
                     "; " +
                     article.questions.join(";");
                   must_read = article.must_read;
+                  date = new Date(article.date);
                 }}
               /></th
             >
