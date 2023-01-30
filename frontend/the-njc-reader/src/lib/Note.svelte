@@ -173,7 +173,7 @@
           </div>
           <div class="py-2">
             <h3 class="italic font-semibold">Further reflection</h3>
-            {note.notes}
+            {note.notes ?? "Nil"}
           </div>
         </div>
       </div>
