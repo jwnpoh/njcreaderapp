@@ -16,9 +16,14 @@ export const actions = {
   updateUser: async ({ locals, cookies, request }) => {
     const formData = await request.formData()
     const new_password = formData.get("new_password")
+    const confirm = formData.get("confirm")
     const old_password = formData.get("old_password")
     const display_name = formData.get("display_name")
     const userID = locals.user.id
+
+    if (new_password !== confirm) {
+      return invalid(400, { failed: true, message: "New password and confirm password need to match." })
+    }
 
     const session = cookies.get("session")
 

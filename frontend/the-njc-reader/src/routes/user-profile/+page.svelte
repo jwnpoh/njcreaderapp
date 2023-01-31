@@ -49,6 +49,14 @@
           on:input={saveChanges}
         />
         {#if save}
+          <h2 class="pt-3 text-md font-semibold">Confirm new password</h2>
+          <input
+            required
+            name="confirm"
+            type="password"
+            placeholder="Confirm new password"
+            class="input w-full max-w-md text-center bg-neutral bg-opacity-5"
+          />
           <h2 class="pt-3 text-md font-extrabold">Current password</h2>
           <input
             required
