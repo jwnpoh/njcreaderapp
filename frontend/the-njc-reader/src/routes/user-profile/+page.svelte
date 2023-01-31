@@ -51,7 +51,6 @@
         {#if save}
           <h2 class="pt-3 text-md font-semibold">Confirm new password</h2>
           <input
-            required
             name="confirm"
             type="password"
             placeholder="Confirm new password"
