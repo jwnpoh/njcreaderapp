@@ -122,11 +122,11 @@
       <thead>
         <tr>
           <th>check</th>
+          <th>Date</th>
           <th>Title</th>
-          <th>Must read?</th>
           <th>Topics</th>
           <th>Questions</th>
-          <th>Date</th>
+          <th>Must read?</th>
         </tr>
       </thead>
       <tbody>
@@ -150,11 +150,11 @@
                 }}
               /></th
             >
+            <td>{article.date}</td>
             <td>{article.title}</td>
-            <td>{article.must_read}</td>
             <td>{article.topics}</td>
             <td>{article.questions}</td>
-            <td>{article.date}</td>
+            <td>{article.must_read}</td>
           </tr>
         {/each}
       </tbody>
