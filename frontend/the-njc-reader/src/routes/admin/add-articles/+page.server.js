@@ -62,7 +62,7 @@ export const actions = {
   },
   send: async ({ cookies }) => {
     if (queue.length < 1) {
-      return invalid(400, { failed: true, message: "No articles queued. Add one or more articles before adding to the database." })
+      return invalid(400, { failed: true, message: "No articles queued. Add one or more articles before saving to the database." })
 
     }
     const session = cookies.get("session")

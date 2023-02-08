@@ -97,24 +97,26 @@
   <p class="mx-7 pt-7 text-primary">{form?.message}</p>
 {/if}
 
-<div class="divider py-5 font-bold">Queued articles ({len})</div>
 
-<div class="px-2 grid gap-10 relative">
-  <div class="max-w-sm place-self-center">
+<div class="mx-7 pt-5 grid gap-2 relative">
+  <div class="max-w-sm ">
     <form method="POST" action="?/send">
-      <button class="btn btn-md btn-primary">Add to database</button>
+      <button class="btn btn-md btn-primary">Save queued articles to database</button>
     </form>
   </div>
   {#if form?.sent}
-    <div class="alert alert-success max-w-fit place-self-center">
+    <div class="alert alert-success max-w-fit ">
       <span>Articles added successfully.</span>
     </div>
   {/if}
   {#if form?.failed}
-    <div class="alert alert-error max-w-fit place-self-center">
+    <div class="alert alert-error max-w-fit  ">
       <span class="text-center">{form?.message}</span>
     </div>
   {/if}
+
+<div class="divider py-5 font-bold">Queued articles ({len})</div>
+
   {#each queue as item}
     <form method="POST" action="?/remove">
       <input type="hidden" name="index" value={item.index} />
