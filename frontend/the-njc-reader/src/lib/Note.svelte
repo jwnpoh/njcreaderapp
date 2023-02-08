@@ -23,6 +23,8 @@
 
   $: liked = liked_notes.includes(note.id) ? true : false;
 
+  let seeMore;
+
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", "Bearer " + session);
@@ -56,8 +58,6 @@
 
     location.reload();
   };
-
-  let seeMore;
 </script>
 
 <div class="flex place-content-center">
@@ -90,7 +90,7 @@
           <div class="inline">
             {#if note.tags[0] !== ""}
               {#each note.tags as tag}
-                <button class="mr-1 badge badge-outline">{tag}</button>
+                <button class="mr-1 badge badge-outline" >{tag}</button>
               {/each}
             {/if}
           </div>
