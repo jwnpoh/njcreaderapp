@@ -194,11 +194,11 @@
         {/if}
         {#if form?.success}
           <div
-            class="alert alert-success z-50 fixed place-self-center top-1/3 max-w-sm shadow-2xl border-2 border-black border-opacity-40"
+            class="alert alert-success z-40 fixed place-self-center top-1/3 max-w-sm shadow-2xl border-2 border-neutral border-opacity-80"
           >
-            <div class="grid md:grid-cols-2 p-5 place-items-center">
+            <div class="grid md:grid-cols-2 p-10 justify-items-center">
               <p class="text-xl col-span-2 text-center">
-                Successfully added post! <br /> What would you like to do now?
+                Successfully added post!<br /> 
               </p>
               <span class="col-span-2" />
               <a href="/">Go to article feed</a>
