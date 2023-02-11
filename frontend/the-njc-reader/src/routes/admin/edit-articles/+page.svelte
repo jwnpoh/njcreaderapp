@@ -147,6 +147,7 @@
                     article.questions.join(";");
                   must_read = article.must_read;
                   date = new Date(article.date);
+                  form = {};
                 }}
               /></th
             >

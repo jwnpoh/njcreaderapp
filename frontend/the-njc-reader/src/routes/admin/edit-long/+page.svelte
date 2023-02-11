@@ -109,6 +109,7 @@
                   url = article.url;
                   title = article.title;
                   topic = article.topic;
+                  form = {};
                 }}
               /></th
             >

@@ -6,6 +6,9 @@
   export let data;
   export let form;
 
+  let queue = data.queue;
+  let len = queue.length;
+
   let url = form?.url ?? "";
   let title = form?.title ?? "";
   let tags = form?.tags ?? "";
@@ -28,8 +31,6 @@
     title = response.data;
   };
 
-  let queue = data.queue;
-  let len = queue.length;
 </script>
 
 <PageTitle>Add articles</PageTitle>
