@@ -1,5 +1,6 @@
 <script>
   import { page } from "$app/stores";
+  import SearchStore from "$lib/stores/notesSearch"
 
   import dayjs from "dayjs";
   import relativeTime from "dayjs/plugin/relativeTime";
@@ -58,6 +59,10 @@
 
     location.reload();
   };
+
+  const updateSearch = (tag) => {
+    SearchStore.set(tag);
+  } 
 </script>
 
 <div class="flex place-content-center">
@@ -90,7 +95,7 @@
           <div class="inline">
             {#if note.tags[0] !== ""}
               {#each note.tags as tag}
-                <button class="mr-1 badge badge-outline" >{tag}</button>
+                <button class="mr-1 badge badge-outline" on:click={updateSearch(tag)} >{tag}</button>
               {/each}
             {/if}
           </div>

@@ -1,6 +1,11 @@
 <script>
   import { page } from "$app/stores";
+  import { onDestroy } from "svelte";
   import Note from "$lib/Note.svelte";
+  import SearchStore  from "$lib/stores/notesSearch"
+
+  import Icon from "svelte-awesome";
+  import close from "svelte-awesome/icons/close";
 
   export let data;
   export let API_URL;
@@ -10,23 +15,30 @@
   const user_id = $page.data.user.id;
 
   let searchTerm = "";
-  $: search = searchTerm;
-  $: console.log(search);
+
+  const unsubscribe = SearchStore.subscribe(term => {
+    searchTerm = term;
+    console.log(searchTerm);
+  });
+
+  const removeSearchTerm = () => {
+    SearchStore.set("");
+  }
+
+  onDestroy(() => {
+    unsubscribe();
+  })
 
 </script>
 
 <h2 class="py-2 text-lg font-semibold italic text-center">
   {section ? section : ""}
 </h2>
-      <div class="form-control mx-auto text-black w-fit place-self-center">
-        <input
-          type="text"
-          placeholder="Search tags"
-          class="input input-bordered "
-          name="query"
-          bind:value={searchTerm}
-        />
-      </div>
+{#if searchTerm}
+      <p class="text-center text-lg">
+      Showing notes tagged <badge class="mr-1 badge badge-outline hover:cursor-default" >{searchTerm} <button on:click={removeSearchTerm}><Icon data={close} style="padding-left: 3px;" /></button></badge>
+      </p>
+      {/if}
 <div class="px-5 md:px-10 py-5 grid gap-5 mb-20">
   {#if notes}
     {#each notes as note}
