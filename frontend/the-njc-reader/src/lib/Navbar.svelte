@@ -70,7 +70,7 @@
                 {greeting}, {user.display_name}!
               </div>
             </li>
-            <li />
+            <div class="divider px-2 before:bg-white opacity-30 after:bg-white opacity-30" />
           {/if}
             <li><a data-sveltekit-reload href="/articles">News Feed</a></li>
           {#if user.loggedIn}
@@ -79,9 +79,8 @@
               <a href="/notes">The Social Notebook</a>
             </li>
           {/if}
-          <li><a href="/about">About</a></li>
           {#if user.loggedIn}
-            <li />
+            <div class="divider px-2 before:bg-white opacity-30 after:bg-white opacity-30" />
             {#if role === "admin"}
               <li>
                 <a href="/admin">Admin dashboard</a>

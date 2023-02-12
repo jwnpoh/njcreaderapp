@@ -15,6 +15,7 @@
   $: notes = data.notes;
   $: following = data.following;
   $: discover = data.discover;
+
   const API_URL = data.API_URL;
 
   const refresh = () => {
