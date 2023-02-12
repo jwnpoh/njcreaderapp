@@ -61,7 +61,9 @@
               <a href="/"> The NJC Reader </a>
             </div>
           </li>
-          <li class="md:hidden" />
+          <li class="md:hidden">
+            <div class="divider px-2 before:bg-white opacity-30 after:bg-white opacity-30" />
+            </li>
           {#if user.loggedIn}
             <li>
               <div
