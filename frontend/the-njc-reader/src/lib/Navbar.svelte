@@ -50,10 +50,7 @@
       </label>
       <div class={!showMenu ? "hidden" : ""}>
         <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-        <ul
-        tabindex="0"
-          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-primary-focus rounded-box w-64"
-        >
+        <ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-primary-focus rounded-box w-64" >
           <li>
             <div
               class="md:hidden py-1 text-xl font-medium  hover:cursor-default"
@@ -61,18 +58,17 @@
               <a href="/"> The NJC Reader </a>
             </div>
           </li>
-          <li class="md:hidden">
-            <div class="divider px-2 before:bg-white opacity-30 after:bg-white opacity-30" />
-            </li>
           {#if user.loggedIn}
             <li>
               <div
-                class="md:py-1 px-2 font-semibold text-lg  hover:cursor-default"
+                class="md:py-1 px-4 font-semibold text-lg  hover:cursor-default"
               >
                 {greeting}, {user.display_name}!
               </div>
             </li>
             <div class="divider px-2 before:bg-white opacity-30 after:bg-white opacity-30" />
+            {:else}
+            <div class="md:hidden divider px-2 before:bg-white opacity-30 after:bg-white opacity-30" />
           {/if}
             <li><a data-sveltekit-reload href="/articles">News Feed</a></li>
           {#if user.loggedIn}
