@@ -6,9 +6,6 @@
   export let data;
   export let form;
 
-  let queue = data.queue;
-  let len = queue.length;
-
   let url = form?.url ?? "";
   let title = form?.title ?? "";
   let tags = form?.tags ?? "";
@@ -39,7 +36,7 @@
     ><p class="align-middle">&#8678; Back to admin dashboard</p></a
   >
 </div>
-<form method="POST" action="?/queue">
+<form method="POST" action="?/send">
   <div class="flex pt-5 px-5">
     <div class="flex-auto basis-7/12">
       <div class="">
@@ -92,73 +89,15 @@
     <input name="must_read" type="checkbox" class="checkbox" />
   </div>
 
-  <button class="btn btn-sm btn-secondary mx-7">Add to queue</button>
+  <button class="btn btn-md btn-primary mx-6">Save article to database</button>
 </form>
-{#if form?.error}
-  <p class="mx-7 pt-7 text-primary">{form?.message}</p>
-{/if}
-
-
-<div class="mx-7 pt-5 grid gap-2 relative">
-  <div class="max-w-sm ">
-    <form method="POST" action="?/send">
-      <button class="btn btn-md btn-primary">Save queued articles to database</button>
-    </form>
-  </div>
   {#if form?.sent}
-    <div class="alert alert-success max-w-fit ">
-      <span>Articles added successfully.</span>
+    <div class="alert alert-success max-w-fit mx-6">
+      <span>Article added successfully.</span>
     </div>
   {/if}
-  {#if form?.failed}
-    <div class="alert alert-error max-w-fit  ">
+{#if form?.error}
+    <div class="alert alert-error max-w-fit mx-6">
       <span class="text-center">{form?.message}</span>
     </div>
-  {/if}
-
-<div class="divider py-5 font-bold">Queued articles ({len})</div>
-
-  {#each queue as item}
-    <form method="POST" action="?/remove">
-      <input type="hidden" name="index" value={item.index} />
-      <div
-        class="card bg-base-100 shadow-lg w-4/5 mx-auto"
-        class:bg-secondary={item.must_read}
-      >
-        <div class="card-body pb-5">
-          <h2 class="card-title">
-            <a href={item.url} rel="noreferrer" target="_blank">{item.title}</a>
-          </h2>
-          <p>{item.date}</p>
-          <div />
-          <div class="inline">
-            tags: {item.tags}
-          </div>
-        </div>
-        <button class="btn btn-x btn-xs btn-circle submit">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            /></svg
-          >
-        </button>
-      </div>
-    </form>
-  {/each}
-</div>
-
-<style>
-  .btn-x {
-    position: absolute;
-    top: 0%;
-    left: 0.1%;
-  }
-</style>
+{/if}
