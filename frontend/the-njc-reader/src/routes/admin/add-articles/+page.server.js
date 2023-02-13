@@ -1,8 +1,6 @@
 import "dotenv/config";
 import { invalid, redirect } from "@sveltejs/kit";
 
-let queue = [];
-
 export const load = ({ locals }) => {
   if (!locals.user.loggedIn) {
     throw redirect(302, "/login")
@@ -11,13 +9,13 @@ export const load = ({ locals }) => {
     throw redirect(302, "/profile")
   }
   return {
-    queue: queue,
     API_URL: `${process.env.API_URL}`
   }
 }
 
 export const actions = {
-  queue: async ({ request }) => {
+  send: async ({ cookies, request }) => {
+    let queue = [];
     const formData = await request.formData()
     const url = formData.get("url")
     const title = formData.get("title")
@@ -34,12 +32,10 @@ export const actions = {
         tags,
         date,
         must_read,
-        queue
       })
     }
 
     const input = {
-      index: Math.floor(Math.random() * 100) + 1,
       title: title,
       url: url,
       tags: tags,
@@ -47,24 +43,7 @@ export const actions = {
       must_read: must_read
     };
     queue.push(input);
-    return {
-      success: true,
-    }
-  },
-  remove: async ({ request }) => {
-    const formData = await request.formData()
-    const index = formData.get("index")
 
-    queue = queue.filter(input => input.index != index)
-    return {
-      success: true,
-    }
-  },
-  send: async ({ cookies }) => {
-    if (queue.length < 1) {
-      return invalid(400, { failed: true, message: "No articles queued. Add one or more articles before saving to the database." })
-
-    }
     const session = cookies.get("session")
 
     const myHeaders = new Headers();
@@ -81,10 +60,15 @@ export const actions = {
 
     const response = await res.json();
     if (response.error) {
-      return invalid(400, { failed: true, message: response.data })
-    }
-    if (!response.error) {
-      queue = [];
+      return invalid(400, { 
+        failed: true, 
+        message: response.data,
+        url,
+        title,
+        tags,
+        date,
+        must_read,
+     })
     }
     return {
       success: true,
