@@ -176,14 +176,16 @@ func (b *broker) InsertPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	toCheck := []string{input.TLDR, input.Examples, input.Notes, strings.Join(input.Tags, ",")}
-	for _, v := range toCheck {
-		profanityCheck := profanity.CheckProfanity(v)
-		if profanityCheck.IsProfane {
-			s := serializer.NewSerializer(true, fmt.Sprintf("Please use clean language on this platform.\nThe system auto-detected the use of the profanity: '%s'.\nIf this is a false positive, please report the false positive via the feedback form.", profanityCheck.Profanity), input.UserID)
-			s.Encode(w, http.StatusBadRequest)
-			b.Logger.Info(s, r)
-			return
+	if input.Public == "on" {
+		toCheck := []string{input.TLDR, input.Examples, input.Notes, strings.Join(input.Tags, ",")}
+		for _, v := range toCheck {
+			profanityCheck := profanity.CheckProfanity(v)
+			if profanityCheck.IsProfane {
+				s := serializer.NewSerializer(true, fmt.Sprintf("Please use clean language when posting publicly on this platform.\nThe system auto-detected the use of the profanity: '%s'.\nIf this is a false positive, please report the false positive to the system admin via your teacher.", profanityCheck.Profanity), input.UserID)
+				s.Encode(w, http.StatusBadRequest)
+				b.Logger.Info(s, r)
+				return
+			}
 		}
 	}
 
@@ -258,14 +260,16 @@ func (b *broker) UpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	toCheck := []string{input.Post.TLDR, input.Post.Examples, input.Post.Notes, strings.Join(input.Post.Tags, ",")}
-	for _, v := range toCheck {
-		profanityCheck := profanity.CheckProfanity(v)
-		if profanityCheck.IsProfane {
-			s := serializer.NewSerializer(true, fmt.Sprintf("Please use clean language on this platform.\nThe system auto-detected the use of the profanity: '%s'.\nIf this is a false positive, please report the false positive via the feedback form.", profanityCheck.Profanity), input.Post.UserID)
-			s.Encode(w, http.StatusBadRequest)
-			b.Logger.Info(s, r)
-			return
+	if input.Post.Public == "on" {
+		toCheck := []string{input.Post.TLDR, input.Post.Examples, input.Post.Notes, strings.Join(input.Post.Tags, ",")}
+		for _, v := range toCheck {
+			profanityCheck := profanity.CheckProfanity(v)
+			if profanityCheck.IsProfane {
+				s := serializer.NewSerializer(true, fmt.Sprintf("Please use clean language on this platform.\nThe system auto-detected the use of the profanity: '%s'.\nIf this is a false positive, please report the false positive via the feedback form.", profanityCheck.Profanity), input.Post.UserID)
+				s.Encode(w, http.StatusBadRequest)
+				b.Logger.Info(s, r)
+				return
+			}
 		}
 	}
 

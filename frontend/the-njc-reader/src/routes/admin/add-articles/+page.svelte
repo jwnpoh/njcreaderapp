@@ -11,12 +11,18 @@
   let tags = form?.tags ?? "";
   let date = new Date();
 
+
   const session = $page.data.user.session;
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", "Bearer " + session);
 
   const getTitle = async (url) => {
+  if (url === "") {
+    title = "";
+    return
+  }
+    form = {};
     const payload = { url: url };
     const res = await fetch(`${data.API_URL}/api/admin/articles/get-title`, {
       method: "POST",
