@@ -9,7 +9,7 @@
   import NotesContainer from "$lib/NotesContainer.svelte";
   import PageTitle from "$lib/PageTitle.svelte";
 
-  let active = "following";
+  let active = "notes";
 
   export let data;
   $: notes = data.notes;
@@ -25,6 +25,9 @@
 
 <Container>
   <PageTitle>The Social Notebook</PageTitle>
+  {#if active === "notes"}
+    <NotesContainer data={notes ?? ""} {API_URL} section={"My notes"} />
+  {/if}
   {#if active === "following"}
     <NotesContainer
       data={following ?? ""}
@@ -39,12 +42,13 @@
       section={"Notes from everyone"}
     />
   {/if}
-  {#if active === "notes"}
-    <NotesContainer data={notes ?? ""} {API_URL} section={"My notes"} />
-  {/if}
 </Container>
 
 <button class="btm-nav" on:click={refresh}>
+  <button class:active={active === "notes"} on:click={() => (active = "notes")}
+    ><Icon data={book} scale={1.6} />
+    <p class="text-xs md:text-sm">My Notes</p></button
+  >
   <button
     class:active={active === "following"}
     on:click={() => (active = "following")}
@@ -59,8 +63,4 @@
     <Icon data={globe} scale={1.6} />
     <p class="text-xs md:text-sm">Discover</p>
   </button>
-  <button class:active={active === "notes"} on:click={() => (active = "notes")}
-    ><Icon data={book} scale={1.6} />
-    <p class="text-xs md:text-sm">My Notes</p></button
-  >
 </button>
