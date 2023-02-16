@@ -33,11 +33,11 @@ func NewPostsDB(dsn string) (*PostsDB, error) {
 func (pDB *PostsDB) GetAllPublicPosts() (*core.Posts, error) {
 	posts := make(core.Posts, 0)
 
-	query := "SELECT * FROM posts WHERE public = true ORDER BY created_at DESC"
+	query := "SELECT * FROM notes WHERE public = true ORDER BY created_at DESC"
 
 	rows, err := pDB.DB.Queryx(query)
 	if err != nil {
-		return nil, fmt.Errorf("PScalePosts: unable to query posts table - %w", err)
+		return nil, fmt.Errorf("PScalePosts: unable to query notes table - %w", err)
 	}
 
 	for rows.Next() {
@@ -77,7 +77,7 @@ func (pDB *PostsDB) GetPosts(userIDs []int, public bool) (*core.Posts, error) {
 
 	rows, err := pDB.DB.Queryx(query)
 	if err != nil {
-		return nil, fmt.Errorf("PScalePosts: unable to query posts table - %w", err)
+		return nil, fmt.Errorf("PScalePosts: unable to query notes table - %w", err)
 	}
 
 	for rows.Next() {
@@ -105,7 +105,7 @@ func (pDB *PostsDB) GetPosts(userIDs []int, public bool) (*core.Posts, error) {
 }
 
 func (pDB *PostsDB) AddPost(post *core.Post) error {
-	query := "INSERT INTO posts (user_id, author, author_class, likes, tldr, examples, notes, tags, created_at, public, article_id, article_title, article_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	query := "INSERT IGNORE INTO notes (user_id, author, author_class, likes, tldr, examples, notes, tags, created_at, public, article_id, article_title, article_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 	tx, err := pDB.DB.Begin()
 	if err != nil {
@@ -129,7 +129,7 @@ func (pDB *PostsDB) AddPost(post *core.Post) error {
 func (pDB *PostsDB) GetPost(id int) (*core.Post, error) {
 	var post core.Post
 
-	query := "SELECT * FROM posts WHERE id = ?"
+	query := "SELECT * FROM notes WHERE id = ?"
 
 	row := pDB.DB.QueryRowx(query, id)
 
@@ -153,29 +153,29 @@ func (pDB *PostsDB) GetPost(id int) (*core.Post, error) {
 }
 
 func (pDB *PostsDB) DeletePost(postID int) error {
-	query := fmt.Sprintf("DELETE FROM posts WHERE id = %d", postID)
+	query := fmt.Sprintf("DELETE FROM notes WHERE id = %d", postID)
 
 	tx, err := pDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to begin tx for deleting posts from db - %w", err)
+		return fmt.Errorf("PScalePosts: unable to begin tx for deleting notes from db - %w", err)
 	}
 	defer tx.Rollback()
 
 	_, err = tx.Exec(query)
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to delete posts from db - %w", err)
+		return fmt.Errorf("PScalePosts: unable to delete notes from db - %w", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to commit tx to delete posts from db - %w", err)
+		return fmt.Errorf("PScalePosts: unable to commit tx to delete notes from db - %w", err)
 	}
 
 	return nil
 }
 
 func (pDB *PostsDB) UpdatePost(postID int, post *core.Post) error {
-	query := "UPDATE posts SET user_id = ?, author = ?, author_class = ?, likes = ?, tldr = ?, examples = ?, notes = ?, tags = ?, created_at = ?, public = ?, article_id = ?, article_title = ?, article_url = ? WHERE id = ?"
+	query := "UPDATE notes SET user_id = ?, author = ?, author_class = ?, likes = ?, tldr = ?, examples = ?, notes = ?, tags = ?, created_at = ?, public = ?, article_id = ?, article_title = ?, article_url = ? WHERE id = ?"
 
 	tx, err := pDB.DB.Begin()
 	if err != nil {
@@ -229,7 +229,7 @@ func (pDB *PostsDB) GetLikes(id int, userOrPost string) ([]int, error) {
 
 func parseQuery(userIDs []int) string {
 	if len(userIDs) == 1 {
-		return fmt.Sprintf("SELECT * FROM posts WHERE user_id = %d", userIDs[0])
+		return fmt.Sprintf("SELECT * FROM notes WHERE user_id = %d", userIDs[0])
 	}
 
 	params := strings.Builder{}
@@ -242,7 +242,7 @@ func parseQuery(userIDs []int) string {
 	}
 
 	query := strings.Builder{}
-	query.WriteString(fmt.Sprintf("SELECT * FROM posts WHERE user_id IN (%s)", params.String()))
+	query.WriteString(fmt.Sprintf("SELECT * FROM notes WHERE user_id IN (%s)", params.String()))
 
 	return query.String()
 }
