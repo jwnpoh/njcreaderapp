@@ -35,6 +35,7 @@ The NJC Reader is a full stack web app that is an evolution of the [NJC GP News 
 - [Svelte-Awesome](https://github.com/RobBrazier/svelte-awesome#more-advanced-cases)
 - [Date Picker Svelte](https://github.com/probablykasper/date-picker-svelte)
 - [Day.js](https://github.com/iamkun/dayjs/)
+- [Papa Parse](https://www.papaparse.com/)
 - [dotenv](https://github.com/motdotla/dotenv)
 
 ### Progress tracking
