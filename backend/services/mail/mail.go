@@ -56,3 +56,21 @@ func (m *MailService) ResetPassword(user *core.User, newRandPassword string) (se
 
 	return serializer.NewSerializer(false, "successfully reset password. please check your email for the new temporary password", nil), nil
 }
+
+func (m *MailService) AdminConfirmation(adminEmail, message string) (serializer.Serializer, error) {
+	client, err := m.mailService.Connect()
+	if err != nil {
+		return serializer.NewSerializer(true, "unable to initialize email client to notify user", nil), err
+	}
+
+	email := mail.NewMSG()
+	email.SetFrom(m.mailService.Username).AddTo(adminEmail).SetReplyTo(m.mailService.Username).SetSubject("Admin changes confirmation")
+	email.SetBody(mail.TextPlain, message)
+
+	err = email.Send(client)
+	if err != nil {
+		return serializer.NewSerializer(true, "unable to send admin confirmation email to admin", nil), err
+	}
+
+	return serializer.NewSerializer(false, "successfully notified admin", nil), nil
+}

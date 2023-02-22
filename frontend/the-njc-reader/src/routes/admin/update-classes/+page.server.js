@@ -29,7 +29,7 @@ export const actions = {
 
     let payload = parsed.data
 
-    const res = await fetch(`${process.env.API_URL}/api/admin/users/insert-users`, {
+    const res = await fetch(`${process.env.API_URL}/api/admin/users/update-classes`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: myHeaders,

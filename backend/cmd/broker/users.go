@@ -14,6 +14,22 @@ import (
 )
 
 func (b *broker) InsertUsers(w http.ResponseWriter, r *http.Request) {
+	token, err := b.Authenticator.AuthenticateToken(r)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to authenticate user", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	user, err := b.Users.GetUser("id", token.UserID)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to get user", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
 	input := make([]core.User, 0)
 
 	s := serializer.NewSerializer(false, "", nil)
@@ -27,17 +43,92 @@ func (b *broker) InsertUsers(w http.ResponseWriter, r *http.Request) {
 		users = append(users, v)
 	}
 
-	err := b.Users.InsertUsers(&users)
+	if len(users) > 0 {
+		s = serializer.NewSerializer(false, "successfully sent list of new users to backend. a confirmation email will be sent shortly after the insertion is completed.", nil)
+		s.Encode(w, http.StatusAccepted)
+	}
+
+	err = b.Users.InsertUsers(&users)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to add new users", err)
+		// s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		s, err = b.Mailer.AdminConfirmation(user.Email, "Unable to add new users to database.")
+		if err != nil {
+			s := serializer.NewSerializer(true, "unable to send email confirmation to notify error in inserting new users", err)
+			s.ErrorJson(w, err)
+			b.Logger.Error(s, r)
+			fmt.Println(err)
+			return
+		}
+		return
+	}
+
+	// TODO: format table to display list of users added.
+
+	s, err = b.Mailer.AdminConfirmation(user.Email, "Successfully inserted new users.")
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to send email confirmation to confirm new users insertion", err)
 		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		fmt.Println(err)
 		return
 	}
+}
 
-	s = serializer.NewSerializer(false, "successfully added new users", nil)
-	s.Encode(w, http.StatusAccepted)
+func (b *broker) UpdateClasses(w http.ResponseWriter, r *http.Request) {
+	token, err := b.Authenticator.AuthenticateToken(r)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to authenticate user", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	user, err := b.Users.GetUser("id", token.UserID)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to get user", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
+	input := make([]core.User, 0)
+
+	s := serializer.NewSerializer(false, "", nil)
+	s.Decode(w, r, &input)
+
+	if len(input) > 0 {
+		s = serializer.NewSerializer(false, "successfully sent data to backend. a confirmation email will be sent shortly after the update is completed.", nil)
+		s.Encode(w, http.StatusAccepted)
+	}
+
+	err = b.Users.UpdateClasses(&input)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to update classes", err)
+		// s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		s, err = b.Mailer.AdminConfirmation(user.Email, "Unable to update classes in database.")
+		if err != nil {
+			s := serializer.NewSerializer(true, "unable to send email confirmation to notify error in updating classes", err)
+			s.ErrorJson(w, err)
+			b.Logger.Error(s, r)
+			fmt.Println(err)
+			return
+		}
+		return
+	}
+
+	// TODO: format table to display list of users added.
+
+	s, err = b.Mailer.AdminConfirmation(user.Email, "Successfully updated classes.")
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to send email confirmation to confirm class update", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		fmt.Println(err)
+		return
+	}
 }
 
 func (b *broker) GetUser(w http.ResponseWriter, r *http.Request) {

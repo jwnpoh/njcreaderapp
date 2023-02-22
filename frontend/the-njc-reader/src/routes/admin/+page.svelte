@@ -56,7 +56,7 @@
             ><a href="/admin/add-users">Add users</a></button
           >
           <button class="btn btn-link text-xl"
-            ><a href="/admin/delete-users">Delete users</a></button
+            ><a href="/admin/update-classes">Update classes</a></button
           >
         </div>
       </div>

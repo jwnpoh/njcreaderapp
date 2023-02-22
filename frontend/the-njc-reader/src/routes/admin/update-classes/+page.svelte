@@ -3,14 +3,14 @@
   export let form;
 </script>
 
-<PageTitle>Add users</PageTitle>
+<PageTitle>Update classes</PageTitle>
 <div class="px-5 pt-5 ">
   <a href="/admin" class="btn-link"
     ><p class="align-middle">&#8678; Back to admin dashboard</p></a
   >
 </div>
 <div class="pt-4 px-10">
-  <h2 class="text-lg font-semibold">Add users</h2>
+  <h2 class="text-lg font-semibold">Update classes</h2>
   <div class="py-5">
     <p class=" text-md  text-justify opacity-90">
       Upload the CSV template. 

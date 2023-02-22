@@ -63,6 +63,7 @@ func (b *broker) serveRoutes(mux chi.Router) {
 		mux.Use(b.Auth)
 		mux.Post("/insert-users", b.InsertUsers)
 		mux.Post("/delete-user", b.DeleteUser)
+		mux.Post("/update-classes", b.UpdateClasses)
 	})
 
 	mux.Route("/api/admin/articles", func(mux chi.Router) {

@@ -12,6 +12,7 @@ type UsersDB interface {
 	GetUser(field string, value any) (*core.User, error)
 	DeleteUser(id int) error
 	UpdateUser(*core.User) error
+	UpdateClasses(*[]core.User) error
 }
 
 type UserManager struct {
@@ -62,6 +63,15 @@ func (um *UserManager) UpdateUser(newUser *core.User) error {
 	err = um.db.UpdateUser(newUser)
 	if err != nil {
 		return fmt.Errorf("userManager: unable to update user %d - %w", newUser.ID, err)
+	}
+
+	return nil
+}
+
+func (um *UserManager) UpdateClasses(users *[]core.User) error {
+	err := um.db.UpdateClasses(users)
+	if err != nil {
+		return fmt.Errorf("userManager: unable to insert new user - %w", err)
 	}
 
 	return nil

@@ -104,6 +104,37 @@ func (uDB *UsersDB) UpdateUser(newUser *core.User) error {
 	return nil
 }
 
+func (uDB *UsersDB) UpdateClasses(users *[]core.User) error {
+	query := "UPDATE users SET class = ? WHERE display_name = ?"
+
+	tx, err := uDB.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("PScaleUsers: unable to begin tx for adding articles input to db - %w", err)
+	}
+	defer tx.Rollback()
+
+	for i, user := range *users {
+		_, err = tx.Exec(query, user.Class, user.DisplayName)
+		if err != nil {
+			return fmt.Errorf("PScaleUsers: unable to add user %s to db - %w", user.Email, err)
+		}
+
+		if i >= 0 && i%200 == 0 || i == len(*users)-1 {
+			err = tx.Commit()
+			if err != nil {
+				return fmt.Errorf("PScaleUsers: unable to commit tx to db - %w", err)
+			}
+			tx, err = uDB.DB.Begin()
+			if err != nil {
+				return fmt.Errorf("PScaleUsers: unable to begin tx for adding articles input to db - %w", err)
+			}
+			defer tx.Rollback()
+		}
+	}
+
+	return nil
+}
+
 func (uDB *UsersDB) DeleteUser(id int) error {
 	query := "DELETE FROM users WHERE id = ?"
 
