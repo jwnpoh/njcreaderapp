@@ -2,7 +2,7 @@
   import { page } from "$app/stores";
   import { onDestroy } from "svelte";
   import Note from "$lib/Note.svelte";
-  import SearchStore  from "$lib/stores/notesSearch"
+  import SearchStore from "$lib/stores/notesSearch";
 
   import Icon from "svelte-awesome";
   import close from "svelte-awesome/icons/close";
@@ -16,40 +16,44 @@
 
   let searchTerm = "";
 
-  const unsubscribe = SearchStore.subscribe(term => {
+  const unsubscribe = SearchStore.subscribe((term) => {
     searchTerm = term;
     console.log(searchTerm);
   });
 
   const updateSearch = (query) => {
     SearchStore.set(query);
-  } 
+  };
 
   const removeSearchTerm = () => {
     SearchStore.set("");
-  }
+  };
 
   onDestroy(() => {
     unsubscribe();
-  })
+  });
 </script>
 
 <h2 class="py-2 text-lg font-semibold italic text-center">
   {section ? section : ""}
 </h2>
-      <div class="form-control relative mx-auto w-fit px-3 text-black">
-        <input
-          type="text"
-          placeholder="Search notes"
-          class="input input-bordered "
-          name="query"
-          bind:value={searchTerm}
-          on:input={updateSearch(searchTerm)}
-        />
-        {#if searchTerm !== ""}
-        <button class="absolute top-3 right-6" on:click={removeSearchTerm}><Icon data={close} scale={1.2} style="padding-left: 3px;" /></button>
-        {/if}
-      </div>
+{#if section}
+  <div class="form-control relative mx-auto w-fit px-3 text-black">
+    <input
+      type="text"
+      placeholder="Search notes"
+      class="input input-bordered "
+      name="query"
+      bind:value={searchTerm}
+      on:input={updateSearch(searchTerm)}
+    />
+    {#if searchTerm !== ""}
+      <button class="absolute top-3 right-6" on:click={removeSearchTerm}
+        ><Icon data={close} scale={1.2} style="padding-left: 3px;" /></button
+      >
+    {/if}
+  </div>
+{/if}
 <div class="px-5 md:px-10 py-5 grid gap-5 mb-20">
   {#if notes}
     {#each notes as note}
@@ -71,14 +75,12 @@
             <Note {note} {API_URL} />
           {/if}
         {/if}
+      {:else if section !== "My notes"}
+        {#if note.user_id !== user_id}
+          <Note {note} {API_URL} />
+        {/if}
       {:else}
-          {#if section !== "My notes"}
-            {#if note.user_id !== user_id}
-              <Note {note} {API_URL} />
-            {/if}
-          {:else}
-            <Note {note} {API_URL} />
-          {/if}
+        <Note {note} {API_URL} />
       {/if}
     {/each}
   {:else if message}
