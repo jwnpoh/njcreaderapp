@@ -1,32 +1,22 @@
 import { invalid, redirect } from "@sveltejs/kit"
 import "dotenv/config"
 
-let data;
+let data = "";
 
-export const load = async ({ locals }) => {
+export const load = async ({ url, locals, cookies }) => {
+  let articleID = url.searchParams.get('articleID')
+  let returnURL = `/notes/add-note?articleID=${articleID}`
+
   if (!locals.user.loggedIn) {
-    throw redirect(302, "/login")
+    throw redirect(302, `/login?redirect=${returnURL}`)
   }
 
-  return {
-    data: data
-  }
-}
-
-export const actions = {
-  newnote: async ({ request, locals, cookies }) => {
-    if (!locals.user.loggedIn) {
-      throw redirect(302, "/login")
-    }
-
+  if (articleID) {
     const session = cookies.get("session")
 
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer " + session);
-
-    const formData = await request.formData()
-    const articleID = await formData.get("article_id")
 
     const queryURL = `${process.env.API_URL}/api/posts/get-article?id=${articleID}`;
     const res = await fetch(queryURL, {
@@ -37,7 +27,14 @@ export const actions = {
     const response = await res.json();
 
     data = response.data;
-  },
+  }
+
+  return {
+    data
+  }
+}
+
+export const actions = {
   add: async ({ request, cookies, locals }) => {
     const formData = await request.formData()
     const articleID = formData.get("article_id")

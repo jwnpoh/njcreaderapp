@@ -21,12 +21,12 @@
   <div class="card bg-base-100 box-shadow ">
     {#if loggedIn}
       <div class="bookmark bg-base-100">
-        <form method="POST" action="/notes/add-note?/newnote">
           <input name="article_id" type="hidden" hidden value={id} />
+          <a href="/notes/add-note?articleID={id}" >
           <button>
             <Icon data={bookmark} scale={2} class="bookmark text-primary" />
           </button>
-        </form>
+          </a>
       </div>
     {/if}
     <div class="card-body pb-5">
