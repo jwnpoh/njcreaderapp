@@ -1,8 +1,11 @@
 import { invalid, redirect } from '@sveltejs/kit';
 import "dotenv/config"
 
-export const load = async () => {
+export const load = async ({ url }) => {
+  const returnURL = url.searchParams.get('redirect')
+
   return {
+    returnURL
   }
 }
 
@@ -11,6 +14,7 @@ export const actions = {
     const formData = await request.formData()
     const email = formData.get('email')
     const password = formData.get('password')
+    const returnURL = formData.get('returnURL')
 
     if (
       typeof email != "string" ||
@@ -42,7 +46,11 @@ export const actions = {
       secure: process.env.NODE_ENV == "production",
     })
 
-    throw redirect(302, "/articles")
+    if (returnURL) {
+      throw redirect(302, `${returnURL}`)
+    } else {
+      throw redirect(302, "/articles")
+    }
   }
 }
 

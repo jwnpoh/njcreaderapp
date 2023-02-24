@@ -3,6 +3,9 @@
   import userCircle from "svelte-awesome/icons/userCircle";
   import ellipsisH from "svelte-awesome/icons/ellipsisH";
 
+  export let data;
+  const returnURL = data.returnURL;
+
   export let form;
 </script>
 
@@ -40,6 +43,7 @@
       </label>
     </div>
     <br />
+    <input type="hidden" name="returnURL" value={returnURL} hidden>
     <button class="btn btn-md bg-primary mx-3">Log in</button>
   </form>
 
