@@ -30,18 +30,13 @@ func NewAuthenticator(authDB AuthDB) *Authenticator {
 }
 
 func (auth *Authenticator) CreateToken(userID int, timeToLife time.Duration) (*core.Token, error) {
-	err := auth.db.ClearTokens(userID)
-	if err != nil {
-		return nil, err
-	}
-
 	token := &core.Token{
 		UserID: userID,
 		Expiry: time.Now().Add(timeToLife),
 	}
 
 	randomBytes := make([]byte, 16)
-	_, err = rand.Read(randomBytes)
+	_, err := rand.Read(randomBytes)
 	if err != nil {
 		return nil, err
 	}
