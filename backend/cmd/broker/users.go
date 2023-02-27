@@ -169,7 +169,7 @@ func (b *broker) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	profanityCheck := profanity.CheckProfanity(userInput.DisplayName)
 	if profanityCheck.IsProfane {
-		s := serializer.NewSerializer(true, fmt.Sprintf("Please use clean language on this platform.\nThe system auto-detected the use of the profanity: '%s'.\nIf you think this is a mistake, please report the false positive via the feedback form.", profanityCheck.Profanity), userInput.UserID)
+		s := serializer.NewSerializer(true, "Please use clean language on this platform.\nThe system auto-detected the use of profanity in your entry.\nIf you think this is a mistake, please submit a request with a screenshot of your entry via your tutor.", userInput.UserID)
 		s.Encode(w, http.StatusBadRequest)
 		b.Logger.Info(s, r)
 		return

@@ -1,7 +1,6 @@
 package broker
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -181,7 +180,7 @@ func (b *broker) InsertPost(w http.ResponseWriter, r *http.Request) {
 		for _, v := range toCheck {
 			profanityCheck := profanity.CheckProfanity(v)
 			if profanityCheck.IsProfane {
-				s := serializer.NewSerializer(true, fmt.Sprintf("Please use clean language when posting publicly on this platform.\nThe system auto-detected the use of the profanity: '%s'.\nIf this is a false positive, please report the false positive to the system admin via your teacher.", profanityCheck.Profanity), input.UserID)
+				s := serializer.NewSerializer(true, "Please use clean language when posting publicly on this platform.\nThe system auto-detected the use of profanity.\nIf you think this is a false positive, please provide a screenshot of your entry and report the false positive via your teacher.", input.UserID)
 				s.Encode(w, http.StatusBadRequest)
 				b.Logger.Info(s, r)
 				return
@@ -265,7 +264,7 @@ func (b *broker) UpdatePost(w http.ResponseWriter, r *http.Request) {
 		for _, v := range toCheck {
 			profanityCheck := profanity.CheckProfanity(v)
 			if profanityCheck.IsProfane {
-				s := serializer.NewSerializer(true, fmt.Sprintf("Please use clean language on this platform.\nThe system auto-detected the use of the profanity: '%s'.\nIf this is a false positive, please report the false positive via the feedback form.", profanityCheck.Profanity), input.Post.UserID)
+				s := serializer.NewSerializer(true, "Please use clean language on this platform.\nThe system auto-detected the use of profanity.\nIf you think this is a false positive, please provide a screenshot nd report the false positive via your teacher.", input.Post.UserID)
 				s.Encode(w, http.StatusBadRequest)
 				b.Logger.Info(s, r)
 				return
