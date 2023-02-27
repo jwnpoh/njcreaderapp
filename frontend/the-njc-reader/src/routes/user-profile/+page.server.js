@@ -21,8 +21,10 @@ export const actions = {
     const display_name = formData.get("display_name")
     const userID = locals.user.id
 
-    if (new_password !== confirm) {
-      return invalid(400, { failed: true, message: "New password and confirm password need to match." })
+    if (confirm) {
+      if (new_password !== confirm) {
+        return invalid(400, { failed: true, message: "New password and confirm password need to match." })
+      }
     }
 
     const session = cookies.get("session")

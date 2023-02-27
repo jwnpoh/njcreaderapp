@@ -22,7 +22,7 @@ func (b *broker) Authenticate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s := serializer.NewSerializer(true, "invalid credentials", err)
 		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
+		// b.Logger.Error(s, r)
 		return
 	}
 
@@ -30,7 +30,7 @@ func (b *broker) Authenticate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s := serializer.NewSerializer(true, "invalid credentials", err)
 		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
+		// b.Logger.Error(s, r)
 		return
 	}
 
