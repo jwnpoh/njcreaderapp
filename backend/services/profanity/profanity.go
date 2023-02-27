@@ -11,9 +11,11 @@ type ProfanityCheck struct {
 }
 
 func CheckProfanity(input string) ProfanityCheck {
+	profanityDetector := goaway.NewProfanityDetector().WithSanitizeSpaces(false)
+
 	return ProfanityCheck{
 		Input:     input,
-		IsProfane: goaway.IsProfane(input),
-		Profanity: goaway.ExtractProfanity(input),
+		IsProfane: profanityDetector.IsProfane(input),
+		Profanity: profanityDetector.ExtractProfanity(input),
 	}
 }
