@@ -39,7 +39,7 @@
           bind:value={userName}
           on:input={saveChanges}
         />
-        <h2 class="pt-10 text-md font-semibold">Change password?</h2>
+        <h2 class="pt-6 text-md font-semibold">Change password?</h2>
         <input
           name="new_password"
           type="password"
@@ -49,14 +49,18 @@
           on:input={saveChanges}
         />
         {#if save}
-          <h2 class="pt-3 text-md font-semibold">Confirm new password</h2>
-          <input
-            name="confirm"
-            type="password"
-            placeholder="Confirm new password"
-            class="input w-full max-w-md text-center bg-neutral bg-opacity-5"
-          />
-          <h2 class="pt-3 text-md font-extrabold">Current password</h2>
+          {#if newPassword}
+            <h2 class="pt-3 text-md font-semibold">Confirm new password</h2>
+            <input
+              name="confirm"
+              type="password"
+              placeholder="Confirm new password"
+              class="input w-full max-w-md text-center bg-neutral bg-opacity-5"
+            />
+          {/if}
+          <h2 class="pt-6 text-md font-extrabold">
+            Enter current password to confirm changes.
+          </h2>
           <input
             required
             name="old_password"
