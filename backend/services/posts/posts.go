@@ -168,7 +168,7 @@ func (pDB *Posts) GetPost(postID int) (serializer.Serializer, error) {
 	// get from Planetscale
 	post, err := pDB.db.GetPost(postID)
 	if err != nil {
-		return nil, fmt.Errorf("unable to delete note with id %d - %w", postID, err)
+		return nil, fmt.Errorf("unable to get note with id %d - %w", postID, err)
 	}
 
 	return serializer.NewSerializer(false, "got note", post), nil

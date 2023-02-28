@@ -111,12 +111,12 @@ func (sDB *SocialsDB) UnFollow(userID, toUnFollow int) error {
 	query := "DELETE FROM follows WHERE user_id = ? AND follows = ?"
 	_, err = tx.Exec(query, userID, toUnFollow)
 	if err != nil {
-		return fmt.Errorf("PScaleSocials: unable to add like to posts table in db - %w", err)
+		return fmt.Errorf("PScaleSocials: unable to delete from follows table in db - %w", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("PScaleSocials: unable to commit tx to add like to db - %w", err)
+		return fmt.Errorf("PScaleSocials: unable to commit tx to delete from follows table in db - %w", err)
 	}
 
 	return nil
@@ -129,10 +129,10 @@ func (sDB *SocialsDB) Like(userID, postID int) error {
 	}
 	defer tx.Rollback()
 
-	queryOnPosts := "UPDATE posts SET likes = likes + 1 WHERE id = ?"
+	queryOnPosts := "UPDATE notes SET likes = likes + 1 WHERE id = ?"
 	_, err = tx.Exec(queryOnPosts, postID)
 	if err != nil {
-		return fmt.Errorf("PScaleSocials: unable to add like to posts table in db - %w", err)
+		return fmt.Errorf("PScaleSocials: unable to add like to notes table in db - %w", err)
 	}
 
 	queryOnLikes := "INSERT INTO likes_list (post_id, liked_by) VALUES (?, ?)"
@@ -156,10 +156,10 @@ func (sDB *SocialsDB) Unlike(userID, postID int) error {
 	}
 	defer tx.Rollback()
 
-	queryOnPosts := "UPDATE posts SET likes = likes - 1 WHERE id = ?"
+	queryOnPosts := "UPDATE notes SET likes = likes - 1 WHERE id = ?"
 	_, err = tx.Exec(queryOnPosts, postID)
 	if err != nil {
-		return fmt.Errorf("PScaleSocials: unable to add like to posts table in db - %w", err)
+		return fmt.Errorf("PScaleSocials: unable to add like to notes table in db - %w", err)
 	}
 
 	queryOnLikes := "DELETE FROM likes_list WHERE post_id = ? AND liked_by = ?"
