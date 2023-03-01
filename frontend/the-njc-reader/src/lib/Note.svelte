@@ -90,7 +90,7 @@
           </div>
           <div class="py-2">
             <h3 class="font-semibold">TL;DR</h3>
-            {note.tldr}
+            <p class="whitespace-pre-wrap">{note.tldr}</p>
           </div>
           <div class="inline">
             {#if note.tags[0] !== ""}
@@ -174,11 +174,11 @@
         <div class="collapse-content">
           <div class="py-1">
             <h3 class="italic font-semibold">Examples from article</h3>
-            <div class="whitespace-pre-line">{note.examples}</div>
+            <p class="whitespace-pre-wrap">{note.examples}</p>
           </div>
           <div class="py-2">
             <h3 class="italic font-semibold">Further reflection</h3>
-            {note.notes ?? "Nil"}
+            <p class="whitespace-pre-wrap">{note.notes ?? "Nil"}</p>
           </div>
         </div>
       </div>
