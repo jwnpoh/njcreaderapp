@@ -127,7 +127,7 @@
                 {:else}
                   {note_likes[note.id]}
                 {/if}
-                {note_likes[note.id] > 1 ? "likes" : "like"} received
+                {note_likes[note.id] === 1 ? "like" : "likes"} received
               </p>
               <form method="POST" action="/notes/edit-note?/edit">
                 <input name="note_id" type="hidden" hidden value={note.id} />
