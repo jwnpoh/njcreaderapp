@@ -136,7 +136,6 @@
           </p>
           <textarea
             required
-            maxlength="160"
             name="examples"
             type="text"
             placeholder="Interesting or useful examples..."

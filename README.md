@@ -15,7 +15,7 @@ The NJC Reader is a full stack web app that is an evolution of the [NJC GP News 
 - Personal notebook and social notes feed to check out public notes shared by other students
 
 #### Teacher/admin
-- Adding and deleting articles can now be performed on multiple articles at a go
+- Deleting articles can now be performed on multiple articles at a go
 - User management (to be implemented)
 - Monitoring of teaching classes (to be implemented)
 
