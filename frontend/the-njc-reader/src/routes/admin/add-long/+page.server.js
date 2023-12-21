@@ -2,15 +2,23 @@ import "dotenv/config";
 import { invalid, redirect } from "@sveltejs/kit";
 
 
-export const load = ({ locals }) => {
+export async function load({ fetch, locals }) {
   if (!locals.user.loggedIn) {
     throw redirect(302, "/login")
   }
   if (locals.user.role != "admin") {
     throw redirect(302, "/profile")
   }
+
+  const queryURL = `${process.env.API_URL}/api/long`;
+  const res = await fetch(queryURL);
+  const data = await res.json();
+
+  const topics = data.data;
+
   return {
-    API_URL: `${process.env.API_URL}`
+    API_URL: `${process.env.API_URL}`,
+    topics: topics
   }
 }
 

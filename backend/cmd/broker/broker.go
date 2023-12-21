@@ -16,6 +16,7 @@ import (
 	"github.com/jwnpoh/njcreaderapp/backend/services/mail"
 	"github.com/jwnpoh/njcreaderapp/backend/services/posts"
 	"github.com/jwnpoh/njcreaderapp/backend/services/socials"
+	"github.com/jwnpoh/njcreaderapp/backend/services/stats"
 	"github.com/jwnpoh/njcreaderapp/backend/services/users"
 )
 
@@ -33,6 +34,7 @@ type broker struct {
 	Users         *users.UserManager
 	Posts         *posts.Posts
 	Socials       *socials.Socials
+	Stats         *stats.Stats
 	Mailer        *mail.MailService
 }
 
@@ -73,6 +75,11 @@ func NewBrokerService(config config.Config) BrokerService {
 		log.Fatal(err)
 	}
 
+	statsDB, err := pscale.NewStatsDB(config.DSN)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	mailService := mail.NewMailService(config.MailServiceConfig)
 
 	broker := broker{
@@ -84,6 +91,7 @@ func NewBrokerService(config config.Config) BrokerService {
 		Users:         users.NewUserManager(usersDB),
 		Posts:         posts.NewPostsDB(postsDB, articlesDB, socialsDB, usersDB),
 		Socials:       socials.NewSocialsDB(socialsDB, usersDB),
+		Stats:         stats.NewStatsService(statsDB),
 		Mailer:        mailService,
 	}
 

@@ -1,6 +1,8 @@
 <script>
   import PageTitle from "$lib/PageTitle.svelte";
   export let form;
+  export let data;
+  $: topics = data.topics;
 </script>
 
 <PageTitle>Add long articles</PageTitle>
@@ -41,3 +43,14 @@ https://example2.com/article2; topic 2"
     {/if}
   </div>
 </form>
+
+<br/>
+
+<details class="dropdown mt-0">
+  <summary class="collapse-title text-lg px-5">Show existing topics</summary>
+  <ul class="mx-5 py-2 text-md shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-60">
+  {#each topics as topic}
+    <li class="px-5">{topic}</li>
+  {/each}
+  </ul>
+</details>

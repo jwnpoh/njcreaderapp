@@ -47,6 +47,7 @@ func (a *Articles) Get(page, limit int) (serializer.Serializer, error) {
 	return serializer.NewSerializer(false, fmt.Sprintf("got articles from page %d", page), articles), nil
 }
 
+// GetArticle retrieves a particular article from PlanetScale given an id.
 func (a *Articles) GetArticle(id int) (serializer.Serializer, error) {
 	article, err := a.db.GetArticle(id)
 	if err != nil {
@@ -90,6 +91,7 @@ func (a *Articles) Store(input core.ArticlePayload) error {
 	return nil
 }
 
+// Update parses the update info and sends the data to PlanetScale.
 func (a *Articles) Update(input core.ArticlePayload) error {
 	data, err := a.parseNewArticles(input)
 	if err != nil {
@@ -105,6 +107,7 @@ func (a *Articles) Update(input core.ArticlePayload) error {
 	return nil
 }
 
+// Delete takes a slice of id strings and sends to PlanetScale to delete rows by id.
 func (a *Articles) Delete(input []string) error {
 	ids := strings.Join(input, ", ")
 
@@ -115,6 +118,17 @@ func (a *Articles) Delete(input []string) error {
 	}
 	return nil
 }
+
+// // Stats gets a bunch of predefined statistics on the articles database.
+// func (a *Articles) GetStats() (serializer.Serializer, error) {
+// 	// get articles from db
+// 	articleStats, err := a.db.GetStats()
+// 	if err != nil {
+// 		return nil, fmt.Errorf("unable to get articles from db - %w", err)
+// 	}
+
+// 	return serializer.NewSerializer(false, fmt.Sprintf("got articles from page %d", page), articles), nil
+// }
 
 func checkQuery(q string) string {
 	q, _ = formatQuestionString(q)

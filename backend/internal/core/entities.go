@@ -49,6 +49,21 @@ type Question struct {
 	Wording string
 }
 
+type KV struct {
+	K string
+	V int
+}
+
+type Stats struct {
+	NumberofArticles         int  `json:"number_of_articles"`
+	TopicsWithMostArticles   []KV `json:"topics_with_most_articles"`
+	TopicsWithFewestArticles []KV `json:"topics_with_fewest_articles"`
+
+	QuestionsWithMostArticles []KV `json:"questions_with_most_articles"`
+
+	QuestionsWthFewestArticles []KV `json:"questions_with_fewest_articles"`
+}
+
 type Post struct {
 	ID           int      `json:"id,omitempty"`
 	UserID       int      `json:"user_id"`

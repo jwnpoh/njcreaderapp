@@ -66,6 +66,11 @@ func (b *broker) serveRoutes(mux chi.Router) {
 		mux.Post("/update-classes", b.UpdateClasses)
 	})
 
+	mux.Route("/api/admin/stats", func(mux chi.Router) {
+		mux.Use(b.Auth)
+		mux.Get("/get-stats", b.GetStats)
+	})
+
 	mux.Route("/api/admin/articles", func(mux chi.Router) {
 		mux.Use(b.Auth)
 		mux.Post("/insert", b.Store)
