@@ -27,7 +27,7 @@ func NewUsersDB(dsn string) (*UsersDB, error) {
 }
 
 func (uDB *UsersDB) InsertUsers(users *[]core.User) error {
-	query := "INSERT INTO users (email, hash, role, last_login, display_name, class) VALUES (?, ?, ?, ?, ?, ?)"
+	query := "INSERT INTO users (email, hash, role, last_login, display_name, class) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE class = ?"
 
 	tx, err := uDB.DB.Begin()
 	if err != nil {
@@ -36,7 +36,7 @@ func (uDB *UsersDB) InsertUsers(users *[]core.User) error {
 	defer tx.Rollback()
 
 	for i, user := range *users {
-		_, err = tx.Exec(query, user.Email, user.Hash, user.Role, user.LastLogin, user.DisplayName, user.Class)
+		_, err = tx.Exec(query, user.Email, user.Hash, user.Role, user.LastLogin, user.DisplayName, user.Class, user.Class)
 		if err != nil {
 			return fmt.Errorf("PScaleUsers: unable to add user %s to db - %w", user.Email, err)
 		}
@@ -52,6 +52,10 @@ func (uDB *UsersDB) InsertUsers(users *[]core.User) error {
 			}
 			defer tx.Rollback()
 		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("PScaleUsers: unable to commit tx to db - %w", err)
 	}
 
 	return nil

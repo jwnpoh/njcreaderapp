@@ -28,6 +28,7 @@ export const actions = {
     myHeaders.append("Authorization", "Bearer " + session);
 
     let payload = parsed.data
+    console.log(payload)
 
     const res = await fetch(`${process.env.API_URL}/api/admin/users/insert-users`, {
       method: "POST",
