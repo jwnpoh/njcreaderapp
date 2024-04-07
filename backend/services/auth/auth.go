@@ -4,12 +4,12 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base32"
-	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 )
 
@@ -29,7 +29,7 @@ func NewAuthenticator(authDB AuthDB) *Authenticator {
 	return &Authenticator{authDB}
 }
 
-func (auth *Authenticator) CreateToken(userID int, timeToLife time.Duration) (*core.Token, error) {
+func (auth *Authenticator) CreateToken(userID uuid.UUID, timeToLife time.Duration) (*core.Token, error) {
 	token := &core.Token{
 		UserID: userID,
 		Expiry: time.Now().Add(timeToLife),
@@ -44,8 +44,8 @@ func (auth *Authenticator) CreateToken(userID int, timeToLife time.Duration) (*c
 	token.PlainToken = base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
 	hash := sha256.Sum256([]byte(token.PlainToken))
 	hashed := hash[:]
-	hashString := hex.EncodeToString(hashed)
-	token.Hash = hashString
+	// hashString := hex.EncodeToString(hashed)
+	token.Hash = hashed
 
 	err = auth.db.InsertToken(token)
 	if err != nil {
@@ -86,9 +86,9 @@ func (auth *Authenticator) AuthenticateToken(r *http.Request) (*core.Token, erro
 		return nil, fmt.Errorf("no authorization header received")
 	}
 
-	token := headerParts[1]
+	tokenString := headerParts[1]
 
-	tok, err := auth.checkToken(token)
+	tok, err := auth.checkToken(tokenString)
 	if err != nil {
 		return nil, err
 	}

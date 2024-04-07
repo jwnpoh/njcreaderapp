@@ -2,15 +2,15 @@ package broker
 
 import (
 	"net/http"
-	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
 )
 
 func (b *broker) GetFriends(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("user")
 
-	userID, err := strconv.Atoi(q)
+	userID, err := uuid.Parse(q)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to get parse user id from request", err)
 		s.ErrorJson(w, err)
@@ -35,9 +35,9 @@ func (b *broker) GetFriends(w http.ResponseWriter, r *http.Request) {
 
 func (b *broker) Follow(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		UserID   int  `json:"user_id"`
-		ToFollow int  `json:"to_follow"`
-		Follow   bool `json:"follow"`
+		UserID   uuid.UUID `json:"user_id"`
+		ToFollow uuid.UUID `json:"to_follow"`
+		Follow   bool      `json:"follow"`
 	}
 
 	s := serializer.NewSerializer(false, "", nil)
@@ -60,9 +60,9 @@ func (b *broker) Follow(w http.ResponseWriter, r *http.Request) {
 
 func (b *broker) Like(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		UserID int  `json:"user_id"`
-		PostID int  `json:"post_id"`
-		Like   bool `json:"like"`
+		UserID uuid.UUID `json:"user_id"`
+		PostID uuid.UUID `json:"post_id"`
+		Like   bool      `json:"like"`
 	}
 
 	s := serializer.NewSerializer(false, "", nil)

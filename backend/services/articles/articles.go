@@ -3,7 +3,6 @@ package articles
 import (
 	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
@@ -16,7 +15,7 @@ type ArticlesDB interface {
 	Find(terms string) (*core.ArticleSeries, error)
 	Store(data *core.ArticleSeries) error
 	Update(data *core.ArticleSeries) error
-	Delete(ids string) error
+	Delete(ids []string) error
 	GetQuestion(qnNo string) (string, error)
 }
 
@@ -76,17 +75,17 @@ func (a *Articles) Store(input core.ArticlePayload) error {
 		return fmt.Errorf("unable to parse articles input - %w", err)
 	}
 
-	// send to PlanetScale
+	// send to Cockroach DB
 	err = a.db.Store(&data)
 	if err != nil {
 		return fmt.Errorf("unable to store articles - %w", err)
 	}
 
 	// send to SheetsDB
-	err = a.sheets.Store(&data)
-	if err != nil {
-		return fmt.Errorf("unable to store articles in Sheets DB - %w", err)
-	}
+	// err = a.sheets.Store(&data)
+	// if err != nil {
+	// 	return fmt.Errorf("unable to store articles in Sheets DB - %w", err)
+	// }
 
 	return nil
 }
@@ -98,7 +97,7 @@ func (a *Articles) Update(input core.ArticlePayload) error {
 		return fmt.Errorf("unable to parse articles input - %w", err)
 	}
 
-	// send to PlanetScale
+	// send to Cockroach DB
 	err = a.db.Update(&data)
 	if err != nil {
 		return fmt.Errorf("unable to store articles - %w", err)
@@ -109,12 +108,10 @@ func (a *Articles) Update(input core.ArticlePayload) error {
 
 // Delete takes a slice of id strings and sends to PlanetScale to delete rows by id.
 func (a *Articles) Delete(input []string) error {
-	ids := strings.Join(input, ", ")
-
-	// send to Planetscale
-	err := a.db.Delete(ids)
+	// send to Cockroach DB
+	err := a.db.Delete(input)
 	if err != nil {
-		return fmt.Errorf("unable to delete articles with id %s - %w", ids, err)
+		return fmt.Errorf("unable to delete articles with id %s - %w", input, err)
 	}
 	return nil
 }
@@ -182,21 +179,12 @@ func (a *Articles) parseNewArticles(input core.ArticlePayload) (core.ArticleSeri
 			return nil, fmt.Errorf("unable to parse questions - %w", err)
 		}
 
-		var id int
-		if item.ID != "" {
-			id, err = strconv.Atoi(item.ID)
-			if err != nil {
-				return nil, fmt.Errorf("unable to id - %w", err)
-			}
-		}
-
 		var mustRead bool
 		if item.MustRead == "on" {
 			mustRead = true
 		}
 
 		article := core.Article{
-			ID:              id,
 			Title:           item.Title,
 			URL:             item.URL,
 			Topics:          topics,

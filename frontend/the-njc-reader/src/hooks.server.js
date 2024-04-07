@@ -16,6 +16,7 @@ export const handle = async ({ event, resolve }) => {
   }
 
   const user = await getUser(session)
+  console.log("user: ", user)
 
   if (!user.error) {
     const note_likes = await getDiscover(session)

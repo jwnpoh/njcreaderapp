@@ -42,9 +42,9 @@ func (b *broker) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.LastLogin = time.Now().Format("02 Jan 2006")
-	user.Hash = userInput.Password
+	// user.Hash = userInput.Password
 
-	b.Users.UpdateUser(user)
+	b.Users.UpdateUser(user, userInput.Password)
 
 	s = serializer.NewSerializer(false, fmt.Sprintf("successfully generated token for user %s", user.Email), token)
 	s.Encode(w, http.StatusAccepted)

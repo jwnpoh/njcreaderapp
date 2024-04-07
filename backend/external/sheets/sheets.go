@@ -68,7 +68,7 @@ func (sheetsDB *SheetsDB) Update(data *core.ArticleSeries) error {
 	return nil
 }
 
-func (sheetsDB *SheetsDB) Delete(ids string) error {
+func (sheetsDB *SheetsDB) Delete(ids []string) error {
 
 	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/articles"
 	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
@@ -14,12 +15,12 @@ import (
 
 type PostsDB interface {
 	GetAllPublicPosts() (*core.Posts, error)
-	GetPosts(userIDs []int, public bool) (*core.Posts, error)
+	GetPosts(userIDs []uuid.UUID, public bool) (*core.Posts, error)
 	AddPost(post *core.Post) error
-	GetPost(postID int) (*core.Post, error)
-	DeletePost(postID int) error
-	UpdatePost(postID int, post *core.Post) error
-	GetLikes(id int, userOrPost string) ([]int, error)
+	GetPost(postID uuid.UUID) (*core.Post, error)
+	DeletePost(postID uuid.UUID) error
+	UpdatePost(postID uuid.UUID, post *core.Post) error
+	GetLikes(id uuid.UUID, userOrPost string) ([]uuid.UUID, error)
 }
 
 type Posts struct {
@@ -62,8 +63,8 @@ func (pDB *Posts) GetAllPublicPosts() (serializer.Serializer, error) {
 	return serializer.NewSerializer(false, "got all public notes", data), nil
 }
 
-func (pDB *Posts) GetPublicPosts(userID int) (serializer.Serializer, error) {
-	params := []int{userID}
+func (pDB *Posts) GetPublicPosts(userID uuid.UUID) (serializer.Serializer, error) {
+	params := []uuid.UUID{userID}
 
 	posts, err := pDB.db.GetPosts(params, true)
 	if err != nil {
@@ -88,7 +89,7 @@ func (pDB *Posts) GetPublicPosts(userID int) (serializer.Serializer, error) {
 	return serializer.NewSerializer(false, "got all user notes", data), nil
 }
 
-func (pDB *Posts) GetFollowingPosts(userID int) (serializer.Serializer, error) {
+func (pDB *Posts) GetFollowingPosts(userID uuid.UUID) (serializer.Serializer, error) {
 	params, err := pDB.GetFollowing(userID)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get following - %w", err)
@@ -117,8 +118,8 @@ func (pDB *Posts) GetFollowingPosts(userID int) (serializer.Serializer, error) {
 	return serializer.NewSerializer(false, "There are currently no notes from the people that you are following. Try again later, or create your own note now.", data), nil
 }
 
-func (pDB *Posts) GetOwnPosts(userID int) (serializer.Serializer, error) {
-	params := []int{userID}
+func (pDB *Posts) GetOwnPosts(userID uuid.UUID) (serializer.Serializer, error) {
+	params := []uuid.UUID{userID}
 
 	posts, err := pDB.db.GetPosts(params, false)
 	if err != nil {
@@ -164,7 +165,7 @@ func (pDB *Posts) AddPost(post *core.PostPayload) error {
 	return nil
 }
 
-func (pDB *Posts) GetPost(postID int) (serializer.Serializer, error) {
+func (pDB *Posts) GetPost(postID uuid.UUID) (serializer.Serializer, error) {
 	// get from Planetscale
 	post, err := pDB.db.GetPost(postID)
 	if err != nil {
@@ -174,7 +175,7 @@ func (pDB *Posts) GetPost(postID int) (serializer.Serializer, error) {
 	return serializer.NewSerializer(false, "got note", post), nil
 }
 
-func (pDB *Posts) DeletePost(postID int) error {
+func (pDB *Posts) DeletePost(postID uuid.UUID) error {
 	// send to Planetscale
 	err := pDB.db.DeletePost(postID)
 	if err != nil {
@@ -183,7 +184,7 @@ func (pDB *Posts) DeletePost(postID int) error {
 	return nil
 }
 
-func (pDB *Posts) UpdatePost(postID int, post *core.PostPayload) error {
+func (pDB *Posts) UpdatePost(postID uuid.UUID, post *core.PostPayload) error {
 	newPost, err := parseNewPost(post)
 	if err != nil {
 		return fmt.Errorf("unable to parse input for new note - %w", err)
@@ -204,7 +205,7 @@ func (pDB *Posts) UpdatePost(postID int, post *core.PostPayload) error {
 	return nil
 }
 
-func (pDB *Posts) GetLikes(postID int) (serializer.Serializer, error) {
+func (pDB *Posts) GetLikes(postID uuid.UUID) (serializer.Serializer, error) {
 	likedByIDs, err := pDB.db.GetLikes(postID, "post")
 	if err != nil {
 		return serializer.NewSerializer(true, fmt.Sprintf("unable to retrieve likes for note id %d - %v", postID, err), nil), err
@@ -222,7 +223,7 @@ func (pDB *Posts) GetLikes(postID int) (serializer.Serializer, error) {
 	return serializer.NewSerializer(false, "successfully retrieved post likes", likedByUsers), nil
 }
 
-func (pDB *Posts) GetLikedPosts(userID int) (serializer.Serializer, error) {
+func (pDB *Posts) GetLikedPosts(userID uuid.UUID) (serializer.Serializer, error) {
 	likedPosts, err := pDB.db.GetLikes(userID, "user")
 	if err != nil {
 		return serializer.NewSerializer(true, fmt.Sprintf("unable to retrieve likes by user id %d - %v", userID, err), nil), err
