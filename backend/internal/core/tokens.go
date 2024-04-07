@@ -1,10 +1,14 @@
 package core
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Token struct {
-	PlainToken string    `json:"-"`
-	UserID     int       `json:"-"`
+	PlainToken string    `json:"token"`
+	UserID     uuid.UUID `json:"-"`
 	Expiry     time.Time `json:"expiry"`
-	Hash       string    `json:"token"`
+	Hash       []byte    `json:"-"`
 }

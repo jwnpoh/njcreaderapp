@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/jwnpoh/njcreaderapp/backend/cmd/config"
-	"github.com/jwnpoh/njcreaderapp/backend/external/pscale"
+	"github.com/jwnpoh/njcreaderapp/backend/external/cockroach"
 	"github.com/jwnpoh/njcreaderapp/backend/external/sheets"
 	"github.com/jwnpoh/njcreaderapp/backend/services/articles"
 	"github.com/jwnpoh/njcreaderapp/backend/services/auth"
@@ -40,7 +40,7 @@ type broker struct {
 
 // NewBrokerService creates a new BrokerService.
 func NewBrokerService(config config.Config) BrokerService {
-	articlesDB, err := pscale.NewArticlesDB(config.DSN)
+	articlesDB, err := cockroach.NewArticlesDB(config.DSN)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,32 +50,32 @@ func NewBrokerService(config config.Config) BrokerService {
 		log.Fatal(err)
 	}
 
-	longsDB, err := pscale.NewLongsDB(config.DSN)
+	longsDB, err := cockroach.NewLongsDB(config.DSN)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	authDB, err := pscale.NewAuthDB(config.DSN)
+	authDB, err := cockroach.NewAuthDB(config.DSN)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	usersDB, err := pscale.NewUsersDB(config.DSN)
+	usersDB, err := cockroach.NewUsersDB(config.DSN)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	postsDB, err := pscale.NewPostsDB(config.DSN)
+	postsDB, err := cockroach.NewPostsDB(config.DSN)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	socialsDB, err := pscale.NewSocialsDB(config.DSN)
+	socialsDB, err := cockroach.NewSocialsDB(config.DSN)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	statsDB, err := pscale.NewStatsDB(config.DSN)
+	statsDB, err := cockroach.NewStatsDB(config.DSN)
 	if err != nil {
 		log.Fatal(err)
 	}

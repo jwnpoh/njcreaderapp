@@ -30,7 +30,7 @@ func LoadConfig() (Config, error) {
 
 	cfg := Config{
 		Port: os.Getenv("PORT"),
-		DSN:  os.Getenv("PSCALE"),
+		DSN:  os.Getenv("COCKROACH"),
 		MailServiceConfig: MailServiceConfig{
 			Host:     os.Getenv("SMTP_HOST"),
 			Port:     os.Getenv("SMTP_PORT"),

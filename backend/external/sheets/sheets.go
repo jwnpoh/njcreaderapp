@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jwnpoh/njcreaderapp/backend/cmd/config"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"google.golang.org/api/option"
@@ -36,7 +37,7 @@ func (sheetsDB *SheetsDB) Get(offset, limit int) (*core.ArticleSeries, error) {
 	return nil, nil
 }
 
-func (sheetsDB *SheetsDB) GetArticle(id int) (*core.Article, error) {
+func (sheetsDB *SheetsDB) GetArticle(id uuid.UUID) (*core.Article, error) {
 	return nil, nil
 
 }
@@ -68,7 +69,7 @@ func (sheetsDB *SheetsDB) Update(data *core.ArticleSeries) error {
 	return nil
 }
 
-func (sheetsDB *SheetsDB) Delete(ids string) error {
+func (sheetsDB *SheetsDB) Delete(ids []string) error {
 
 	return nil
 }

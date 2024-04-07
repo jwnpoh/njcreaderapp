@@ -86,6 +86,8 @@ func (b *broker) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(input)
+
 	for i, item := range input {
 		date := formatDate(item.Date)
 		input[i].Date = date

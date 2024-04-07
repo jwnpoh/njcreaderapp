@@ -2,9 +2,9 @@ package broker
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/profanity"
 	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
@@ -14,14 +14,7 @@ import (
 func (b *broker) GetArticle(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("id")
 
-	id, err := strconv.Atoi(q)
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to parse article id requested", err)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		return
-	}
-
+	id, err := uuid.Parse(q)
 	data, err := b.Articles.GetArticle(id)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to get article from database", err)
@@ -41,7 +34,7 @@ func (b *broker) GetArticle(w http.ResponseWriter, r *http.Request) {
 func (b *broker) GetPost(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("id")
 
-	id, err := strconv.Atoi(q)
+	id, err := uuid.Parse(q)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to parse article id requested", err)
 		s.ErrorJson(w, err)
@@ -86,7 +79,7 @@ func (b *broker) GetPublicFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(q)
+	id, err := uuid.Parse(q)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to parse user id requested", err)
 		s.ErrorJson(w, err)
@@ -113,7 +106,7 @@ func (b *broker) GetPublicFeed(w http.ResponseWriter, r *http.Request) {
 func (b *broker) GetFollowing(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("user")
 
-	id, err := strconv.Atoi(q)
+	id, err := uuid.Parse(q)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to parse user id requested", err)
 		s.ErrorJson(w, err)
@@ -140,7 +133,7 @@ func (b *broker) GetFollowing(w http.ResponseWriter, r *http.Request) {
 func (b *broker) GetNotebook(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("user")
 
-	id, err := strconv.Atoi(q)
+	id, err := uuid.Parse(q)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to parse user id requested", err)
 		s.ErrorJson(w, err)
@@ -210,7 +203,7 @@ func (b *broker) InsertPost(w http.ResponseWriter, r *http.Request) {
 
 // DeletePost deletes posts specified in the slice of postIDs specified in the POST request.
 func (b *broker) DeletePost(w http.ResponseWriter, r *http.Request) {
-	var input int
+	var input uuid.UUID
 
 	err := serializer.NewSerializer(false, "", nil).Decode(w, r, &input)
 	if err != nil {
@@ -239,7 +232,7 @@ func (b *broker) DeletePost(w http.ResponseWriter, r *http.Request) {
 
 func (b *broker) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		PostID string            `json:"post_id"`
+		PostID uuid.UUID         `json:"post_id"`
 		Post   *core.PostPayload `json:"post"`
 	}
 
@@ -251,13 +244,13 @@ func (b *broker) UpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(input.PostID)
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to convert post_id from string to int", err)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		return
-	}
+	// id, err := strconv.Atoi(input.PostID)
+	// if err != nil {
+	// 	s := serializer.NewSerializer(true, "unable to convert post_id from string to int", err)
+	// 	s.ErrorJson(w, err)
+	// 	b.Logger.Error(s, r)
+	// 	return
+	// }
 
 	if input.Post.Public == "on" {
 		toCheck := []string{input.Post.TLDR, input.Post.Examples, input.Post.Notes, strings.Join(input.Post.Tags, ",")}
@@ -275,7 +268,8 @@ func (b *broker) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	date := formatDate(input.Post.Date)
 	input.Post.Date = date
 
-	err = b.Posts.UpdatePost(id, input.Post)
+	// err = b.Posts.UpdatePost(id, input.Post)
+	err = b.Posts.UpdatePost(input.PostID, input.Post)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to add new post", err)
 		s.ErrorJson(w, err)
@@ -296,7 +290,7 @@ func (b *broker) UpdatePost(w http.ResponseWriter, r *http.Request) {
 func (b *broker) GetLikedPosts(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("user")
 
-	id, err := strconv.Atoi(q)
+	id, err := uuid.Parse(q)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to parse user id requested", err)
 		s.ErrorJson(w, err)
@@ -323,7 +317,7 @@ func (b *broker) GetLikedPosts(w http.ResponseWriter, r *http.Request) {
 func (b *broker) GetPostLikes(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("post")
 
-	id, err := strconv.Atoi(q)
+	id, err := uuid.Parse(q)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to parse user id requested", err)
 		s.ErrorJson(w, err)

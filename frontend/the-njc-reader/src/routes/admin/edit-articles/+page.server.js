@@ -60,6 +60,7 @@ export const actions = {
       date: date,
       must_read: must_read
     }];
+    console.log("sending article to update", payload)
 
     const session = cookies.get("session")
 

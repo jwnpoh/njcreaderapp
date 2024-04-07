@@ -31,6 +31,7 @@ export const actions = {
 
     const authResponse = await authenticate(JSON.stringify(input))
     const res = await authResponse.json()
+    console.log(res)
 
     if (res.error) {
       return invalid(400, { credentials: true })
@@ -38,6 +39,7 @@ export const actions = {
 
     let token = res.data.token
     let expiry = res.data.expiry
+    console.log(token)
 
     cookies.set("session", token, {
       path: "/",

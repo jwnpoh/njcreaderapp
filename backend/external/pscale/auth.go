@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 )
@@ -76,8 +77,9 @@ func (ps *AuthDB) GetToken(tokenHash string) (*core.Token, error) {
 
 	row := ps.DB.QueryRowx(query, tokenHash)
 
-	var plainToken, hash, expiryString string
-	var userID int
+	var plainToken, expiryString string
+	var hash []byte
+	var userID uuid.UUID
 	var expiry time.Time
 
 	err := row.Scan(&plainToken, &userID, &expiryString, &hash)

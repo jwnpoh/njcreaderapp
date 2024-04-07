@@ -3,18 +3,19 @@ package socials
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
 	"github.com/jwnpoh/njcreaderapp/backend/services/users"
 )
 
 type SocialsDB interface {
-	GetFollowing(userID int) ([]int, error)
-	GetFollowedBy(userID int) ([]int, error)
-	Follow(userID, toFollow int) error
-	UnFollow(userID, toUnFollow int) error
-	Like(userID, postID int) error
-	Unlike(userID, postID int) error
+	GetFollowing(userID uuid.UUID) ([]uuid.UUID, error)
+	GetFollowedBy(userID uuid.UUID) ([]uuid.UUID, error)
+	Follow(userID, toFollow uuid.UUID) error
+	UnFollow(userID, toUnFollow uuid.UUID) error
+	Like(userID, postID uuid.UUID) error
+	Unlike(userID, postID uuid.UUID) error
 }
 
 type Socials struct {
@@ -29,7 +30,7 @@ func NewSocialsDB(socialsDB SocialsDB, usersDB users.UsersDB) *Socials {
 	}
 }
 
-func (sDB *Socials) GetFriends(userID int) (serializer.Serializer, error) {
+func (sDB *Socials) GetFriends(userID uuid.UUID) (serializer.Serializer, error) {
 	following, err := sDB.db.GetFollowing(userID)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get following ids - %w", err)
@@ -69,7 +70,7 @@ func (sDB *Socials) GetFriends(userID int) (serializer.Serializer, error) {
 	return serializer.NewSerializer(false, "successfully got friends", friends), nil
 }
 
-func (sDB *Socials) Follow(userID, toFollow int, follow bool) (serializer.Serializer, error) {
+func (sDB *Socials) Follow(userID, toFollow uuid.UUID, follow bool) (serializer.Serializer, error) {
 	if !follow {
 		return sDB.unfollow(userID, toFollow)
 	}
@@ -87,7 +88,7 @@ func (sDB *Socials) Follow(userID, toFollow int, follow bool) (serializer.Serial
 	return serializer.NewSerializer(false, fmt.Sprintf("successfully followed user %s", toFollowUser.DisplayName), nil), nil
 }
 
-func (sDB *Socials) unfollow(userID, toUnFollow int) (serializer.Serializer, error) {
+func (sDB *Socials) unfollow(userID, toUnFollow uuid.UUID) (serializer.Serializer, error) {
 	toUnFollowUser, err := sDB.GetUser("id", toUnFollow)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get user info to follow - %w", err)
@@ -101,7 +102,7 @@ func (sDB *Socials) unfollow(userID, toUnFollow int) (serializer.Serializer, err
 	return serializer.NewSerializer(false, fmt.Sprintf("successfully unfollowed user %s", toUnFollowUser.DisplayName), nil), nil
 }
 
-func (sDB *Socials) Like(userID, postID int, like bool) (serializer.Serializer, error) {
+func (sDB *Socials) Like(userID, postID uuid.UUID, like bool) (serializer.Serializer, error) {
 	if !like {
 		return sDB.unlike(userID, postID)
 	}
@@ -114,7 +115,7 @@ func (sDB *Socials) Like(userID, postID int, like bool) (serializer.Serializer, 
 	return serializer.NewSerializer(false, "liked post", nil), nil
 }
 
-func (sDB *Socials) unlike(userID, postID int) (serializer.Serializer, error) {
+func (sDB *Socials) unlike(userID, postID uuid.UUID) (serializer.Serializer, error) {
 	err := sDB.db.Unlike(userID, postID)
 	if err != nil {
 		return nil, fmt.Errorf("error unliking post - %w", err)

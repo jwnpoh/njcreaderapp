@@ -202,10 +202,10 @@ func (b *broker) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		Class:       user.Class,
 		LastLogin:   time.Now().Format("02 Jan 2006"),
 		DisplayName: userInput.DisplayName,
-		Hash:        userInput.NewPassword,
+		Hash:        user.Hash,
 	}
 
-	err = b.Users.UpdateUser(newUser)
+	err = b.Users.UpdateUser(newUser, userInput.NewPassword)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to update user", err)
 		s.ErrorJson(w, err)
@@ -301,6 +301,7 @@ func (b *broker) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newRandPassword := core.GenerateRandomString()
+	newHash, err := hasher.GenerateHash(newRandPassword)
 
 	newUser := &core.User{
 		ID:          user.ID,
@@ -309,10 +310,10 @@ func (b *broker) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		Class:       user.Class,
 		LastLogin:   time.Now().Format("02 Jan 2006"),
 		DisplayName: user.DisplayName,
-		Hash:        newRandPassword,
+		Hash:        newHash,
 	}
 
-	err = b.Users.UpdateUser(newUser)
+	err = b.Users.UpdateUser(newUser, newRandPassword)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to reset password. try again or contact system adminstrator", err)
 		s.ErrorJson(w, err)

@@ -3,6 +3,7 @@ package users
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/hasher"
 )
@@ -10,7 +11,7 @@ import (
 type UsersDB interface {
 	InsertUsers(*[]core.User) error
 	GetUser(field string, value any) (*core.User, error)
-	DeleteUser(id int) error
+	DeleteUser(id uuid.UUID) error
 	UpdateUser(*core.User) error
 	UpdateClasses(*[]core.User) error
 }
@@ -53,12 +54,12 @@ func (um *UserManager) GetUser(field string, value any) (*core.User, error) {
 	return user, nil
 }
 
-func (um *UserManager) UpdateUser(newUser *core.User) error {
-	newPasswordHash, err := hasher.GenerateHash(newUser.Hash)
+func (um *UserManager) UpdateUser(newUser *core.User, password string) error {
+	newHash, err := hasher.GenerateHash(string(password))
 	if err != nil {
 		return fmt.Errorf("userManager: unable to generate hash from user input password - %w", err)
 	}
-	newUser.Hash = newPasswordHash
+	newUser.Hash = newHash
 
 	err = um.db.UpdateUser(newUser)
 	if err != nil {
@@ -77,7 +78,7 @@ func (um *UserManager) UpdateClasses(users *[]core.User) error {
 	return nil
 }
 
-func (um *UserManager) DeleteUser(id int) error {
+func (um *UserManager) DeleteUser(id uuid.UUID) error {
 	err := um.db.DeleteUser(id)
 	if err != nil {
 		return fmt.Errorf("userManager: unable to delete user %d - %w", id, err)

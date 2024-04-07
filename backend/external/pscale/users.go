@@ -3,6 +3,7 @@ package pscale
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 )
@@ -66,8 +67,9 @@ func (uDB *UsersDB) GetUser(field string, value any) (*core.User, error) {
 
 	row := uDB.DB.QueryRowx(query, value)
 
-	var email, hash, role, class, displayName, lastLogin string
-	var id int
+	var email, role, class, displayName, lastLogin string
+	var hash []byte
+	var id uuid.UUID
 	err := row.Scan(&id, &email, &hash, &role, &lastLogin, &displayName, &class)
 	if err != nil {
 		return nil, fmt.Errorf("PScaleUsers: error scanning row to get user- %w", err)
