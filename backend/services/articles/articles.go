@@ -5,13 +5,14 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 	"github.com/jwnpoh/njcreaderapp/backend/services/serializer"
 )
 
 type ArticlesDB interface {
 	Get(offset, limit int) (*core.ArticleSeries, error)
-	GetArticle(id int) (*core.Article, error)
+	GetArticle(id uuid.UUID) (*core.Article, error)
 	Find(terms string) (*core.ArticleSeries, error)
 	Store(data *core.ArticleSeries) error
 	Update(data *core.ArticleSeries) error
@@ -47,7 +48,7 @@ func (a *Articles) Get(page, limit int) (serializer.Serializer, error) {
 }
 
 // GetArticle retrieves a particular article from PlanetScale given an id.
-func (a *Articles) GetArticle(id int) (serializer.Serializer, error) {
+func (a *Articles) GetArticle(id uuid.UUID) (serializer.Serializer, error) {
 	article, err := a.db.GetArticle(id)
 	if err != nil {
 		return serializer.NewSerializer(true, "no articles matched the query", nil), err

@@ -2,7 +2,6 @@ package broker
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -15,14 +14,7 @@ import (
 func (b *broker) GetArticle(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("id")
 
-	id, err := strconv.Atoi(q)
-	if err != nil {
-		s := serializer.NewSerializer(true, "unable to parse article id requested", err)
-		s.ErrorJson(w, err)
-		b.Logger.Error(s, r)
-		return
-	}
-
+	id, err := uuid.Parse(q)
 	data, err := b.Articles.GetArticle(id)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to get article from database", err)

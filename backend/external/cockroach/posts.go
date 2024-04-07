@@ -15,15 +15,15 @@ type PostsDB struct {
 	DB *sqlx.DB
 }
 
-// NewPscaleDB returns a connection interface for the application to connect to the planetscale database.
+// NewCockroachDB returns a connection interface for the application to connect to the planetscale database.
 func NewPostsDB(dsn string) (*PostsDB, error) {
 	db, err := sqlx.Open("pgx", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("PScalePosts: unable to initialize pscale database - %w", err)
+		return nil, fmt.Errorf("CockroachPosts: unable to initialize Cockroach database - %w", err)
 	}
 	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("PScalePosts: no response from pscale database - %w", err)
+		return nil, fmt.Errorf("CockroachPosts: no response from cockroach database - %w", err)
 	}
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(10)
@@ -38,7 +38,7 @@ func (pDB *PostsDB) GetAllPublicPosts() (*core.Posts, error) {
 
 	rows, err := pDB.DB.Queryx(query)
 	if err != nil {
-		return nil, fmt.Errorf("PScalePosts: unable to query notes table - %w", err)
+		return nil, fmt.Errorf("CockroachPost-GetAllPublicPosts: unable to query notes table - %w", err)
 	}
 
 	for rows.Next() {
@@ -46,7 +46,7 @@ func (pDB *PostsDB) GetAllPublicPosts() (*core.Posts, error) {
 		var tags, author, authorClass sql.NullString
 		err = rows.Scan(&post.ID, &post.UserID, &author, &authorClass, &post.Likes, &post.TLDR, &post.Examples, &post.Notes, &tags, &post.CreatedAt, &post.Public, &post.ArticleID, &post.ArticleTitle, &post.ArticleURL)
 		if err != nil {
-			return nil, fmt.Errorf("PScalePosts: error scanning row - %w", err)
+			return nil, fmt.Errorf("CockroachPosts-GetAllPublicPosts(): error scanning row - %w", err)
 		}
 		if tags.Valid {
 			post.Tags = strings.Split(tags.String, ",")
@@ -78,7 +78,7 @@ func (pDB *PostsDB) GetPosts(userIDs []uuid.UUID, public bool) (*core.Posts, err
 
 	rows, err := pDB.DB.Queryx(query)
 	if err != nil {
-		return nil, fmt.Errorf("PScalePosts: unable to query notes table - %w", err)
+		return nil, fmt.Errorf("CockroachPosts-GetPosts: unable to query notes table with query %s - %w", query, err)
 	}
 
 	for rows.Next() {
@@ -86,7 +86,7 @@ func (pDB *PostsDB) GetPosts(userIDs []uuid.UUID, public bool) (*core.Posts, err
 		var tags, author, authorClass sql.NullString
 		err = rows.Scan(&post.ID, &post.UserID, &author, &authorClass, &post.Likes, &post.TLDR, &post.Examples, &post.Notes, &tags, &post.CreatedAt, &post.Public, &post.ArticleID, &post.ArticleTitle, &post.ArticleURL)
 		if err != nil {
-			return nil, fmt.Errorf("PScalePosts: error scanning row - %w", err)
+			return nil, fmt.Errorf("CockroachPosts-GetPosts: error scanning row - %w", err)
 		}
 		if tags.Valid {
 			post.Tags = strings.Split(tags.String, ",")
@@ -110,18 +110,18 @@ func (pDB *PostsDB) AddPost(post *core.Post) error {
 
 	tx, err := pDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to begin tx for adding post to db - %w", err)
+		return fmt.Errorf("CockroachPosts-AddPost: unable to begin tx for adding post to db - %w", err)
 	}
 	defer tx.Rollback()
 
 	_, err = tx.Exec(query, post.UserID, post.Author, post.AuthorClass, post.Likes, post.TLDR, post.Examples, post.Notes, strings.Join(post.Tags, ","), post.CreatedAt, post.Public, post.ArticleID, post.ArticleTitle, post.ArticleURL)
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to add post to db - %w", err)
+		return fmt.Errorf("CockroachPosts-AddPost: unable to add post to db - %w", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to commit tx to add post to db - %w", err)
+		return fmt.Errorf("CockroachPosts-AddPost: unable to commit tx to add post to db - %w", err)
 	}
 
 	return nil
@@ -137,7 +137,7 @@ func (pDB *PostsDB) GetPost(id uuid.UUID) (*core.Post, error) {
 	var tags, author, authorClass sql.NullString
 	err := row.Scan(&post.ID, &post.UserID, &author, &authorClass, &post.Likes, &post.TLDR, &post.Examples, &post.Notes, &tags, &post.CreatedAt, &post.Public, &post.ArticleID, &post.ArticleTitle, &post.ArticleURL)
 	if err != nil {
-		return nil, fmt.Errorf("PScalePosts: error scanning row - %w", err)
+		return nil, fmt.Errorf("CockroachPosts-GetPost: error scanning row - %w", err)
 	}
 	if tags.Valid {
 		post.Tags = strings.Split(tags.String, ",")
@@ -158,18 +158,18 @@ func (pDB *PostsDB) DeletePost(postID uuid.UUID) error {
 
 	tx, err := pDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to begin tx for deleting notes from db - %w", err)
+		return fmt.Errorf("CockroachPosts-DeletePost: unable to begin tx for deleting notes from db - %w", err)
 	}
 	defer tx.Rollback()
 
 	_, err = tx.Exec(query)
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to delete notes from db - %w", err)
+		return fmt.Errorf("CockroachPosts-DeletePost: unable to delete notes from db - %w", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to commit tx to delete notes from db - %w", err)
+		return fmt.Errorf("CockroachCockroachosts: unable to commit tx to delete notes from db - %w", err)
 	}
 
 	return nil
@@ -180,18 +180,18 @@ func (pDB *PostsDB) UpdatePost(postID uuid.UUID, post *core.Post) error {
 
 	tx, err := pDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to begin tx for adding post to db - %w", err)
+		return fmt.Errorf("CockroachPosts-UpdatePost: unable to begin tx for adding post to db - %w", err)
 	}
 	defer tx.Rollback()
 
 	_, err = tx.Exec(query, post.UserID, post.Author, post.AuthorClass, post.Likes, post.TLDR, post.Examples, post.Notes, strings.Join(post.Tags, ","), post.CreatedAt, post.Public, post.ArticleID, post.ArticleTitle, post.ArticleURL, postID)
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to add post to db - %w", err)
+		return fmt.Errorf("CockroachPosts-UpdatePost: unable to add post to db - %w", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("PScalePosts: unable to commit tx to add post to db - %w", err)
+		return fmt.Errorf("CockroachPosts-UpdatePost: unable to commit tx to add post to db - %w", err)
 	}
 
 	return nil
@@ -208,19 +208,19 @@ func (pDB *PostsDB) GetLikes(id uuid.UUID, userOrPost string) ([]uuid.UUID, erro
 	case "user":
 		query = "SELECT post_id FROM likes_list WHERE liked_by = $1"
 	default:
-		return nil, fmt.Errorf("PScalePosts: error interpreting 'user' or 'post'")
+		return nil, fmt.Errorf("CockroachPosts-GetLikes: error interpreting 'user' or 'post'")
 	}
 
 	rows, err := pDB.DB.Queryx(query, id)
 	if err != nil {
-		return nil, fmt.Errorf("PScalePosts: unable to query likes_list table - %w", err)
+		return nil, fmt.Errorf("CockroachPosts-GetLikes: unable to query likes_list table - %w", err)
 	}
 
 	var resID uuid.UUID
 	for rows.Next() {
 		err = rows.Scan(&resID)
 		if err != nil {
-			return nil, fmt.Errorf("PScalePosts: error scanning row - %w", err)
+			return nil, fmt.Errorf("CockroachPosts-GetLikes: error scanning row - %w", err)
 		}
 		likedBys = append(likedBys, resID)
 	}
@@ -230,20 +230,18 @@ func (pDB *PostsDB) GetLikes(id uuid.UUID, userOrPost string) ([]uuid.UUID, erro
 
 func parseQuery(userIDs []uuid.UUID) string {
 	if len(userIDs) == 1 {
-		return fmt.Sprintf("SELECT * FROM notes WHERE user_id = %d", userIDs[0])
-	}
-
-	params := strings.Builder{}
-	for i, v := range userIDs {
-		if i < len(userIDs)-1 {
-			params.WriteString(fmt.Sprintf("%d, ", v))
-			continue
-		}
-		params.WriteString(fmt.Sprintf("%d", v))
+		return fmt.Sprintf("SELECT * FROM notes WHERE user_id = '%s'", userIDs[0])
 	}
 
 	query := strings.Builder{}
-	query.WriteString(fmt.Sprintf("SELECT * FROM notes WHERE user_id IN (%s)", params.String()))
+	query.WriteString("SELECT * FROM notes WHERE ")
+	for i, v := range userIDs {
+		if i < len(userIDs)-1 {
+			query.WriteString(fmt.Sprintf("user_id = '%s' AND ", v))
+			continue
+		}
+		query.WriteString(fmt.Sprintf("user_id = '%s'", v))
+	}
 
 	return query.String()
 }

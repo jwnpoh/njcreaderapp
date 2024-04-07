@@ -51,10 +51,22 @@ func main() {
 	// 	fmt.Printf("unable to complete users table migration: %v\n", err)
 	// }
 
-	fmt.Println("migrating questions list from pscale to cockroach...")
-	err = migrateQuestionListTable(pscaleDB, cockroachDB)
+	// fmt.Println("migrating questions list from pscale to cockroach...")
+	// err = migrateQuestionListTable(pscaleDB, cockroachDB)
+	// if err != nil {
+	// 	fmt.Printf("unable to complete users table migration: %v\n", err)
+	// }
+
+	// fmt.Println("migrating follows from pscale to cockroach...")
+	// err = migrateFollowsTable(pscaleDB, cockroachDB)
+	// if err != nil {
+	// 	fmt.Printf("unable to complete follows table migration: %v\n", err)
+	// }
+
+	fmt.Println("migrating likes from pscale to cockroach...")
+	err = migrateLikesTable(pscaleDB, cockroachDB)
 	if err != nil {
-		fmt.Printf("unable to complete users table migration: %v\n", err)
+		fmt.Printf("unable to complete follows table migration: %v\n", err)
 	}
 }
 

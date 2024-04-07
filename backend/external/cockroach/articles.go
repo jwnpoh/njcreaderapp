@@ -62,7 +62,7 @@ func (aDB *ArticlesDB) Get(offset, limit int) (*core.ArticleSeries, error) {
 	return &series, nil
 }
 
-func (aDB *ArticlesDB) GetArticle(id int) (*core.Article, error) {
+func (aDB *ArticlesDB) GetArticle(id uuid.UUID) (*core.Article, error) {
 	query := "SELECT * FROM articles WHERE id = $1"
 
 	row := aDB.DB.QueryRowx(query, id)
