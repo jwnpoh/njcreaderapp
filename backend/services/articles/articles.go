@@ -129,9 +129,11 @@ func (a *Articles) Delete(input []string) error {
 // }
 
 func checkQuery(q string) string {
-	q, _ = formatQuestionString(q)
+	q, isQn := formatQuestionString(q)
 
 	switch {
+	case isQn:
+		return searchQn(q)
 	case strings.Contains(q, "AND"):
 		return searchAND(q)
 	case strings.Contains(q, "OR"):

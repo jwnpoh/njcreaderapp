@@ -1,47 +1,25 @@
 package articles
 
 import (
-	"fmt"
 	"strings"
 )
 
 func searchExact(q string) string {
-	return fmt.Sprintf("\"%v\"", q)
+	return q
 }
 
 func searchAND(q string) string {
-	terms := strings.Split(q, "AND")
-
-	t := strings.Builder{}
-
-	for i, v := range terms {
-		t.WriteString("+" + v)
-		if i < len(terms) {
-			t.WriteString(" ")
-		}
-	}
-	return t.String()
+	return strings.ReplaceAll(q, "AND", "&")
 }
 
 func searchOR(q string) string {
-	terms := strings.Split(q, "OR")
-
-	t := strings.Builder{}
-
-	for _, v := range terms {
-		t.WriteString(" " + v)
-	}
-	return t.String()
+	return strings.ReplaceAll(q, "OR", "|")
 }
 
 func searchNOT(q string) string {
-	terms := strings.Split(q, "NOT")
+	return strings.ReplaceAll(q, "NOT ", "& !")
+}
 
-	t := strings.Builder{}
-
-	t.WriteString("+" + terms[0])
-	t.WriteString(" ")
-	t.WriteString("-" + terms[1])
-
-	return t.String()
+func searchQn(q string) string {
+	return "isQn" + q
 }
