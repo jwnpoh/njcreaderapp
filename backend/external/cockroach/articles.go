@@ -82,15 +82,18 @@ func (aDB *ArticlesDB) GetArticle(id uuid.UUID) (*core.Article, error) {
 	return &article, nil
 }
 
-// Find implements a mysql fulltext search of the articles table
+// Find implements a postgresql fulltext search of the articles table
 func (aDB *ArticlesDB) Find(terms string) (*core.ArticleSeries, error) {
 	series := make(core.ArticleSeries, 0, 12)
 
-	// TODO:
-	// NEED TO UPDATE FUNCTION!!
-	query := "SELECT * FROM articles WHERE MATCH (title, topics, question_display) AGAINST ($1 IN BOOLEAN MODE) ORDER BY id DESC"
+	query := "SELECT id, title, url, topics, questions, question_display, published_on, must_read FROM articles, to_tsvector(title || topics || question_display) article, plainto_tsquery($1) query WHERE query @@ article"
 
-	rows, err := aDB.DB.Queryx(query, terms)
+	term, isQn := strings.CutPrefix(terms, "isQn")
+	if isQn {
+		query = "SELECT id, title, url, topics, questions, question_display, published_on, must_read FROM articles INNER JOIN (SELECT article_id FROM questions WHERE question = $1) questions ON articles.id = questions.article_id"
+	}
+
+	rows, err := aDB.DB.Queryx(query, term)
 	if err != nil {
 		return nil, fmt.Errorf("cockroachArticles: unable to query cockroach database - %w", err)
 	}
@@ -179,20 +182,14 @@ func (aDB *ArticlesDB) Update(data *core.ArticleSeries) error {
 	defer tx.Rollback()
 
 	for i, article := range *data {
-		// res, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.MustRead, article.ID)
-		var id string
-		uuid, _ := uuid.Parse(id)
-		fmt.Printf("updating article uuid %s\ntitle %s\ntopics %s\nquestions %s\n", uuid, article.Title, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"))
-		_, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.MustRead, uuid)
-		if err != nil {
-			return fmt.Errorf("CockroachArticles: unable to add article %s to db - %v\n", article.Title, err)
-		}
+		fmt.Printf("updating article uuid %v\ntitle %s\ntopics %s\nquestions %s\n", article.ID, article.Title, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"))
+		_, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.MustRead, article.ID)
 		if err != nil {
 			return fmt.Errorf("cockroachArticles: unable to update article %s in db - %w", article.Title, err)
 		}
 
 		for _, w := range article.Topics {
-			_, err = tx.Exec("INSERT INTO topics (topic, article_id) VALUES ($1, $2)", w, uuid)
+			_, err = tx.Exec("INSERT INTO topics (topic, article_id) VALUES ($1, $2)", w, article.ID)
 			if err != nil {
 				return fmt.Errorf("cockroachArticles: unable to update topics for article %s in db - %w", article.Title, err)
 			}
@@ -201,7 +198,7 @@ func (aDB *ArticlesDB) Update(data *core.ArticleSeries) error {
 		rx := regexp.MustCompile(`\d{4}\s-\sQ\d{1,2}`)
 		for _, x := range article.Questions {
 			question := rx.FindString(x)
-			_, err = tx.Exec("INSERT INTO questions (question, article_id) VALUES ($1, $2)", question, uuid)
+			_, err = tx.Exec("INSERT INTO questions (question, article_id) VALUES ($1, $2)", question, article.ID)
 			if err != nil {
 				return fmt.Errorf("cockroachArticles: unable to update questions for article %s in db - %w", article.Title, err)
 			}

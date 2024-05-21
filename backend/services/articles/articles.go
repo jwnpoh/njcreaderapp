@@ -129,9 +129,11 @@ func (a *Articles) Delete(input []string) error {
 // }
 
 func checkQuery(q string) string {
-	q, _ = formatQuestionString(q)
+	q, isQn := formatQuestionString(q)
 
 	switch {
+	case isQn:
+		return searchQn(q)
 	case strings.Contains(q, "AND"):
 		return searchAND(q)
 	case strings.Contains(q, "OR"):
@@ -193,6 +195,7 @@ func (a *Articles) parseNewArticles(input core.ArticlePayload) (core.ArticleSeri
 			QuestionDisplay: questionDisplay,
 			PublishedOn:     date,
 			MustRead:        mustRead,
+			ID:              item.ID,
 		}
 
 		data = append(data, article)
