@@ -3,7 +3,7 @@ package broker
 import (
 	"bytes"
 	"html"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"regexp"
 
@@ -29,7 +29,7 @@ func (b *broker) GetTitle(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	b2, err := ioutil.ReadAll(resp.Body)
+	b2, err := io.ReadAll(resp.Body)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to parse article content", err)
 		s.ErrorJson(w, err)

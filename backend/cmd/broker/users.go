@@ -292,12 +292,12 @@ func (b *broker) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if time.Since(t) < 1*time.Minute {
-		if err != nil {
-			s := serializer.NewSerializer(true, "operation not allowed", err)
-			s.ErrorJson(w, err)
-			b.Logger.Error(s, r)
-			return
-		}
+		// if err != nil {
+		s := serializer.NewSerializer(true, "operation not allowed", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+		// }
 	}
 
 	newRandPassword := core.GenerateRandomString()

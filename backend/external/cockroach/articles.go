@@ -182,20 +182,14 @@ func (aDB *ArticlesDB) Update(data *core.ArticleSeries) error {
 	defer tx.Rollback()
 
 	for i, article := range *data {
-		// res, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.MustRead, article.ID)
-		var id string
-		uuid, _ := uuid.Parse(id)
-		fmt.Printf("updating article uuid %s\ntitle %s\ntopics %s\nquestions %s\n", uuid, article.Title, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"))
-		_, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.MustRead, uuid)
-		if err != nil {
-			return fmt.Errorf("CockroachArticles: unable to add article %s to db - %v\n", article.Title, err)
-		}
+		fmt.Printf("updating article uuid %v\ntitle %s\ntopics %s\nquestions %s\n", article.ID, article.Title, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"))
+		_, err := tx.Exec(query, article.Title, article.URL, strings.Join(article.Topics, ","), strings.Join(article.Questions, "\n"), strings.Join(article.QuestionDisplay, "\n"), article.PublishedOn, article.MustRead, article.ID)
 		if err != nil {
 			return fmt.Errorf("cockroachArticles: unable to update article %s in db - %w", article.Title, err)
 		}
 
 		for _, w := range article.Topics {
-			_, err = tx.Exec("INSERT INTO topics (topic, article_id) VALUES ($1, $2)", w, uuid)
+			_, err = tx.Exec("INSERT INTO topics (topic, article_id) VALUES ($1, $2)", w, article.ID)
 			if err != nil {
 				return fmt.Errorf("cockroachArticles: unable to update topics for article %s in db - %w", article.Title, err)
 			}
@@ -204,7 +198,7 @@ func (aDB *ArticlesDB) Update(data *core.ArticleSeries) error {
 		rx := regexp.MustCompile(`\d{4}\s-\sQ\d{1,2}`)
 		for _, x := range article.Questions {
 			question := rx.FindString(x)
-			_, err = tx.Exec("INSERT INTO questions (question, article_id) VALUES ($1, $2)", question, uuid)
+			_, err = tx.Exec("INSERT INTO questions (question, article_id) VALUES ($1, $2)", question, article.ID)
 			if err != nil {
 				return fmt.Errorf("cockroachArticles: unable to update questions for article %s in db - %w", article.Title, err)
 			}

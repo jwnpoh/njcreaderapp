@@ -195,6 +195,7 @@ func (a *Articles) parseNewArticles(input core.ArticlePayload) (core.ArticleSeri
 			QuestionDisplay: questionDisplay,
 			PublishedOn:     date,
 			MustRead:        mustRead,
+			ID:              item.ID,
 		}
 
 		data = append(data, article)
