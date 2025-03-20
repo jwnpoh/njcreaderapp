@@ -11,15 +11,15 @@ type LongsDB struct {
 	DB *sqlx.DB
 }
 
-// NewPscaleDB returns a connection interface for the application to connect to the planetscale database.
+// NewCockroachDB returns a connection interface for the application to connect to the CockroachDB database.
 func NewLongsDB(dsn string) (*LongsDB, error) {
 	db, err := sqlx.Open("pgx", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("PScaleLong: unable to initialize pscale database - %w", err)
+		return nil, fmt.Errorf("CockroachLong: unable to initialize Cockroach database - %w", err)
 	}
 	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("PScaleLong: no response from pscale database - %w", err)
+		return nil, fmt.Errorf("CockroachLong: no response from Cockroach database - %w", err)
 	}
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(10)
@@ -34,14 +34,14 @@ func (lDB *LongsDB) GetTopics() (*core.LongTopics, error) {
 
 	rows, err := lDB.DB.Queryx(query)
 	if err != nil {
-		return nil, fmt.Errorf("PScaleLong: unable to query pscale database - %w", err)
+		return nil, fmt.Errorf("CockroachLong: unable to query Cockroach database - %w", err)
 	}
 
 	for rows.Next() {
 		var topic string
 		err = rows.Scan(&topic)
 		if err != nil {
-			return nil, fmt.Errorf("PScaleLong: error scanning row - %w", err)
+			return nil, fmt.Errorf("CockroachLong: error scanning row - %w", err)
 		}
 		topics = append(topics, topic)
 	}
@@ -55,7 +55,7 @@ func (lDB *LongsDB) Get(topic string) (*core.LongSeries, error) {
 
 	longs := make(core.LongSeries, 0)
 
-	query := "SELECT * FROM long WHERE topic = $1"
+	query := "SELECT * FROM long WHERE topic = $1 ORDER BY unique_rowid() ASC"
 
 	if topic == "all" {
 		query = "SELECT * FROM long"
@@ -63,14 +63,14 @@ func (lDB *LongsDB) Get(topic string) (*core.LongSeries, error) {
 
 	rows, err := lDB.DB.Queryx(query, topic)
 	if err != nil {
-		return nil, fmt.Errorf("PScaleLong: unable to query pscale database - %w", err)
+		return nil, fmt.Errorf("CockroachLong: unable to query Cockroach database - %w", err)
 	}
 
 	for rows.Next() {
 		var long core.Long
 		err = rows.Scan(&long.ID, &long.Title, &long.URL, &long.Topic)
 		if err != nil {
-			return nil, fmt.Errorf("PScaleLong: error scanning row - %w", err)
+			return nil, fmt.Errorf("CockroachLong: error scanning row - %w", err)
 		}
 		longs = append(longs, long)
 	}
@@ -81,18 +81,18 @@ func (lDB *LongsDB) Get(topic string) (*core.LongSeries, error) {
 func (lDB *LongsDB) GetAll() (*core.LongSeries, error) {
 	longs := make(core.LongSeries, 0)
 
-	query := "SELECT * FROM long"
+	query := "SELECT * FROM long ORDER BY unique_rowid() ASC"
 
 	rows, err := lDB.DB.Queryx(query)
 	if err != nil {
-		return nil, fmt.Errorf("PScaleLong: unable to query pscale database - %w", err)
+		return nil, fmt.Errorf("CockroachLong: unable to query Cockroach database - %w", err)
 	}
 
 	for rows.Next() {
 		var long core.Long
 		err = rows.Scan(&long.ID, &long.Title, &long.URL, &long.Topic)
 		if err != nil {
-			return nil, fmt.Errorf("PScaleLong: error scanning row - %w", err)
+			return nil, fmt.Errorf("CockroachLong: error scanning row - %w", err)
 		}
 		longs = append(longs, long)
 	}
@@ -104,24 +104,24 @@ func (lDB *LongsDB) Store(data *core.LongPayload) error {
 
 	tx, err := lDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("PScaleLong: unable to begin tx to add long articles to db - %w", err)
+		return fmt.Errorf("CockroachLong: unable to begin tx to add long articles to db - %w", err)
 	}
 	defer tx.Rollback()
 
 	for i, long := range *data {
 		_, err = tx.Exec(query, long.Title, long.URL, long.Topic)
 		if err != nil {
-			return fmt.Errorf("PScaleLong: unable to add long article %s to db - %w", long.Title, err)
+			return fmt.Errorf("CockroachLong: unable to add long article %s to db - %w", long.Title, err)
 		}
 
 		if i >= 0 && i%200 == 0 || i == len(*data)-1 {
 			err = tx.Commit()
 			if err != nil {
-				return fmt.Errorf("PScaleLong: unable to commit tx to store long articlesn db - %w", err)
+				return fmt.Errorf("CockroachLong: unable to commit tx to store long articles db - %w", err)
 			}
 			tx, err = lDB.DB.Begin()
 			if err != nil {
-				return fmt.Errorf("PScaleLong: unable to begin tx to add long articles to db - %w", err)
+				return fmt.Errorf("CockroachLong: unable to begin tx to add long articles to db - %w", err)
 			}
 			defer tx.Rollback()
 		}
@@ -134,18 +134,18 @@ func (lDB *LongsDB) Update(data *core.Long) error {
 
 	tx, err := lDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("PScaleLong: unable to begin tx to add long articles to db - %w", err)
+		return fmt.Errorf("CockroachLong: unable to begin tx to add long articles to db - %w", err)
 	}
 	defer tx.Rollback()
 
 	_, err = tx.Exec(query, data.Title, data.URL, data.Topic, data.ID)
 	if err != nil {
-		return fmt.Errorf("PScaleLong: unable to add long article %s to db - %w", data.Title, err)
+		return fmt.Errorf("CockroachLong: unable to add long article %s to db - %w", data.Title, err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("PScaleLong: unable to commit tx to update long article %s - %w", data.Title, err)
+		return fmt.Errorf("CockroachLong: unable to commit tx to update long article %s - %w", data.Title, err)
 	}
 
 	return nil
@@ -156,18 +156,18 @@ func (lDB *LongsDB) Delete(ids string) error {
 
 	tx, err := lDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("PScaleLong: unable to begin tx for deleting long articles from db - %w", err)
+		return fmt.Errorf("CockroachLong: unable to begin tx for deleting long articles from db - %w", err)
 	}
 	defer tx.Rollback()
 
 	_, err = tx.Exec(query)
 	if err != nil {
-		return fmt.Errorf("PScaleLong: unable to delete long articles from db - %w", err)
+		return fmt.Errorf("CockroachLong: unable to delete long articles from db - %w", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("PScaleLong: unable to commit tx to delete long articles from db - %w", err)
+		return fmt.Errorf("CockroachLong: unable to commit tx to delete long articles from db - %w", err)
 	}
 
 	return nil
