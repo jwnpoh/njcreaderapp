@@ -19,6 +19,7 @@
 
 <div class="relative">
   <div class="card bg-base-100 box-shadow ">
+    <!--
     {#if loggedIn}
       <div class="bookmark bg-base-100">
           <input name="article_id" type="hidden" hidden value={id} />
@@ -29,6 +30,7 @@
           </a>
       </div>
     {/if}
+    -->
     <div class="card-body pb-5">
       {#if mustRead}
         <div class="badge badge-secondary py-3">Must read!</div>

@@ -1,10 +1,10 @@
 import "dotenv/config"
-import { redirect } from "@sveltejs/kit"
+// import { redirect } from "@sveltejs/kit"
 
 export async function load({ fetch,locals}) {
-  if (!locals.user.loggedIn) {
-    throw redirect(302, "/login")
-  }
+  // if (!locals.user.loggedIn) {
+  //   throw redirect(302, "/login")
+  // }
 
   const queryURL = `${process.env.API_URL}/api/long`;
   const res = await fetch(queryURL);

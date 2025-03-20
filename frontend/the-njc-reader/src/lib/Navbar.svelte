@@ -58,25 +58,15 @@
               <a href="/"> The NJC Reader </a>
             </div>
           </li>
-          {#if user.loggedIn}
             <li>
               <div
                 class="md:py-1 px-4 font-semibold text-lg  hover:cursor-default"
               >
-                {greeting}, {user.display_name}!
+                {greeting}!
               </div>
             </li>
-            <div class="divider px-2 before:bg-white opacity-30 after:bg-white opacity-30" />
-            {:else}
-            <div class="md:hidden divider px-2 before:bg-white opacity-30 after:bg-white opacity-30" />
-          {/if}
             <li><a data-sveltekit-reload href="/articles">News Feed</a></li>
-          {#if user.loggedIn}
             <li><a href="/long">Long Reads</a></li>
-            <li>
-              <a href="/notes">The Social Notebook</a>
-            </li>
-          {/if}
           {#if user.loggedIn}
             <div class="divider px-2 before:bg-white opacity-30 after:bg-white opacity-30" />
             {#if role === "admin"}
@@ -84,16 +74,13 @@
                 <a href="/admin">Admin dashboard</a>
               </li>
             {/if}
-            <li>
-              <a href="/user-profile">Profile</a>
-            </li>
           {/if}
           <li>
             <a
               data-sveltekit-reload
-              class="bg-secondary text-black"
+              class="text-secondary"
               href={user.loggedIn ? "/logout" : "/login"}
-              >{user.loggedIn ? "Log out" : "Log in"}</a
+              >{user.loggedIn ? "Log out" : "Admin log in"}</a
             >
           </li>
         </ul>
