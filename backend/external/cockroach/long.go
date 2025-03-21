@@ -55,7 +55,7 @@ func (lDB *LongsDB) Get(topic string) (*core.LongSeries, error) {
 
 	longs := make(core.LongSeries, 0)
 
-	query := "SELECT * FROM long WHERE topic = $1 ORDER BY unique_rowid() ASC"
+	query := "SELECT * FROM long WHERE topic = $1 ORDER BY unique_rowid() DESC"
 
 	if topic == "all" {
 		query = "SELECT * FROM long"
@@ -81,7 +81,7 @@ func (lDB *LongsDB) Get(topic string) (*core.LongSeries, error) {
 func (lDB *LongsDB) GetAll() (*core.LongSeries, error) {
 	longs := make(core.LongSeries, 0)
 
-	query := "SELECT * FROM long ORDER BY unique_rowid() ASC"
+	query := "SELECT * FROM long ORDER BY unique_rowid() DESC"
 
 	rows, err := lDB.DB.Queryx(query)
 	if err != nil {
