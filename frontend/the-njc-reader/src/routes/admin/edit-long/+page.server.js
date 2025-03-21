@@ -36,7 +36,7 @@ export const actions = {
     const url = formData.get("url")
     const title = formData.get("title")
     const topic = formData.get("topic")
-    const id = parseInt(formData.get("id"))
+    const id = formData.get("id")
 
     if (url.length < 1 || title.length < 1) {
       return invalid(400, {
@@ -55,6 +55,8 @@ export const actions = {
       topic: topic,
     };
 
+    console.log(payload)
+    
     const session = cookies.get("session")
 
     const myHeaders = new Headers();

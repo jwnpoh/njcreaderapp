@@ -110,6 +110,7 @@
                   title = article.title;
                   topic = article.topic;
                   form = {};
+                  console.log(id);
                 }}
               /></th
             >

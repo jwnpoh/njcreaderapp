@@ -41,6 +41,8 @@ export const actions = {
       payload.push(pair[1])
     }
 
+    console.log(payload)
+    
     const session = cookies.get("session")
 
     const myHeaders = new Headers();
