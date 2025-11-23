@@ -4,44 +4,46 @@ INSERT INTO question_list (
 	number, 
 	wording
 ) VALUES (
-	'2024 - Q1',
-	'2024', 
+	'2025 - Q1',
+	'2025', 
 	'1',
-	'To what extent are science and technology able to solve the problem of waste disposal?'
+	'‘No country should sacrifice its economic development in favour of preserving the
+environment.’ Discuss.'
 ),(
-	'2024 - Q2',
-	'2024', 
+	'2025 - Q2',
+	'2025', 
 	'2',
-	'How desirable is it for a country to provide free healthcare for all its citizens?'
+	'Assess the view that only well-known works of art can be considered great.'
 ),(
-	'2024 - Q3',
-	'2024', 
+	'2025 - Q3',
+	'2025', 
 	'3',
-	'Evaluate the measures taken in your society to deter crime and punish criminals.'
+	'‘The most important aim of a scientist is to satisfy human curiosity about the
+world.’ Evaluate this view.'
 ),(
-	'2024 - Q4',
-	'2024', 
+	'2025 - Q4',
+	'2025', 
 	'4',
-	'‘Education today should involve more than the study of academic subjects.’ How far do you agree?'
+	'How far do you agree that media coverage of celebrities has a positive influence on young people in your society?'
 ),(
-	'2024 - Q5',
-	'2024', 
+	'2025 - Q5',
+	'2025', 
 	'5',
-	'Assess the view that it is always right to challenge injustice.'
+	'‘Democracy is the perfect form of government.’ Discuss.'
 ),(
-	'2024 - Q6',
-	'2024', 
+	'2025 - Q6',
+	'2025', 
 	'6',
-	'‘Online advertisements use increasingly sophisticated methods to target consumers.’ To what extent does this bring more harm than good?'
+	'Examine the claim that it is the responsibility of wealthier countries to assist in dealing with natural disasters.'
 ),(
-	'2024 - Q7',
-	'2024', 
+	'2025 - Q7',
+	'2025', 
 	'7',
-	'‘Humour is essential for an individual''s well-being.’ Discuss.'
+	'‘Learning facts is no longer necessary because information can be instantly accessed online.’ Evaluate this statement.'
 ),(
-	'2024 - Q8',
-	'2024', 
+	'2025 - Q8',
+	'2025', 
 	'8',
-	'‘There is a lack of appreciation for the value of music.’ How far is this true in your society?'
+	'To what extent do you agree that enough is done in your society to encourage a healthy lifestyle?'
 );
 

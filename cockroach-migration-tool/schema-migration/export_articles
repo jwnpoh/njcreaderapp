@@ -1,0 +1,1 @@
+cockroach sql --url postgresql://jwnpoh:qSyhIDYDPtJVSw7y23GuhQ@njcreaderapp-3066.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full --execute "SELECT title FROM articles WHERE published_on::timestamp >= '2024-01-01 00:00:00+00'  AND published_on::timestamp < '2025-01-01 00:00:00+00';;" --format=csv > output_2024_articles.csv 
