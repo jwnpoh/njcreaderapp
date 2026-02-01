@@ -1,7 +1,6 @@
 <script>
   var date = new Date();
 
-
   let greeting = "Hello";
   const h = date.getHours();
   if (h >= 18 && h < 24) {
@@ -27,13 +26,17 @@
   };
 </script>
 
-<div class="navbar bg-primary-focus text-white fixed top-0 z-50 ">
+<div class="navbar bg-primary-focus text-white fixed top-0 z-50">
   <div class="md:navbar-start">
     <div class="dropdown">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <!-- svelte-ignore a11y-label-has-associated-control -->
-      <label tabindex="0" class="btn btn-ghost btn-circle" on:click={toggleMenu}>
+      <label
+        tabindex="0"
+        class="btn btn-ghost btn-circle"
+        on:click={toggleMenu}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5"
@@ -50,30 +53,38 @@
       </label>
       <div class={!showMenu ? "hidden" : ""}>
         <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-        <ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-primary-focus rounded-box w-64" >
+        <ul
+          tabindex="0"
+          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-primary-focus rounded-box w-64"
+        >
           <li>
             <div
-              class="md:hidden py-1 text-xl font-medium  hover:cursor-default"
+              class="md:hidden py-1 text-xl font-medium hover:cursor-default"
             >
               <a href="/"> The NJC Reader </a>
             </div>
           </li>
-            <li>
-              <div
-                class="md:py-1 px-4 font-semibold text-lg  hover:cursor-default"
-              >
-                {greeting}!
-              </div>
-            </li>
-            <li><a data-sveltekit-reload href="/articles">News Feed</a></li>
-            <li><a href="/long">Long Reads</a></li>
+          <li>
+            <div
+              class="md:py-1 px-4 font-semibold text-lg hover:cursor-default"
+            >
+              {greeting}!
+            </div>
+          </li>
+          <li><a data-sveltekit-reload href="/articles">News Feed</a></li>
+          <li><a href="/long">Long Reads</a></li>
           {#if user.loggedIn}
-            <div class="divider px-2 before:bg-white opacity-30 after:bg-white opacity-30" />
+            <div
+              class="divider px-2 before:bg-white opacity-30 after:bg-white opacity-30"
+            />
             {#if role === "admin"}
               <li>
                 <a href="/admin">Admin dashboard</a>
               </li>
             {/if}
+            <li>
+              <a href="/user-profile">User Profile</a>
+            </li>
           {/if}
           <li>
             <a
@@ -98,7 +109,7 @@
         <input
           type="text"
           placeholder="Search articles"
-          class="input input-bordered "
+          class="input input-bordered"
           name="query"
         />
       </div>

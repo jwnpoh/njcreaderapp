@@ -19,7 +19,26 @@ export const actions = {
     const formData = await request.formData()
     const input = await formData.get("input")
     const inputString = await input.text()
-    const parsed = Papa.parse(inputString , {header: true})
+    const parsed = Papa.parse(inputString, {
+      header: true,
+      skipEmptyLines: true,
+    })
+
+    if (parsed.errors.length > 0) {
+      return invalid(400, { failed: true, message: "Invalid CSV format." })
+    }
+
+    const requiredHeaders = ["email", "role", "class", "display_name"]
+    const headers = parsed.meta.fields
+
+    const missingHeaders = requiredHeaders.filter(header => !headers.includes(header))
+    if (missingHeaders.length > 0) {
+      return invalid(400, { failed: true, message: `Missing required headers: ${missingHeaders.join(", ")}` })
+    }
+
+    if (parsed.data.length === 0) {
+      return invalid(400, { failed: true, message: "CSV file is empty." })
+    }
 
     const session = cookies.get("session")
 
