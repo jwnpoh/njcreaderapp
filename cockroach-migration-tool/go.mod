@@ -1,6 +1,6 @@
 module github.com/jwnpoh/njcreaderapp/cockroach-migration-tool
 
-go 1.22
+go 1.18
 
 require (
 	github.com/go-sql-driver/mysql v1.6.0

@@ -43,23 +43,16 @@ func (b *broker) InsertUsers(w http.ResponseWriter, r *http.Request) {
 		users = append(users, v)
 	}
 
-	if len(users) > 0 {
-		s = serializer.NewSerializer(false, "successfully sent list of new users to backend. a confirmation email will be sent shortly after the insertion is completed.", nil)
-		s.Encode(w, http.StatusAccepted)
-	}
-
 	err = b.Users.InsertUsers(&users)
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to add new users", err)
-		// s.ErrorJson(w, err)
+		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
 		s, err = b.Mailer.AdminConfirmation(user.Email, "Unable to add new users to database.")
 		if err != nil {
 			s := serializer.NewSerializer(true, "unable to send email confirmation to notify error in inserting new users", err)
-			s.ErrorJson(w, err)
 			b.Logger.Error(s, r)
 			fmt.Println(err)
-			return
 		}
 		return
 	}
@@ -69,10 +62,13 @@ func (b *broker) InsertUsers(w http.ResponseWriter, r *http.Request) {
 	s, err = b.Mailer.AdminConfirmation(user.Email, "Successfully inserted new users.")
 	if err != nil {
 		s := serializer.NewSerializer(true, "unable to send email confirmation to confirm new users insertion", err)
-		s.ErrorJson(w, err)
 		b.Logger.Error(s, r)
-		fmt.Println(err)
-		return
+		// We don't return here because the insertion was successful
+	}
+
+	if len(users) > 0 {
+		s = serializer.NewSerializer(false, "successfully inserted new users", nil)
+		s.Encode(w, http.StatusOK)
 	}
 }
 
@@ -157,8 +153,15 @@ func (b *broker) GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *broker) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	token, err := b.Authenticator.AuthenticateToken(r)
+	if err != nil {
+		s := serializer.NewSerializer(true, "unable to authenticate user", err)
+		s.ErrorJson(w, err)
+		b.Logger.Error(s, r)
+		return
+	}
+
 	var userInput struct {
-		UserID      int    `json:"user_id"`
 		OldPassword string `json:"old_password"`
 		NewPassword string `json:"new_password"`
 		DisplayName string `json:"display_name"`
@@ -169,13 +172,13 @@ func (b *broker) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	profanityCheck := profanity.CheckProfanity(userInput.DisplayName)
 	if profanityCheck.IsProfane {
-		s := serializer.NewSerializer(true, "Please use clean language on this platform.\nThe system auto-detected the use of profanity in your entry.\nIf you think this is a mistake, please submit a request with a screenshot of your entry via your tutor.", userInput.UserID)
+		s := serializer.NewSerializer(true, "Please use clean language on this platform.\nThe system auto-detected the use of profanity in your entry.\nIf you think this is a mistake, please submit a request with a screenshot of your entry via your tutor.", token.UserID)
 		s.Encode(w, http.StatusBadRequest)
 		b.Logger.Info(s, r)
 		return
 	}
 
-	user, err := b.Users.GetUser("id", userInput.UserID)
+	user, err := b.Users.GetUser("id", token.UserID)
 	if err != nil {
 		s := serializer.NewSerializer(true, "invalid credentials", err)
 		s.ErrorJson(w, err)

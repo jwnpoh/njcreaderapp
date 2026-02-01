@@ -106,7 +106,7 @@ func (pDB *PostsDB) GetPosts(userIDs []uuid.UUID, public bool) (*core.Posts, err
 }
 
 func (pDB *PostsDB) AddPost(post *core.Post) error {
-	query := "INSERT IGNORE INTO notes (user_id, author, author_class, likes, tldr, examples, notes, tags, created_at, public, article_id, article_title, article_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)"
+	query := "INSERT INTO notes (user_id, author, author_class, likes, tldr, examples, notes, tags, created_at, public, article_id, article_title, article_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) ON CONFLICT DO NOTHING"
 
 	tx, err := pDB.DB.Begin()
 	if err != nil {
@@ -237,7 +237,7 @@ func parseQuery(userIDs []uuid.UUID) string {
 	query.WriteString("SELECT * FROM notes WHERE ")
 	for i, v := range userIDs {
 		if i < len(userIDs)-1 {
-			query.WriteString(fmt.Sprintf("user_id = '%s' AND ", v))
+			query.WriteString(fmt.Sprintf("user_id = '%s' OR ", v))
 			continue
 		}
 		query.WriteString(fmt.Sprintf("user_id = '%s'", v))

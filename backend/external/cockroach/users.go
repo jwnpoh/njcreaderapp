@@ -28,7 +28,7 @@ func NewUsersDB(dsn string) (*UsersDB, error) {
 }
 
 func (uDB *UsersDB) InsertUsers(users *[]core.User) error {
-	query := "INSERT INTO users (email, hash, role, last_login, display_name, class) VALUES ($1, $2, $3, $4, $5, $6) ON DUPLICATE KEY UPDATE class = $7"
+	query := "INSERT INTO users (email, hash, role, last_login, display_name, class) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (email) DO UPDATE SET class = excluded.class"
 
 	tx, err := uDB.DB.Begin()
 	if err != nil {
@@ -37,7 +37,7 @@ func (uDB *UsersDB) InsertUsers(users *[]core.User) error {
 	defer tx.Rollback()
 
 	for i, user := range *users {
-		_, err = tx.Exec(query, user.Email, user.Hash, user.Role, user.LastLogin, user.DisplayName, user.Class, user.Class)
+		_, err = tx.Exec(query, user.Email, user.Hash, user.Role, user.LastLogin, user.DisplayName, user.Class)
 		if err != nil {
 			return fmt.Errorf("PScaleUsers: unable to add user %s to db - %w", user.Email, err)
 		}
@@ -63,7 +63,7 @@ func (uDB *UsersDB) InsertUsers(users *[]core.User) error {
 }
 
 func (uDB *UsersDB) GetUser(field string, value any) (*core.User, error) {
-	query := fmt.Sprintf("SELECT * FROM users WHERE %s = $1", field)
+	query := fmt.Sprintf("SELECT id, email, hash, role, last_login, display_name, class FROM users WHERE %s = $1", field)
 
 	row := uDB.DB.QueryRowx(query, value)
 

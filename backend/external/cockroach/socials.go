@@ -87,7 +87,7 @@ func (sDB *SocialsDB) Follow(userID, toFollow uuid.UUID) error {
 	}
 	defer tx.Rollback()
 
-	query := "INSERT INTO follows (user_id, follows) VALUES ($1, $2)"
+	query := "INSERT INTO follows (user_id, follows) VALUES ($1, $2) ON CONFLICT DO NOTHING"
 
 	_, err = tx.Exec(query, userID, toFollow)
 	if err != nil {
@@ -136,7 +136,7 @@ func (sDB *SocialsDB) Like(userID, postID uuid.UUID) error {
 		return fmt.Errorf("PScaleSocials: unable to add like to notes table in db - %w", err)
 	}
 
-	queryOnLikes := "INSERT INTO likes_list (post_id, liked_by) VALUES ($1, $2)"
+	queryOnLikes := "INSERT INTO likes_list (post_id, liked_by) VALUES ($1, $2) ON CONFLICT DO NOTHING"
 	_, err = tx.Exec(queryOnLikes, postID, userID)
 	if err != nil {
 		return fmt.Errorf("PScaleSocials: unable to add like to likes_list table in db - %w", err)
