@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/joho/godotenv"
 	"io"
 	"log"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+	godotenv.Load(".env")
 	token := os.Getenv("BOT_TOKEN")
 	if token == "" {
 		log.Fatal("BOT_TOKEN environment variable is not set")
