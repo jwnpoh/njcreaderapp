@@ -1,11 +1,6 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/jwnpoh/njcreaderapp/backend)](https://goreportcard.com/report/github.com/jwnpoh/njcreaderapp/backend)
-[![CodeFactor](https://www.codefactor.io/repository/github/jwnpoh/njcreaderapp/badge)](https://www.codefactor.io/repository/github/jwnpoh/njcreaderapp)
-
-
-## Introduction
 The NJC Reader is a full stack web app that gives students access to a database of teacher-curated articles tagged by topic as well as relevant past year 'A' Level GP essay questions. 
 
-### With thanks to:
+This project makes use of:
 - [Go](https://go.dev/)
 - [Go-chi](https://go-chi.io/)
 - [sqlx](http://jmoiron.github.io/sqlx/)
