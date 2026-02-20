@@ -30,6 +30,7 @@ export async function load({ fetch, cookies, locals }) {
 
   return {
     articles: articles,
+    API_URL: `${process.env.API_URL}`
   };
 }
 

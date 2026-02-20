@@ -15,7 +15,6 @@
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", "Bearer " + session);
-
   const getTitle = async (url) => {
     const payload = { url: url };
     const res = await fetch(`${data.API_URL}/api/admin/articles/get-title`, {
@@ -23,44 +22,19 @@
       body: JSON.stringify(payload),
       headers: myHeaders,
     });
+
     const response = await res.json();
     title = response.data;
-  };
-
-  // -------------------------------------------------------------------------
-  // NEW: SEARCH STATE
-  // Since ALL long articles are loaded on page open, we can just filter the already-loaded list
-  // entirely in the browser — no API calls needed, and no debouncing required
-  // since we're not hitting a server.
-  // -------------------------------------------------------------------------
-
-  // What the admin has typed in the search box
-  let searchQuery = "";
-
-  // -------------------------------------------------------------------------
-  // NEW: REACTIVE FILTER
-  // -------------------------------------------------------------------------
-  $: displayedArticles = searchQuery.trim()
-    ? articles.filter(
-        (a) =>
-          a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          a.topic.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : articles;
-
-  const clearSearch = () => {
-    searchQuery = "";
   };
 </script>
 
 <PageTitle>Edit long articles</PageTitle>
 <div class="mx-auto px-5">
-  <div class="px-5 pt-5">
-    <a href="/admin" class="btn-link">
-      <p class="align-middle">&#8678; Back to admin dashboard</p>
-    </a>
+  <div class="px-5 pt-5 ">
+    <a href="/admin" class="btn-link"
+      ><p class="align-middle">&#8678; Back to admin dashboard</p></a
+    >
   </div>
-
   <form method="POST" action="?/edit">
     <input name="id" type="text" class="hidden" hidden bind:value={id} />
     <div class="pt-5 px-5">
@@ -94,6 +68,7 @@
         bind:value={topic}
       />
     </div>
+
     <button class="btn btn-sm btn-primary mx-7">Save changes to article</button>
   </form>
 
@@ -109,46 +84,8 @@
   {/if}
 
   <div class="divider py-3" />
-
-  <!-- ======================================================================
-    NEW: Search bar
-  ======================================================================= -->
-  <div class="px-5 pb-3">
-    <p class="pb-3 text-sm opacity-70">
-      Filter articles by title or topic.
-    </p>
-    <div class="flex gap-2 max-w-lg">
-      <input
-        type="text"
-        placeholder="e.g. globalisation, technology..."
-        class="input input-bordered flex-1"
-        bind:value={searchQuery}
-      />
-      {#if searchQuery}
-        <button type="button" class="btn btn-ghost" on:click={clearSearch}>
-          Clear
-        </button>
-      {/if}
-    </div>
-    <!-- Show result count when a filter is active -->
-    {#if searchQuery.trim()}
-      <p class="pt-2 text-sm opacity-70">
-        {#if displayedArticles.length > 0}
-          Showing {displayedArticles.length} result(s) for "{searchQuery}".
-        {:else}
-          No results found for "{searchQuery}".
-        {/if}
-      </p>
-    {/if}
-  </div>
-
-  <!-- ======================================================================
-    Changed: loops over displayedArticles instead of articles.
-  ======================================================================= -->
-  <div class="mx-auto pb-5 px-5">
-    {#if !searchQuery.trim()}
-      <p class="text-sm opacity-70">Displaying all long articles. Select article to edit.</p>
-    {/if}
+  <div class="mx-auto pb-5">
+    <p>Displaying all long articles. Select article to edit.</p>
   </div>
   <div>
     <table class="table table-compact w-full">
@@ -160,10 +97,10 @@
         </tr>
       </thead>
       <tbody>
-        {#each displayedArticles as article}
+        {#each articles as article}
           <tr>
-            <th>
-              <input
+            <th
+              ><input
                 type="radio"
                 name="selection"
                 value={article.id}
@@ -173,9 +110,10 @@
                   title = article.title;
                   topic = article.topic;
                   form = {};
+                  console.log(id);
                 }}
-              />
-            </th>
+              /></th
+            >
             <td>{article.title}</td>
             <td>{article.topic}</td>
           </tr>
