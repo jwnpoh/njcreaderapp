@@ -3,8 +3,7 @@
 
 
 ## Introduction
-The NJC Reader is a full stack web app that is an evolution of the now defunct NJC GP News Feed. 
-
+The NJC Reader is a full stack web app that gives students access to a database of teacher-curated articles tagged by topic as well as relevant past year 'A' Level GP essay questions. 
 
 ### With thanks to:
 - [Go](https://go.dev/)
