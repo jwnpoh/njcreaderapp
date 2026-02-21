@@ -5,6 +5,11 @@ import (
 	"os"
 )
 
+type TelegramConfig struct {
+	BotToken string
+	ChatID   string
+}
+
 type MailServiceConfig struct {
 	Host     string
 	Port     string
@@ -23,6 +28,7 @@ type Config struct {
 	DSN  string
 	MailServiceConfig
 	SheetsConfig
+	TelegramConfig
 }
 
 func LoadConfig() (Config, error) {
@@ -41,6 +47,10 @@ func LoadConfig() (Config, error) {
 			Credentials: os.Getenv("SHEET_CREDENTIALS"),
 			SheetID:     os.Getenv("SHEET_ID"),
 			SheetName:   os.Getenv("SHEET_NAME"),
+		},
+		TelegramConfig: TelegramConfig{
+			BotToken: os.Getenv("BOT_TOKEN"),
+			ChatID:   os.Getenv("CHAT_ID"),
 		},
 	}
 

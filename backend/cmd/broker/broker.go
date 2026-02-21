@@ -17,6 +17,7 @@ import (
 	"github.com/jwnpoh/njcreaderapp/backend/services/posts"
 	"github.com/jwnpoh/njcreaderapp/backend/services/socials"
 	"github.com/jwnpoh/njcreaderapp/backend/services/stats"
+	"github.com/jwnpoh/njcreaderapp/backend/services/telegram"
 	"github.com/jwnpoh/njcreaderapp/backend/services/users"
 )
 
@@ -36,6 +37,7 @@ type broker struct {
 	Socials       *socials.Socials
 	Stats         *stats.Stats
 	Mailer        *mail.MailService
+	Telegram      *telegram.TelegramService
 }
 
 // NewBrokerService creates a new BrokerService.
@@ -82,6 +84,8 @@ func NewBrokerService(config config.Config) BrokerService {
 
 	mailService := mail.NewMailService(config.MailServiceConfig)
 
+	telegramService := telegram.NewTelegramService(config.TelegramConfig)
+
 	broker := broker{
 		Port:          config.Port,
 		Logger:        logger.NewAppLogger(),
@@ -93,6 +97,7 @@ func NewBrokerService(config config.Config) BrokerService {
 		Socials:       socials.NewSocialsDB(socialsDB, usersDB),
 		Stats:         stats.NewStatsService(statsDB),
 		Mailer:        mailService,
+		Telegram:      telegramService,
 	}
 
 	return &broker

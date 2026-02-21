@@ -78,6 +78,7 @@ func (b *broker) serveRoutes(mux chi.Router) {
 		mux.Get("/update", b.Get100)
 		mux.Put("/update", b.Update)
 		mux.Post("/get-title", b.GetTitle)
+		mux.Post("/telegram-send", b.SendTelegramDigest)
 	})
 
 	mux.Route("/api/admin/long", func(mux chi.Router) {
