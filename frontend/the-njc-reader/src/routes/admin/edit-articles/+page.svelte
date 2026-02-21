@@ -65,7 +65,7 @@
   // -------------------------------------------------------------------------
   const handleSearch = async (query) => {
     // If the search box is empty, just reset back to the default 100 articles
-    if (!query.trim()) {
+    if (!query.trim() || query.trim().length < 3) {
       displayedArticles = articles;
       searchStatus = "";
       return;

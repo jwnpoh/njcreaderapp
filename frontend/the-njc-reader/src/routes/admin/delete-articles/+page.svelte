@@ -60,7 +60,7 @@
   // Called automatically via the reactive block below whenever searchQuery changes.
   // -------------------------------------------------------------------------
   const handleSearch = async (query) => {
-    if (!query.trim()) {
+    if (!query.trim() || query.trim().length < 3) {
       // Empty search box — reset to default 100 articles
       displayedArticles = articles;
       searchStatus = "";

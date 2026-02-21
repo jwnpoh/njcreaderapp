@@ -12,7 +12,7 @@ export let loggedIn;
 
 {#if query}
   <p class="px-10 py-5 italic font-medium text-xl">
-    Showing results for: "{query}"
+    Found {articles.length} result(s) for: "{query}"
   </p>
 {/if}
 
