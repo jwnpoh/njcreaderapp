@@ -104,7 +104,7 @@
     >
   </div>
   <div class="md:navbar-end">
-    <form method="POST" action="/search">
+    <form method="GET" action="/search">
       <div class="form-control px-3 fixed top-2 right-1 text-black">
         <input
           type="text"

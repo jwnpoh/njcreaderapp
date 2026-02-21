@@ -72,7 +72,13 @@
     </div>
 -->
 </div>
-
+<div
+    class="grid justify-center place-content-center mt-4 mb-4 "
+  >
+          <button class="btn btn-link text-xl"
+            ><a href="/admin/telegram">Send Telegram digest</a></button
+          >
+          </div>
 
 <div
     class="grid justify-center place-content-center mt-10 "

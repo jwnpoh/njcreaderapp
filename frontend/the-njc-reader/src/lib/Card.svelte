@@ -42,7 +42,7 @@
       <div />
       <div class="inline">
         {#each topics as topic}
-          <form class="inline" action="/search" method="POST">
+          <form class="inline" action="/search" method="GET">
             <input type="hidden" value={topic} name="query" />
             <button class="badge badge-outline ">{topic}</button>
           </form>
@@ -58,7 +58,7 @@
         <div class="collapse-content px-0 py-0">
           <ul class="list-none">
             {#each question_display as question}
-              <form action="/search" method="POST">
+              <form action="/search" method="GET">
                 <input type="hidden" value={question} name="query" />
                 <button class="submit-btn">{question}</button>
               </form>
