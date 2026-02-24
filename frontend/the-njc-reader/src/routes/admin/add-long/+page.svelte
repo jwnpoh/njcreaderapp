@@ -1,3 +1,4 @@
+<!--
 <script>
   import PageTitle from "$lib/PageTitle.svelte";
   export let form;
@@ -54,3 +55,54 @@ https://example2.com/article2; topic 2"
   {/each}
   </ul>
 </details>
+-->
+<script>
+  import PageTitle from "$lib/PageTitle.svelte";
+  export let form;
+  export let data;
+  $: topics = data.topics;
+</script>
+
+<PageTitle>Add long articles</PageTitle>
+<div class="px-5 pt-5">
+  <a href="/admin" class="btn-link">
+    <p class="align-middle">&#8678; Back to admin dashboard</p>
+  </a>
+</div>
+
+<div class="px-5 pt-5">
+  <form method="POST" action="?/add">
+    <div class="card bg-base-100 shadow-sm border border-base-300 p-5 max-w-3xl mb-4">
+      <p class="text-sm opacity-70 mb-3">
+        Enter each article on a new line, separating the URL and topic with a semicolon.
+      </p>
+      <textarea
+        required
+        name="input"
+        placeholder="https://example.com/article1 ; Topic{'\n'}https://example.com/article2 ; Topic 2"
+        class="textarea textarea-bordered w-full h-40 mb-4"
+      />
+      <button class="btn btn-primary btn-sm w-fit">Add to database</button>
+    </div>
+  </form>
+
+  {#if form?.sent}
+    <div class="alert alert-success max-w-3xl mt-3">
+      <span>Articles added successfully.</span>
+    </div>
+  {/if}
+  {#if form?.failed}
+    <div class="alert alert-error max-w-3xl mt-3">
+      <span>{form?.message}</span>
+    </div>
+  {/if}
+
+  <details class="max-w-3xl mt-4">
+    <summary class="text-sm opacity-70 cursor-pointer">Show existing topics</summary>
+    <ul class="mt-2 flex flex-wrap gap-2">
+      {#each topics as topic}
+        <li class="badge badge-outline">{topic}</li>
+      {/each}
+    </ul>
+  </details>
+</div>
