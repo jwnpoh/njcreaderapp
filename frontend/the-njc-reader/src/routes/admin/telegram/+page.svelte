@@ -42,7 +42,7 @@
       <button class="btn btn-sm btn-primary mb-5">
         Send to Telegram
       </button>
-      <table class="table table-compact w-full">
+      <table class="table table-compact w-full px-4">
         <thead>
           <tr>
             <th>Send</th>

@@ -550,7 +550,7 @@
     {/if}
   </div>
   <div>
-    <table class="table table-compact w-full">
+    <table class="table table-compact w-full px-4">
       <thead>
         <tr>
           <th>check</th>
@@ -558,7 +558,6 @@
           <th>Title</th>
           <th>Topics</th>
           <th>Questions</th>
-          <th>Must read?</th>
         </tr>
       </thead>
       <tbody>
@@ -590,10 +589,9 @@
               />
             </th>
             <td>{article.date}</td>
-            <td>{article.title}</td>
+            <td>{article.title} {#if article.must_read}<span class="badge badge-secondary">Must Read</span>{/if}</td>
             <td>{article.topics}</td>
             <td>{article.questions}</td>
-            <td>{article.must_read}</td>
           </tr>
         {/each}
       </tbody>

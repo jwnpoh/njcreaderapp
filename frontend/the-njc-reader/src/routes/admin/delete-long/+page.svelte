@@ -5,9 +5,7 @@
 
   const articles = data.articles;
 
-  // -------------------------------------------------------------------------
-  // NEW: CLIENT-SIDE FILTERING
-  // -------------------------------------------------------------------------
+
   let searchQuery = "";
 
   $: displayedArticles = searchQuery.trim()
@@ -26,10 +24,9 @@
     searchQuery = "";
   };
 
-  // -------------------------------------------------------------------------
-  // NEW: TRACKING CHECKED ARTICLES ACROSS SEARCHES
-  // -------------------------------------------------------------------------
   let selectedIds = new Set();
+let deleteStatus = ""; // "success" | "error" | ""
+let deleteError = "";
 
   const toggleSelection = (id, checked) => {
     if (checked) {
@@ -46,10 +43,7 @@
   const handleDelete = async (event) => {
     event.preventDefault();
 
-    if (selectedIds.size === 0) {
-      alert("No articles selected for deletion.");
-      return;
-    }
+    if (selectedIds.size === 0) return;
 
     const formData = new FormData();
     for (const id of selectedIds) {
@@ -62,12 +56,14 @@
     });
 
     if (res.ok) {
-      selectedIds = new Set();
-      searchQuery = "";
-      window.location.reload();
-    } else {
-      alert("Deletion failed. Please try again.");
-    }
+  selectedIds = new Set();
+  searchQuery = "";
+  deleteStatus = "success";
+  window.location.reload();
+} else {
+  deleteStatus = "error";
+  deleteError = "Deletion failed. Please try again.";
+}
   };
 </script>
 
@@ -125,6 +121,11 @@
       <button class="btn btn-sm btn-error mb-5" disabled={selectedIds.size === 0}>
         Delete {selectedIds.size > 0 ? `${selectedIds.size} selected` : "selected"} article(s)
       </button>
+      {#if deleteStatus === "error"}
+  <div class="alert alert-error max-w-lg mb-3">
+    <span>{deleteError}</span>
+  </div>
+{/if}
       <table class="table table-compact w-full">
         <thead>
           <tr>

@@ -6,9 +6,6 @@
 
   const articles = data.articles;
 
-  // -------------------------------------------------------------------------
-  // NEW: SEARCH STATE
-  // -------------------------------------------------------------------------
 
   // What the admin has typed in the search box
   let searchQuery = "";
@@ -23,18 +20,9 @@
   // True while waiting for the API to respond
   let isSearching = false;
 
-  // -------------------------------------------------------------------------
-  // IMPORTANT: TRACKING CHECKED ARTICLES ACROSS SEARCHES
-  //
-  // If we just relied on the checkboxes in the DOM, any checked items would
-  // disappear from view when search results replace the table — and since
-  // they're no longer rendered, they wouldn't be included in the form POST.
-  //
-  // The solution: maintain a Set of selected article IDs in JS. Checkboxes
-  // update this Set when ticked/unticked. The form submission reads from
-  // this Set, not from the DOM checkboxes directly.
-  // -------------------------------------------------------------------------
   let selectedIds = new Set();
+let deleteStatus = ""; // "success" | "error" | ""
+let deleteError = "";
 
   const toggleSelection = (id, checked) => {
     // When a checkbox is ticked, add the article ID to our Set.
@@ -116,10 +104,7 @@
   const handleDelete = async (event) => {
     event.preventDefault(); // stop the default browser form submission
 
-    if (selectedIds.size === 0) {
-      alert("No articles selected for deletion.");
-      return;
-    }
+    if (selectedIds.size === 0) return;
 
     // Build a FormData object manually, adding one entry per selected ID —
     // this matches exactly what the original form would have submitted
@@ -135,14 +120,14 @@
     });
 
     if (res.ok) {
-      // On success: clear selection and refresh the article list
-      selectedIds = new Set();
-      searchQuery = "";
-      // Reload the page so the deleted articles disappear from the table
-      window.location.reload();
-    } else {
-      alert("Deletion failed. Please try again.");
-    }
+  selectedIds = new Set();
+  searchQuery = "";
+  deleteStatus = "success";
+  window.location.reload();
+} else {
+  deleteStatus = "error";
+  deleteError = "Deletion failed. Please try again.";
+}
   };
 </script>
 
@@ -206,14 +191,19 @@
       <button class="btn btn-sm btn-error mb-5" disabled={selectedIds.size === 0}>
         Delete {selectedIds.size > 0 ? `${selectedIds.size} selected` : "selected"} article(s)
       </button>
+      {#if deleteStatus === "error"}
+  <div class="alert alert-error max-w-lg mb-3">
+    <span>{deleteError}</span>
+  </div>
+{/if}
       <table class="table table-compact w-full">
         <thead>
           <tr>
             <th>check</th>
+            <th>Date</th>
             <th>Title</th>
             <th>Topics</th>
             <th>Questions</th>
-            <th>Date</th>
           </tr>
         </thead>
         <tbody>
@@ -228,10 +218,14 @@
                   on:change={(e) => toggleSelection(article.id, e.target.checked)}
                 />
               </th>
-              <td>{article.title}</td>
+              <td>{article.date}</td>
+              <td>{article.title}                   
+                {#if article.must_read}
+                    <span class="badge badge-secondary badge-sm mt-1">must read</span>
+                  {/if}
+              </td>
               <td>{article.topics}</td>
               <td>{article.questions}</td>
-              <td>{article.date}</td>
             </tr>
           {/each}
         </tbody>
