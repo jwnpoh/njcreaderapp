@@ -86,7 +86,8 @@ func (aDB *ArticlesDB) GetArticle(id uuid.UUID) (*core.Article, error) {
 func (aDB *ArticlesDB) Find(terms string) (*core.ArticleSeries, error) {
 	series := make(core.ArticleSeries, 0, 12)
 
-	query := "SELECT id, title, url, topics, questions, question_display, published_on, must_read FROM articles, to_tsvector(title || topics || question_display) article, plainto_tsquery($1) query WHERE query @@ article"
+	// query := "SELECT id, title, url, topics, questions, question_display, published_on, must_read FROM articles, to_tsvector(title || topics || question_display) article, plainto_tsquery($1) query WHERE query @@ article"
+	query := "SELECT id, title, url, topics, questions, question_display, published_on, must_read FROM articles, to_tsvector(title || ' ' || topics || ' ' || question_display) article, to_tsquery($1) query WHERE query @@ article"
 
 	term, isQn := strings.CutPrefix(terms, "isQn")
 	if isQn {

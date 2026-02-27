@@ -134,11 +134,11 @@ func checkQuery(q string) string {
 	switch {
 	case isQn:
 		return searchQn(q)
-	case strings.Contains(q, "AND"):
+	case strings.Contains(q, " AND "):
 		return searchAND(q)
-	case strings.Contains(q, "OR"):
+	case strings.Contains(q, " OR "):
 		return searchOR(q)
-	case strings.Contains(q, "NOT"):
+	case strings.Contains(q, " NOT "):
 		return searchNOT(q)
 	case strings.Contains(q, " "):
 		return searchExact(q)
