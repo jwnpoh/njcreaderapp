@@ -219,7 +219,7 @@
   <!-- ========================================================================
     ENTRY FORM
   ========================================================================= -->
-  <div class="card bg-base-100 shadow-sm border border-base-300 p-5 max-w-3xl mb-4">
+  <div class="card bg-base-100 shadow-sm border border-base-300 p-5 max-w-3xl mb-4 overflow-visible">
 
     <!-- Row 1: URL | Date | Must read -->
     <div class="grid grid-cols-12 gap-3 items-end mb-3">
