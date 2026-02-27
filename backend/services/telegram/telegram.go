@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/jwnpoh/njcreaderapp/backend/cmd/config"
 )
@@ -41,7 +42,64 @@ func (t *TelegramService) SendDigest(articles []TelegramPayload) error {
 func (t *TelegramService) formatMessage(articles []TelegramPayload) string {
 	var sb strings.Builder
 
-	sb.WriteString("<b>⭐ Today's Must Read(s) ⭐</b>\n\n")
+	titles := []string{
+		"📚 What you need to know today",
+		"🎯 Don't miss these stories",
+		"⚡ Today's essential reads",
+		"🔥 Hot takes for smart students",
+		"💡 Insights you can't skip",
+		"🌟 Your daily knowledge boost",
+		"🎓 Sharp minds read these",
+		"⭐ Stories shaping the conversation",
+		"🚀 Fuel your brain today",
+		"📰 The smart student's briefing",
+		"🧠 Think deeper with these",
+		"🎯 Required reading for today",
+		"💎 Premium picks for you",
+		"🔍 What everyone's talking about",
+		"📊 Data-driven stories today",
+		"🌍 Global issues, local impact",
+		"⚡ Quick reads, big ideas",
+		"🎨 Perspectives that matter",
+		"🔥 Trending in current affairs",
+		"💭 Food for thought today",
+		"📚 Expand your worldview",
+		"🎯 Sharp takes for sharp minds",
+		"⭐ Today's conversation starters",
+		"🧭 Navigate today's headlines",
+		"💡 Illuminate your understanding",
+		"🎓 Level up your awareness",
+		"🔔 Stories you actually need",
+		"🌟 Today's standout journalism",
+		"⚡ Brief but brilliant reads",
+		"🎯 Your competitive edge today",
+		"🔥 What's worth your time",
+		"📈 Ideas on the rise",
+		"💡 Thought-provoking reads",
+		"🎯 The informed student's pick",
+		"🌟 Quality over quantity today",
+		"🧠 Challenge your thinking",
+		"📚 Beyond the classroom",
+		"⚡ Stay ahead of the curve",
+		"🎓 Smart reads for today",
+		"💎 Curated for curious minds",
+		"🔍 Deep dives worth taking",
+		"🌍 Stories that connect",
+		"📊 Numbers tell stories too",
+		"🎯 Signal in the noise",
+		"💡 Fresh perspectives today",
+		"🔥 Can't-miss coverage",
+		"⭐ Your strategic advantage",
+		"🧭 Navigate complexity here",
+		"📰 Context you're missing",
+		"🚀 Accelerate your learning",
+	}
+
+	// Rotate based on day of year for consistency within a day
+	dayOfYear := time.Now().YearDay()
+	selectedTitle := titles[dayOfYear%len(titles)]
+
+	sb.WriteString(fmt.Sprintf("<b>%s</b>\n\n", selectedTitle))
 
 	for i, article := range articles {
 		// Title as hyperlink
