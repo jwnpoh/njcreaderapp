@@ -261,7 +261,7 @@
             placeholder="https://..."
             class="input input-bordered input-sm w-full"
             bind:value={url}
-            on:change={() => getTitle(url)}
+            on:input={() => getTitle(url)}
           />
         </div>
         <div>
