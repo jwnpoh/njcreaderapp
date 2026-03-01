@@ -125,10 +125,22 @@ func (t *TelegramService) formatMessage(articles []TelegramPayload) string {
 func (t *TelegramService) sendMessage(text string) error {
 	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", t.botToken)
 
-	payload := map[string]interface{}{
-		"chat_id":    t.chatID,
-		"text":       text,
-		"parse_mode": "HTML",
+	inlineKeyboard := map[string]any{
+		"inline_keyboard": [][]map[string]string{
+			{
+				{"text": "📖 Visit NJC Reader", "url": "https://the-njc-reader.vercel.app"},
+			},
+			{
+				{"text": "📚 Longer Reads", "url": "https://the-njc-reader.vercel.app/long"},
+			},
+		},
+	}
+
+	payload := map[string]any{
+		"chat_id":      t.chatID,
+		"text":         text,
+		"parse_mode":   "HTML",
+		"reply_markup": inlineKeyboard,
 	}
 
 	jsonData, err := json.Marshal(payload)
@@ -142,7 +154,7 @@ func (t *TelegramService) sendMessage(text string) error {
 	}
 	defer resp.Body.Close()
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return fmt.Errorf("telegram service: failed to decode response - %w", err)
 	}
