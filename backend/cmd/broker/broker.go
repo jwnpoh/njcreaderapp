@@ -29,9 +29,9 @@ type BrokerService interface {
 type broker struct {
 	Port          string
 	Logger        logger.Logger
-	Articles      *articles.Articles
+	Articles      ArticleService
 	Longs         *long.Longs
-	Authenticator *auth.Authenticator
+	Authenticator AuthService
 	Users         *users.UserManager
 	Posts         *posts.Posts
 	Socials       *socials.Socials
