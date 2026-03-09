@@ -2,6 +2,7 @@
   import PageTitle from "$lib/PageTitle.svelte";
   import { page } from "$app/stores";
   import { DateInput } from "date-picker-svelte";
+  import articleQueue from "$lib/stores/articleQueue"
 
   export let data;
 
@@ -10,9 +11,7 @@
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", "Bearer " + session);
 
-  // ---------------------------------------------------------------------------
   // FORM STATE
-  // ---------------------------------------------------------------------------
   let url = "";
   let title = "";
   let tags = "";
@@ -45,14 +44,7 @@
     duplicateWarning = "";
   };
 
-  // ---------------------------------------------------------------------------
   // TAG PARSING
-  //
-  // Replicates the backend's formatQuestionString + parseTags logic in JS.
-  // The Go regex is: \s?\d{4}(\s?)+-?(\s?)+(q|Q)?\d{1,2}
-  // Very permissive — matches YYYY followed by optional spacing/hyphens,
-  // optional q/Q, then 1-2 digits.
-  // ---------------------------------------------------------------------------
   const QUESTION_REGEX = /\d{4}\s*-?\s*(q|Q)?\d{1,2}/;
 
   // Normalises a matched question token to YYYY - QN, mirroring the backend's
@@ -64,7 +56,7 @@
   };
 
   const parseTags = (tagString) => {
-    // Mirror splitTags: trim, strip trailing semicolon, split on semicolon
+    // Mirror splitTags in backend: trim, strip trailing semicolon, split on semicolon
     const raw = tagString.trim().replace(/;$/, "");
     const tokens = raw.split(";").map(t => t.trim()).filter(Boolean);
 
@@ -82,22 +74,9 @@
     ];
   };
 
-  // ---------------------------------------------------------------------------
-  // QUEUE STATE
-  //
-  // Each entry stores the Date object directly (not date.toString()) so that
-  // round-trip re-hydration via editEntry is lossless. date.toString() is only
-  // called at send time when building the API payload.
-  // ---------------------------------------------------------------------------
-  let queue = [];
-
-  // ---------------------------------------------------------------------------
-  // DUPLICATE DETECTION
-  // Non-blocking — surfaces a warning but does not prevent adding to the queue.
-  // ---------------------------------------------------------------------------
   const checkForDuplicates = (incomingUrl, incomingTitle) => {
-    const urlMatch = queue.find(e => e.url === incomingUrl);
-    const titleMatch = queue.find(e => e.title === incomingTitle);
+    const urlMatch = $articleQueue.find(e => e.url === incomingUrl);
+    const titleMatch = $articleQueue.find(e => e.title === incomingTitle);
     if (urlMatch && titleMatch) return "This URL and title are already in the queue.";
     if (urlMatch) return "This URL is already in the queue.";
     if (titleMatch) return "This title is already in the queue.";
@@ -112,8 +91,8 @@
 
     duplicateWarning = checkForDuplicates(url.trim(), title.trim());
 
-    queue = [
-      ...queue,
+    $articleQueue = [
+      ...$articleQueue,
       {
         url: url.trim(),
         title: title.trim(),
@@ -129,21 +108,12 @@
   };
 
   const removeFromQueue = (index) => {
-    queue = queue.filter((_, i) => i !== index);
+    $articleQueue = $articleQueue.filter((_, i) => i !== index);
   };
 
-  // ---------------------------------------------------------------------------
   // EDIT ENTRY
-  //
-  // Pulls an entry out of the queue and populates the form with its data so
-  // the admin can correct it and re-add it. The entry is removed from the queue
-  // immediately to prevent duplicates.
-  //
-  // Because date is stored as a Date object, it binds directly to DateInput
-  // without any string parsing — no timezone risk.
-  // ---------------------------------------------------------------------------
   const editEntry = (index) => {
-    const entry = queue[index];
+    const entry = $articleQueue[index];
     url = entry.url;
     title = entry.title;
     // Reconstruct the tags string from parsedTags display values so the
@@ -153,29 +123,22 @@
     must_read = entry.must_read === "on";
     formError = "";
     duplicateWarning = "";
-    queue = queue.filter((_, i) => i !== index);
+    $articleQueue = $articleQueue.filter((_, i) => i !== index);
   };
 
-  // ---------------------------------------------------------------------------
   // SUBMISSION
-  //
-  // date.toString() is called here — once, at send time — on a Date object
-  // that has never been serialised and re-parsed. formatDate() on the backend
-  // strips the day-of-week and extracts "Mon DD YYYY", which ParseUnixTime
-  // parses with the "Jan 02 2006" layout.
-  // ---------------------------------------------------------------------------
   let isSubmitting = false;
   let submitStatus = "";
   let submitError = "";
 
   const sendToDatabase = async () => {
-    if (queue.length === 0) return;
+    if ($articleQueue.length === 0) return;
     isSubmitting = true;
     submitStatus = "";
 
     // Build the API payload: strip parsedTags (display only) and convert
     // the stored Date object to a string for the backend to parse.
-    const payload = queue.map(({ parsedTags, date, ...rest }) => ({
+    const payload = $articleQueue.map(({ parsedTags, date, ...rest }) => ({
       ...rest,
       date: date.toString(),
     }));
@@ -190,14 +153,14 @@
 
       if (response.error) {
         submitStatus = "error";
-        submitError = response.message ?? "Something went wrong. Your queue has been preserved — please try again.";
+        submitError = response.message ?? "Something went wrong. Your $articleQueue has been preserved — please try again.";
       } else {
         submitStatus = "success";
-        queue = [];
+        $articleQueue = [];
       }
     } catch (e) {
       submitStatus = "error";
-      submitError = "Request failed. Please check your connection. Your queue has been preserved.";
+      submitError = "Request failed. Please check your connection. Your $articleQueue has been preserved.";
     }
 
     isSubmitting = false;
@@ -294,7 +257,7 @@
 
     {#if duplicateWarning}
       <div class="alert alert-warning mt-3 py-2">
-        <span class="text-sm">⚠ {duplicateWarning} Check the queue below before sending.</span>
+        <span class="text-sm">⚠ {duplicateWarning} Check the $articleQueue below before sending.</span>
       </div>
     {/if}
   </div>
@@ -302,18 +265,18 @@
   <!-- ========================================================================
     QUEUE
   ========================================================================= -->
-  {#if queue.length > 0 || submitStatus === "success"}
+  {#if $articleQueue.length > 0 || submitStatus === "success"}
     <div class="card bg-base-100 shadow-sm border border-base-300 p-5 mx-5">
 
-      {#if submitStatus === "success" && queue.length === 0}
+      {#if submitStatus === "success" && $articleQueue.length === 0}
         <div class="alert alert-success max-w-fit">
           <span>All articles added successfully.</span>
         </div>
       {:else}
-        <!-- Queue header -->
+        <!-- $articleQueue header -->
         <div class="flex items-center justify-between mb-3">
           <p class="text-sm font-medium opacity-70">
-            {queue.length} article{queue.length !== 1 ? "s" : ""} queued
+            {$articleQueue.length} article{$articleQueue.length !== 1 ? "s" : ""} queued
           </p>
           <button
             type="button"
@@ -323,11 +286,11 @@
           >
             {isSubmitting
               ? "Sending..."
-              : `Send ${queue.length} article${queue.length !== 1 ? "s" : ""} to database`}
+              : `Send ${$articleQueue.length} article${$articleQueue.length !== 1 ? "s" : ""} to database`}
           </button>
         </div>
 
-        <!-- Queue table -->
+        <!-- $articleQueue table -->
         <table class="table table-compact w-full table-fixed text-sm">
           <thead>
             <tr>
@@ -342,7 +305,7 @@
             </tr>
           </thead>
           <tbody>
-            {#each queue as entry, i}
+            {#each $articleQueue as entry, i}
               <tr>
                 <td>
                   <span class="block truncate">{entry.title}</span>
