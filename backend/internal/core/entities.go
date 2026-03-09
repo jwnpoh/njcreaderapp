@@ -1,6 +1,8 @@
 package core
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -31,10 +33,11 @@ type ArticlePayload []struct {
 
 // Long is the entity that represents articles in the longer reads section
 type Long struct {
-	ID    uuid.UUID `json:"id,omitempty"`
-	Title string    `json:"title,omitempty"`
-	URL   string    `json:"url,omitempty"`
-	Topic string    `json:"topic,omitempty"`
+	ID       uuid.UUID `json:"id,omitempty"`
+	Title    string    `json:"title,omitempty"`
+	URL      string    `json:"url,omitempty"`
+	Topic    string    `json:"topic,omitempty"`
+	StoredOn time.Time `json:"stored_on, omitempty"`
 }
 
 // LongSeries is a slice of Longs to transport between database, appilcation, and frontend.

@@ -3,6 +3,7 @@ package cockroach
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/jwnpoh/njcreaderapp/backend/internal/core"
 )
@@ -55,7 +56,7 @@ func (lDB *LongsDB) Get(topic string) (*core.LongSeries, error) {
 
 	longs := make(core.LongSeries, 0)
 
-	query := "SELECT * FROM long WHERE topic = $1 ORDER BY unique_rowid() DESC"
+	query := "SELECT * FROM long WHERE topic = $1 ORDER BY stored_on DESC, id DESC"
 
 	if topic == "all" {
 		query = "SELECT * FROM long"
@@ -68,7 +69,7 @@ func (lDB *LongsDB) Get(topic string) (*core.LongSeries, error) {
 
 	for rows.Next() {
 		var long core.Long
-		err = rows.Scan(&long.ID, &long.Title, &long.URL, &long.Topic)
+		err = rows.Scan(&long.ID, &long.Title, &long.URL, &long.Topic, &long.StoredOn)
 		if err != nil {
 			return nil, fmt.Errorf("CockroachLong: error scanning row - %w", err)
 		}
@@ -81,7 +82,7 @@ func (lDB *LongsDB) Get(topic string) (*core.LongSeries, error) {
 func (lDB *LongsDB) GetAll() (*core.LongSeries, error) {
 	longs := make(core.LongSeries, 0)
 
-	query := "SELECT * FROM long ORDER BY unique_rowid() DESC"
+	query := "SELECT * FROM long ORDER BY stored_on DESC, id DESC"
 
 	rows, err := lDB.DB.Queryx(query)
 	if err != nil {
@@ -90,7 +91,7 @@ func (lDB *LongsDB) GetAll() (*core.LongSeries, error) {
 
 	for rows.Next() {
 		var long core.Long
-		err = rows.Scan(&long.ID, &long.Title, &long.URL, &long.Topic)
+		err = rows.Scan(&long.ID, &long.Title, &long.URL, &long.Topic, &long.StoredOn)
 		if err != nil {
 			return nil, fmt.Errorf("CockroachLong: error scanning row - %w", err)
 		}
@@ -100,7 +101,7 @@ func (lDB *LongsDB) GetAll() (*core.LongSeries, error) {
 	return &longs, nil
 }
 func (lDB *LongsDB) Store(data *core.LongPayload) error {
-	query := "INSERT INTO long (title, url, topic) VALUES ($1, $2, $3)"
+	query := "INSERT INTO long (title, url, topic, stored_on) VALUES ($1, $2, $3, NOW())"
 
 	tx, err := lDB.DB.Begin()
 	if err != nil {
@@ -151,24 +152,53 @@ func (lDB *LongsDB) Update(data *core.Long) error {
 	return nil
 }
 
-func (lDB *LongsDB) Delete(ids string) error {
-	query := fmt.Sprintf("DELETE FROM long WHERE id in (%s)", ids)
+func (lDB *LongsDB) Delete(ids []string) error {
+	query := "DELETE FROM long WHERE id = $1"
+
+	// var uuids []uuid.UUID
 
 	tx, err := lDB.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("CockroachLong: unable to begin tx for deleting long articles from db - %w", err)
+		return fmt.Errorf("cockroachArticles: unable to begin tx for deleting long from db - %w", err)
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(query)
-	if err != nil {
-		return fmt.Errorf("CockroachLong: unable to delete long articles from db - %w", err)
+	for _, id := range ids {
+		uuid, err := uuid.Parse(id)
+		if err != nil {
+			return fmt.Errorf("cockroachArticles: unable to parse uuid from string uuid - %w", err)
+		}
+		// uuids = append(uuids, uuid)
+
+		_, err = tx.Exec(query, uuid)
+		if err != nil {
+			return fmt.Errorf("cockroachArticles: unable to delete long from db - %w", err)
+		}
+
+		// err = tx.Commit()
+		// if err != nil {
+		// 	return fmt.Errorf("cockroachArticles: unable to commit tx to delet long from db - %w", err)
+		// }
 	}
 
-	err = tx.Commit()
-	if err != nil {
-		return fmt.Errorf("CockroachLong: unable to commit tx to delete long articles from db - %w", err)
-	}
+	return tx.Commit()
+	// query := fmt.Sprintf("DELETE FROM long WHERE id in (%s)", ids)
 
-	return nil
+	// tx, err := lDB.DB.Begin()
+	// if err != nil {
+	// 	return fmt.Errorf("CockroachLong: unable to begin tx for deleting long articles from db - %w", err)
+	// }
+	// defer tx.Rollback()
+
+	// _, err = tx.Exec(query)
+	// if err != nil {
+	// 	return fmt.Errorf("CockroachLong: unable to delete long articles from db - %w", err)
+	// }
+
+	// err = tx.Commit()
+	// if err != nil {
+	// 	return fmt.Errorf("CockroachLong: unable to commit tx to delete long articles from db - %w", err)
+	// }
+
+	// return nil
 }

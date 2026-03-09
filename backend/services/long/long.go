@@ -18,7 +18,7 @@ type LongsDB interface {
 	Get(topic string) (*core.LongSeries, error)
 	Store(data *core.LongPayload) error
 	Update(data *core.Long) error
-	Delete(ids string) error
+	Delete(ids []string) error
 }
 
 type Longs struct {
@@ -77,11 +77,9 @@ func (l *Longs) Update(data *core.Long) (serializer.Serializer, error) {
 
 // Delete takes an input of a slice of ids of string type to send to database for a bulk row delete query matching the article id.
 func (l *Longs) Delete(input []string) (serializer.Serializer, error) {
-	ids := strings.Join(input, ", ")
-
-	err := l.db.Delete(ids)
+	err := l.db.Delete(input)
 	if err != nil {
-		return nil, fmt.Errorf("unable to delete long articles %s - %w", ids, err)
+		return nil, fmt.Errorf("unable to delete long articles %s - %w", input, err)
 	}
 
 	return serializer.NewSerializer(false, "successfully deleted long articles", nil), nil
