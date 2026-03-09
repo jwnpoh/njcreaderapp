@@ -1,4 +1,4 @@
-import { redirect } from "@sveltejs/kit"
+import { redirect  } from "@sveltejs/kit"
 import "dotenv/config"
 
 export async function load({ fetch, cookies, locals }) {
