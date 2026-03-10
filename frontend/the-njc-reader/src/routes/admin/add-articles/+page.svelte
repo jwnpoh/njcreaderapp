@@ -191,11 +191,13 @@
           <span class="label-text text-xs opacity-60">Article URL</span>
         </label>
         <input
+          name="url"
           type="url"
           placeholder="https://..."
           class="input input-bordered input-sm w-full"
           bind:value={url}
           on:input={() => getTitle(url)}
+          autocomplete="url"
         />
       </div>
 
@@ -226,10 +228,12 @@
           </span>
         </label>
         <input
+          name="title"
           type="text"
           placeholder="Auto-filled from URL"
           class="input input-bordered input-sm w-full"
           bind:value={title}
+          autocomplete="off"
         />
       </div>
 
@@ -238,10 +242,12 @@
           <span class="label-text text-xs opacity-60">Tags</span>
         </label>
         <input
+          name="tags"
           type="text"
           placeholder="e.g. 2019-Q6; leadership"
           class="input input-bordered input-sm w-full"
           bind:value={tags}
+          autocomplete="on"
         />
       </div>
     </div>
